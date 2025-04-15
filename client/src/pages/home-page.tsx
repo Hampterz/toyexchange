@@ -177,7 +177,7 @@ export default function HomePage() {
       {/* Fixed action button - desktop only */}
       <div className="hidden md:block fixed right-6 bottom-6 z-40">
         <Button 
-          className="h-14 w-14 rounded-full bg-primary shadow-lg flex items-center justify-center text-white hover:bg-primary/90"
+          className="h-14 w-14 rounded-full bg-blue-700 shadow-lg flex items-center justify-center text-white hover:bg-blue-800 transform transition hover:scale-105"
           onClick={() => setIsAddToyModalOpen(true)}
           aria-label="Add toy"
         >

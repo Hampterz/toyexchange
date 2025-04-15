@@ -191,16 +191,31 @@ export function RequestToyModal({ toy, isOpen, onClose }: RequestToyModalProps) 
             </div>
           </div>
           
+          {!user ? (
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200 text-center">
+              <p className="text-blue-800 mb-3">You need to be logged in to request toys</p>
+              <Button 
+                className="bg-blue-700 hover:bg-blue-800"
+                onClick={() => {
+                  onClose();
+                  window.location.href = '/auth';
+                }}
+              >
+                Sign In or Register
+              </Button>
+            </div>
+          ) : null}
+          
           <div className="flex space-x-3">
             <Button 
               variant="outline" 
-              className="flex-1" 
+              className="flex-1 border-blue-200 text-blue-800" 
               onClick={handleCancel}
             >
               Cancel
             </Button>
             <Button 
-              className="flex-1 bg-primary hover:bg-primary/90" 
+              className="flex-1 bg-blue-700 hover:bg-blue-800" 
               onClick={handleSubmit}
               disabled={isSubmitting || !user || !message || !acceptedGuidelines}
             >
