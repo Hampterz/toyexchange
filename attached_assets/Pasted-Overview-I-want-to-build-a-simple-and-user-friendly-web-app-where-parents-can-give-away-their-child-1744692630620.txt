@@ -1,0 +1,76 @@
+Overview:
+I want to build a simple and user-friendly web app where parents can give away their children's unused or gently-used toys to other families for free. The goal is to reduce waste, encourage sharing, and help families who may not be able to afford new toys. Think of it as a Craigslist or Facebook Marketplace, but specifically for free toy exchanges and built with a clean, modern, and safe interface for parents.
+
+Key Features:
+
+User Registration and Profiles
+
+Parents can sign up using email, Google, or Facebook
+
+Each profile includes a name, general location (city or ZIP only, no full address), and their posted toys
+
+Post a Toy
+
+Upload toy details: title, description, age range, condition (new, like new, used), and category (plush, action figure, educational, etc.)
+
+Upload up to 4 images
+
+Select pickup location (approximate area or meet-up spot, no home addresses shown)
+
+Browse Toys
+
+Filter by location, age range, category, or condition
+
+Search by keyword
+
+Option to “favorite” a listing for later
+
+Request a Toy
+
+Button to “Request Toy”
+
+Sender must write a short message to the toy owner
+
+Owner gets notified and can approve or reject the request
+
+Messaging
+
+Basic in-app messaging system for arranging pickups
+
+No personal contact info needed until both parties are ready
+
+Safety and Moderation
+
+Report button on each listing or profile
+
+Admin dashboard to manage flagged posts or users
+
+Responsive Design
+
+Fully mobile-friendly and usable from any device
+
+Optional PWA (Progressive Web App) support for app-like experience on phones
+
+Community and Trust
+
+Optional feedback system after exchanges (emoji-based or 1-5 rating)
+
+Encourage kindness and honesty with community guidelines
+
+Sustainability Badge
+
+After a certain number of successful giveaways, users earn badges to highlight their positive environmental impact
+
+Tech Stack Suggestions (optional):
+
+Frontend: React with Tailwind CSS
+
+Backend: Node.js with Express
+
+Database: MongoDB or Firebase
+
+Auth: Firebase Auth or Auth0
+
+Hosting: Vercel or Netlify for frontend, Render or Railway for backend
+
+Image Storage: Cloudinary
