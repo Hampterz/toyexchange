@@ -187,12 +187,28 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         </DialogHeader>
 
         {!user ? (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              You need to be signed in to share toys. Please sign in or create an account.
-            </AlertDescription>
-          </Alert>
+          <div className="space-y-4">
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <div className="flex items-start">
+                <AlertCircle className="h-5 w-5 text-blue-700 mt-0.5 mr-2" />
+                <div>
+                  <h3 className="font-medium text-blue-800 mb-1">Sign in required</h3>
+                  <p className="text-blue-700 mb-4">
+                    You need to be signed in to share toys. Please sign in or create an account to continue.
+                  </p>
+                  <Button 
+                    className="bg-blue-700 hover:bg-blue-800"
+                    onClick={() => {
+                      onClose();
+                      window.location.href = '/auth';
+                    }}
+                  >
+                    Sign In or Register
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -378,13 +394,13 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   type="button" 
                   variant="outline" 
                   onClick={onClose} 
-                  className="flex-1"
+                  className="flex-1 border-blue-200 text-blue-800"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  className="flex-1 bg-primary hover:bg-primary/90" 
+                  className="flex-1 bg-blue-700 hover:bg-blue-800" 
                   disabled={isUploading || addToyMutation.isPending}
                 >
                   {isUploading || addToyMutation.isPending ? "Uploading..." : "Share Toy"}
