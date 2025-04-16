@@ -78,7 +78,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
+    <div className="page-transition">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row md:items-start gap-8">
           {/* Profile Section */}
@@ -149,7 +149,7 @@ export default function ProfilePage() {
                         />
                       </div>
                       <Button 
-                        className="w-full mt-2" 
+                        className="w-full mt-2 btn-animated" 
                         onClick={handleSaveProfile}
                         disabled={isLoading}
                       >
@@ -187,11 +187,11 @@ export default function ProfilePage() {
           <div className="md:w-2/3">
             <Tabs defaultValue="toys" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="toys">Your Listings</TabsTrigger>
-                <TabsTrigger value="requests">
+                <TabsTrigger value="toys" className="click-scale">Your Listings</TabsTrigger>
+                <TabsTrigger value="requests" className="click-scale">
                   Requests
                   {receivedRequests?.length > 0 && (
-                    <span className="ml-2 bg-orange-500 text-white text-xs py-0.5 px-2 rounded-full">
+                    <span className="ml-2 bg-orange-500 text-white text-xs py-0.5 px-2 rounded-full badge-pulse">
                       {receivedRequests.length}
                     </span>
                   )}
@@ -214,6 +214,6 @@ export default function ProfilePage() {
         isOpen={isAddToyModalOpen}
         onClose={() => setIsAddToyModalOpen(false)}
       />
-    </>
+    </div>
   );
 }

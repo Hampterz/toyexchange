@@ -59,3 +59,49 @@
 .badge-pulse {
   animation: pulse-badge 2s infinite;
 }
+
+/* Page transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Popup notifications */
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.notification-slide {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Button hover animation */
+@keyframes buttonGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.btn-glow:hover {
+  animation: buttonGlow 1.5s infinite;
+}

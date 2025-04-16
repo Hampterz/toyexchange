@@ -32,7 +32,7 @@ export default function HomePage() {
   };
 
   return (
-    <>
+    <div className="page-transition">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-700 to-blue-900 py-14 mb-6 rounded-b-3xl shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -183,6 +183,6 @@ export default function HomePage() {
         isOpen={isAddToyModalOpen}
         onClose={() => setIsAddToyModalOpen(false)}
       />
-    </>
+    </div>
   );
 }

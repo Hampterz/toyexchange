@@ -61,7 +61,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 page-transition">
       <div className="max-w-6xl w-full flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Left Side - Auth Forms */}
         <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
@@ -117,7 +117,7 @@ export default function AuthPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full bg-blue-700 hover:bg-blue-800"
+                        className="w-full bg-blue-700 hover:bg-blue-800 btn-animated"
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? "Signing in..." : "Sign In"}
