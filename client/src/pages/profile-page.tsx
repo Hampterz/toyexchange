@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { MobileNav } from "@/components/layout/mobile-nav";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,10 +77,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row md:items-start gap-8">
           {/* Profile Section */}
           <div className="md:w-1/3">
@@ -208,15 +203,12 @@ export default function ProfilePage() {
             </Tabs>
           </div>
         </div>
-      </main>
-
-      <Footer />
-      <MobileNav onAddToyClick={() => setIsAddToyModalOpen(true)} />
+      </div>
       
       <AddToyModal
         isOpen={isAddToyModalOpen}
         onClose={() => setIsAddToyModalOpen(false)}
       />
-    </div>
+    </>
   );
 }
