@@ -285,6 +285,29 @@ export class MemStorage implements IStorage {
   async deleteFavorite(id: number): Promise<boolean> {
     return this.favoritesMap.delete(id);
   }
+
+  // ContactMessage CRUD methods
+  async getContactMessage(id: number): Promise<ContactMessage | undefined> {
+    return this.contactMessagesMap.get(id);
+  }
+
+  async getAllContactMessages(): Promise<ContactMessage[]> {
+    return Array.from(this.contactMessagesMap.values())
+      .sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        }
+        return 0;
+      });
+  }
+
+  async createContactMessage(insertContactMessage: InsertContactMessage): Promise<ContactMessage> {
+    const id = this.contactMessageCurrentId++;
+    const createdAt = new Date();
+    const contactMessage: ContactMessage = { ...insertContactMessage, id, createdAt };
+    this.contactMessagesMap.set(id, contactMessage);
+    return contactMessage;
+  }
 }
 
 export const storage = new MemStorage();

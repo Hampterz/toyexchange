@@ -6,7 +6,8 @@ import {
   insertToySchema,
   insertMessageSchema,
   insertToyRequestSchema,
-  insertFavoriteSchema
+  insertFavoriteSchema,
+  insertContactMessageSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -379,6 +380,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ favorited: !!favorite });
     } catch (error) {
       res.status(500).json({ message: "Failed to check favorite status" });
+    }
+  });
+
+  // CONTACT MESSAGE ROUTES
+  // Submit a contact form message
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const contactData = req.body;
+      
+      const validatedData = insertContactMessageSchema.parse(contactData);
+      const contactMessage = await storage.createContactMessage(validatedData);
+      
+      // In a real implementation, this would also send an email to the support address
+      // using the SendGrid API with the SENDGRID_API_KEY
+      
+      res.status(201).json({ 
+        success: true, 
+        message: "Your message has been received. We'll get back to you soon.",
+        id: contactMessage.id
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid form data", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to submit contact message" 
+      });
+    }
+  });
+
+  // Get all contact messages (admin only - would have authorization in real app)
+  app.get("/api/contact/messages", ensureAuthenticated, async (req, res) => {
+    try {
+      // In a real app, this would check for admin role
+      const messages = await storage.getAllContactMessages();
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch contact messages" });
     }
   });
 
