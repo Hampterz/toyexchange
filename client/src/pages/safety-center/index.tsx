@@ -1,134 +1,283 @@
-import React from "react";
-import { Link } from "wouter";
+import React, { useState } from "react";
+import { Shield, MapPin, AlertTriangle, Users, CheckCircle, Share, MessageCircle, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SafetyCenter() {
-  const safetyTopics = [
-    {
-      title: "Safe Exchanges",
-      description: "Learn best practices for arranging safe toy exchanges",
-      icon: "🤝",
-      link: "/resources/safety-tips"
-    },
-    {
-      title: "Account Security",
-      description: "Tips for keeping your ToyShare account secure",
-      icon: "🔒",
-      link: "/safety-center/account-security"
-    },
-    {
-      title: "Toy Safety Standards",
-      description: "Information about toy safety requirements and regulations",
-      icon: "🧸",
-      link: "/safety-center/toy-safety"
-    },
-    {
-      title: "Reporting Issues",
-      description: "How to report safety concerns or violations",
-      icon: "🚨",
-      link: "/safety-center/reporting"
-    },
-    {
-      title: "Privacy Protection",
-      description: "Understanding how we protect your personal information",
-      icon: "🛡️",
-      link: "/legal/privacy-policy"
-    },
-    {
-      title: "Community Standards",
-      description: "Our guidelines for a respectful community",
-      icon: "👥",
-      link: "/resources/community-guidelines"
-    }
-  ];
+  const [activeTab, setActiveTab] = useState("guidelines");
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-12">
-      <div className="mb-8">
-        <Link href="/" className="text-blue-700 hover:underline flex items-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Home
-        </Link>
-        <h1 className="text-3xl font-bold text-blue-900 mb-2">Safety Center</h1>
-        <p className="text-blue-700 border-b border-blue-100 pb-4">Resources to ensure a safe and positive experience on ToyShare</p>
-      </div>
-
-      <div className="bg-blue-50 rounded-xl p-6 mb-12">
-        <div className="flex flex-col md:flex-row items-start md:items-center">
-          <div className="bg-blue-700 rounded-full p-3 text-white mb-4 md:mb-0 md:mr-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col">
+        <div className="text-center mb-10">
+          <div className="inline-flex justify-center items-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+            <Shield className="h-8 w-8 text-blue-700" />
           </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-blue-900 mb-2">Your Safety is Our Priority</h2>
-            <p className="text-blue-800">
-              At ToyShare, we're committed to creating a safe platform for families to share toys. Our Safety Center provides resources 
-              and guidance to help you navigate our platform with confidence and peace of mind.
-            </p>
-          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-4">ToyShare Safety Center</h1>
+          <p className="text-lg text-blue-700 max-w-2xl mx-auto">
+            We're committed to creating a safe environment for families to share toys. 
+            Learn about our safety guidelines and best practices.
+          </p>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {safetyTopics.map((topic, index) => (
-          <Link key={index} href={topic.link}>
-            <div className="border border-blue-100 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
-              <div className="text-4xl mb-4">{topic.icon}</div>
-              <h3 className="text-xl font-semibold text-blue-800 mb-2">{topic.title}</h3>
-              <p className="text-gray-600 mb-4 flex-grow">{topic.description}</p>
-              <div className="text-blue-700 font-medium flex items-center mt-auto">
-                Learn more
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+        
+        <Tabs defaultValue="guidelines" className="max-w-4xl mx-auto mb-12">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="guidelines" onClick={() => setActiveTab("guidelines")}>Safety Guidelines</TabsTrigger>
+            <TabsTrigger value="meetups" onClick={() => setActiveTab("meetups")}>Safe Meetups</TabsTrigger>
+            <TabsTrigger value="report" onClick={() => setActiveTab("report")}>Report Issues</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="guidelines" className="mt-6">
+            <Alert className="mb-6 bg-blue-50 border-blue-200">
+              <AlertTriangle className="h-5 w-5 text-blue-700" />
+              <AlertTitle className="text-blue-800 font-medium">Safety First</AlertTitle>
+              <AlertDescription className="text-blue-800">
+                Always prioritize your family's safety when participating in toy exchanges.
+              </AlertDescription>
+            </Alert>
+            
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger className="text-blue-700 font-medium">Verify User Profiles</AccordionTrigger>
+                <AccordionContent className="text-blue-700">
+                  <p>Always check user profiles before arranging a meetup. Look for:</p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Completed profile with real name and location</li>
+                    <li>Profile picture (preferably family appropriate)</li>
+                    <li>Sustainability badges and exchange history</li>
+                    <li>Reviews from other users</li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-2">
+                <AccordionTrigger className="text-blue-700 font-medium">Communication Safety</AccordionTrigger>
+                <AccordionContent className="text-blue-700">
+                  <p>Keep all communication within the ToyShare platform:</p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Use our messaging system for all exchanges</li>
+                    <li>Don't share personal contact information until you're comfortable</li>
+                    <li>Report suspicious communication immediately</li>
+                    <li>Never share financial information with other users</li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-3">
+                <AccordionTrigger className="text-blue-700 font-medium">Toy Safety Guidelines</AccordionTrigger>
+                <AccordionContent className="text-blue-700">
+                  <p>Before sharing or accepting toys:</p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Check for safety recalls on <a href="https://www.cpsc.gov/Recalls" target="_blank" rel="noopener noreferrer" className="underline">CPSC.gov</a></li>
+                    <li>Inspect toys for damage, sharp edges, or small parts</li>
+                    <li>Clean and sanitize toys before and after exchanges</li>
+                    <li>Be honest about the condition and age-appropriateness</li>
+                    <li>Never share toys with significant damage or missing safety features</li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="item-4">
+                <AccordionTrigger className="text-blue-700 font-medium">Trust Indicators</AccordionTrigger>
+                <AccordionContent className="text-blue-700">
+                  <p>Build trust in the community by:</p>
+                  <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Starting with smaller exchanges before large items</li>
+                    <li>Providing detailed descriptions and clear photos</li>
+                    <li>Responding promptly to messages</li>
+                    <li>Following through on exchange agreements</li>
+                    <li>Leaving honest feedback after exchanges</li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </TabsContent>
+          
+          <TabsContent value="meetups" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-blue-200">
+                <CardHeader>
+                  <CardTitle className="text-blue-700 flex items-center">
+                    <MapPin className="h-5 w-5 mr-2" /> Recommended Meetup Locations
+                  </CardTitle>
+                  <CardDescription>
+                    Always choose public, well-populated areas for exchanges
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-blue-700">
+                  <ul className="space-y-2">
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Library or community center lobbies</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Coffee shops and family-friendly restaurants</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Shopping mall common areas</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Police station lobbies (safest option)</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Grocery store or pharmacy parking lots (during daylight)</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-blue-200">
+                <CardHeader>
+                  <CardTitle className="text-blue-700 flex items-center">
+                    <AlertTriangle className="h-5 w-5 mr-2" /> Safety Precautions
+                  </CardTitle>
+                  <CardDescription>
+                    Tips to keep your family safe during exchanges
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-blue-700">
+                  <ul className="space-y-2">
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Bring a friend or family member with you</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Meet during daylight hours</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Tell someone where you're going and when</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Use your phone's location sharing with a trusted person</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
+                      <span>Trust your instincts - leave if something feels wrong</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="bg-white border border-blue-100 rounded-lg p-6 mb-12">
-        <h2 className="text-2xl font-semibold text-blue-900 mb-4">Emergency Resources</h2>
-        <p className="text-gray-700 mb-6">
-          In case of an emergency that requires immediate attention:
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border-l-4 border-red-500 pl-4">
-            <h3 className="font-semibold text-gray-800">Emergency Services</h3>
-            <p className="text-gray-600">Call 911 (US) or your local emergency number</p>
+            
+            <Alert className="mt-6 bg-yellow-50 border-yellow-200">
+              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              <AlertTitle className="text-yellow-800 font-medium">Never meet at your home</AlertTitle>
+              <AlertDescription className="text-yellow-700">
+                For your family's safety, always meet in public places. Never invite strangers to your home
+                or agree to meet at their residence for toy exchanges.
+              </AlertDescription>
+            </Alert>
+          </TabsContent>
+          
+          <TabsContent value="report" className="mt-6">
+            <Card className="border-blue-200 mb-6">
+              <CardHeader>
+                <CardTitle className="text-blue-700">Reporting Issues</CardTitle>
+                <CardDescription>
+                  ToyShare takes safety concerns seriously. If you encounter any issues with users or exchanges,
+                  please report them immediately.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="mr-4 bg-blue-100 p-2 rounded-full">
+                      <AlertTriangle className="h-5 w-5 text-blue-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-blue-700">When to Report</h3>
+                      <ul className="list-disc pl-5 mt-1 text-blue-600 space-y-1">
+                        <li>Suspicious user behavior or communication</li>
+                        <li>Unsafe or recalled toys being shared</li>
+                        <li>Misrepresented toy condition or details</li>
+                        <li>Inappropriate messages or content</li>
+                        <li>No-shows at arranged meetups</li>
+                        <li>Any other safety concerns</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="mr-4 bg-blue-100 p-2 rounded-full">
+                      <Info className="h-5 w-5 text-blue-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-blue-700">How to Report</h3>
+                      <p className="text-blue-600 mt-1">
+                        You can report issues through:
+                      </p>
+                      <ul className="list-disc pl-5 mt-1 text-blue-600 space-y-1">
+                        <li>The Report button on user profiles</li>
+                        <li>The Report option on toy listings</li>
+                        <li>The Report option in message threads</li>
+                        <li>Contacting our support team directly</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <Button className="w-full bg-blue-700 hover:bg-blue-800">
+                    Contact Support
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Alert className="bg-blue-50 border-blue-200">
+              <Shield className="h-5 w-5 text-blue-700" />
+              <AlertTitle className="text-blue-800 font-medium">Community Moderation</AlertTitle>
+              <AlertDescription className="text-blue-700">
+                Our team reviews all reports within 24 hours. Serious safety violations may result in immediate
+                account suspension. We work with local authorities when necessary to ensure community safety.
+              </AlertDescription>
+            </Alert>
+          </TabsContent>
+        </Tabs>
+        
+        <div className="mt-12 text-center">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">Our Safety Commitment</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+              <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-6 w-6 text-blue-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Verified Users</h3>
+              <p className="text-blue-700">
+                We verify user information and encourage community ratings to build trust.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+              <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-6 w-6 text-blue-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">In-App Messaging</h3>
+              <p className="text-blue-700">
+                Our secure messaging system keeps communication safe until you're ready to meet.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+              <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-6 w-6 text-blue-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Moderated Content</h3>
+              <p className="text-blue-700">
+                We actively monitor listings and messages to ensure a safe, family-friendly environment.
+              </p>
+            </div>
           </div>
-          <div className="border-l-4 border-yellow-500 pl-4">
-            <h3 className="font-semibold text-gray-800">Report Urgent Platform Issues</h3>
-            <p className="text-gray-600">Email: urgent@toyshare.example.com</p>
-          </div>
-          <div className="border-l-4 border-blue-500 pl-4">
-            <h3 className="font-semibold text-gray-800">Child Safety Concerns</h3>
-            <p className="text-gray-600">National Child Abuse Hotline: 1-800-4-A-CHILD</p>
-          </div>
-          <div className="border-l-4 border-green-500 pl-4">
-            <h3 className="font-semibold text-gray-800">Product Safety Recalls</h3>
-            <p className="text-gray-600">CPSC: <a href="https://www.cpsc.gov/Recalls" className="text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer">www.cpsc.gov/Recalls</a></p>
-          </div>
-        </div>
-      </div>
-
-      <div className="text-center mb-12">
-        <h2 className="text-2xl font-semibold text-blue-900 mb-6">Still Have Questions?</h2>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/resources/faq" className="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Visit our FAQ
-          </Link>
-          <Link href="/resources/contact-support" className="inline-flex items-center px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Contact Support
-          </Link>
         </div>
       </div>
     </div>

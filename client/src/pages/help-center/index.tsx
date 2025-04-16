@@ -1,377 +1,293 @@
-import React, { useState } from "react";
-import { Link } from "wouter";
-import { Input } from "@/components/ui/input";
+import React from "react";
+import { HelpCircle, Send, Search, Mail, MessageSquare, BookOpen, LifeBuoy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function HelpCenter() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Common help categories
-  const helpCategories = [
-    {
-      title: "Getting Started",
-      icon: "🚀",
-      links: [
-        { title: "Creating an Account", href: "/help-center/create-account" },
-        { title: "Setting Up Your Profile", href: "/help-center/setup-profile" },
-        { title: "Finding Toys Near You", href: "/help-center/find-toys" },
-        { title: "Toy Exchange Process", href: "/help-center/exchange-process" }
-      ]
-    },
-    {
-      title: "Sharing Toys",
-      icon: "🧸",
-      links: [
-        { title: "Creating a Toy Listing", href: "/help-center/create-listing" },
-        { title: "Taking Good Photos", href: "/help-center/toy-photos" },
-        { title: "Setting Age Ranges", href: "/help-center/age-ranges" },
-        { title: "Managing Your Toy Inventory", href: "/help-center/manage-inventory" }
-      ]
-    },
-    {
-      title: "Account Management",
-      icon: "👤",
-      links: [
-        { title: "Update Your Information", href: "/help-center/update-info" },
-        { title: "Password Recovery", href: "/help-center/password-recovery" },
-        { title: "Notification Settings", href: "/help-center/notifications" },
-        { title: "Deleting Your Account", href: "/help-center/delete-account" }
-      ]
-    },
-    {
-      title: "Safety & Security",
-      icon: "🔒",
-      links: [
-        { title: "Safe Exchange Tips", href: "/resources/safety-tips" },
-        { title: "Privacy Settings", href: "/help-center/privacy-settings" },
-        { title: "Reporting Issues", href: "/safety-center/reporting" },
-        { title: "Toy Safety Standards", href: "/safety-center/toy-safety" }
-      ]
-    },
-    {
-      title: "Communication",
-      icon: "💬",
-      links: [
-        { title: "Messaging Other Users", href: "/help-center/messaging" },
-        { title: "Message Notifications", href: "/help-center/message-notifications" },
-        { title: "Communication Guidelines", href: "/resources/community-guidelines" },
-        { title: "Blocking Users", href: "/help-center/blocking" }
-      ]
-    },
-    {
-      title: "Troubleshooting",
-      icon: "🔧",
-      links: [
-        { title: "App Not Working", href: "/help-center/app-issues" },
-        { title: "Missing Toys or Messages", href: "/help-center/missing-content" },
-        { title: "Payment Problems", href: "/help-center/payment-issues" },
-        { title: "Login Issues", href: "/help-center/login-help" }
-      ]
-    }
-  ];
-
-  // Frequently asked questions
-  const faqs = [
-    {
-      question: "How do I share a toy?",
-      answer: "To share a toy, log in to your account, click the 'Add Toy' button, fill out the form with details and photos, and submit your listing.",
-      href: "/help-center/create-listing"
-    },
-    {
-      question: "How do I arrange a toy exchange?",
-      answer: "When you find a toy you want, click 'Request' and message the owner to arrange a meetup time and location that works for both of you.",
-      href: "/help-center/exchange-process"
-    },
-    {
-      question: "Is ToyShare free to use?",
-      answer: "Yes, ToyShare is completely free. We don't charge any fees for listing, requesting, or exchanging toys.",
-      href: "/resources/faq"
-    },
-    {
-      question: "How do I update my location?",
-      answer: "Go to your profile settings, click on 'Edit Profile', update your location information, and save your changes.",
-      href: "/help-center/update-info"
-    }
-  ];
-
-  // Filter categories based on search query
-  const filteredCategories = searchQuery
-    ? helpCategories.map(category => ({
-        ...category,
-        links: category.links.filter(link => 
-          link.title.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(category => category.links.length > 0)
-    : helpCategories;
-
-  // Filter FAQs based on search query
-  const filteredFaqs = searchQuery
-    ? faqs.filter(faq =>
-        faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : faqs;
-
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-12">
-      <div className="mb-8">
-        <Link href="/" className="text-blue-700 hover:underline flex items-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Home
-        </Link>
-        <h1 className="text-3xl font-bold text-blue-900 mb-2">Help Center</h1>
-        <p className="text-blue-700 border-b border-blue-100 pb-4">Find answers and learn how to get the most out of ToyShare</p>
-      </div>
-
-      {/* Search */}
-      <div className="mb-10">
-        <div className="relative max-w-2xl mx-auto">
-          <Input
-            type="text"
-            placeholder="Search for help topics..."
-            className="pl-10 py-6 text-lg border-blue-200 focus-visible:ring-blue-700"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          {searchQuery && (
-            <button
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              onClick={() => setSearchQuery("")}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col">
+        <div className="text-center mb-10">
+          <div className="inline-flex justify-center items-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+            <HelpCircle className="h-8 w-8 text-blue-700" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-4">Help Center</h1>
+          <p className="text-lg text-blue-700 max-w-2xl mx-auto">
+            Find answers to common questions and learn how to make the most of ToyShare.
+          </p>
+        </div>
+        
+        {/* Search Section */}
+        <div className="max-w-3xl mx-auto mb-12 w-full">
+          <div className="bg-blue-50 rounded-lg p-6 mb-6">
+            <h2 className="text-xl font-semibold text-blue-800 mb-4">Find the answer you need</h2>
+            <div className="flex gap-2">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500" />
+                <Input
+                  type="text"
+                  placeholder="Search for help..."
+                  className="pl-10 border-blue-200 focus:border-blue-500"
                 />
-              </svg>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {searchQuery && filteredCategories.length === 0 && filteredFaqs.length === 0 && (
-        <div className="text-center py-10">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-16 w-16 mx-auto text-blue-200 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">No results found</h2>
-          <p className="text-gray-500 mb-6">We couldn't find any help topics matching "{searchQuery}"</p>
-          <Button
-            onClick={() => setSearchQuery("")}
-            className="bg-blue-700 hover:bg-blue-800"
-          >
-            Clear Search
-          </Button>
-        </div>
-      )}
-
-      {/* Help Categories */}
-      {filteredCategories.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-blue-900 mb-6">Help Topics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCategories.map((category, index) => (
-              <div key={index} className="border border-blue-100 rounded-lg overflow-hidden">
-                <div className="bg-blue-50 p-4 flex items-center">
-                  <span className="text-2xl mr-3">{category.icon}</span>
-                  <h3 className="text-xl font-semibold text-blue-800">{category.title}</h3>
-                </div>
-                <div className="p-4">
-                  <ul className="space-y-2">
-                    {category.links.map((link, linkIndex) => (
-                      <li key={linkIndex}>
-                        <Link
-                          href={link.href}
-                          className="text-blue-700 hover:underline hover:text-blue-900 flex items-center"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                          {link.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </div>
-            ))}
+              <Button className="bg-blue-700 hover:bg-blue-800">
+                Search
+              </Button>
+            </div>
           </div>
         </div>
-      )}
-
-      {/* Frequently Asked Questions */}
-      {filteredFaqs.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-blue-900 mb-6">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {filteredFaqs.map((faq, index) => (
-              <div key={index} className="border border-blue-100 rounded-lg p-5">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">{faq.question}</h3>
-                <p className="text-gray-700 mb-3">{faq.answer}</p>
-                <Link href={faq.href} className="text-blue-700 hover:underline text-sm flex items-center">
-                  Learn more
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3 w-3 ml-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
+        
+        {/* Help Categories */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-blue-100 transition-all hover:shadow-md">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-blue-700 flex items-center text-lg">
+                <BookOpen className="h-5 w-5 mr-2" /> Getting Started
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-blue-700">
+                <li className="hover:text-blue-500 cursor-pointer">How to create an account</li>
+                <li className="hover:text-blue-500 cursor-pointer">Setting up your profile</li>
+                <li className="hover:text-blue-500 cursor-pointer">Browsing available toys</li>
+                <li className="hover:text-blue-500 cursor-pointer">Understanding sustainability badges</li>
+              </ul>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-blue-100 transition-all hover:shadow-md">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-blue-700 flex items-center text-lg">
+                <MessageSquare className="h-5 w-5 mr-2" /> Sharing & Exchanging
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-blue-700">
+                <li className="hover:text-blue-500 cursor-pointer">How to list a toy</li>
+                <li className="hover:text-blue-500 cursor-pointer">Requesting a toy</li>
+                <li className="hover:text-blue-500 cursor-pointer">Meeting safely for exchanges</li>
+                <li className="hover:text-blue-500 cursor-pointer">Rating and feedback</li>
+              </ul>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-blue-100 transition-all hover:shadow-md">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-blue-700 flex items-center text-lg">
+                <LifeBuoy className="h-5 w-5 mr-2" /> Account & Support
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-blue-700">
+                <li className="hover:text-blue-500 cursor-pointer">Account settings</li>
+                <li className="hover:text-blue-500 cursor-pointer">Privacy options</li>
+                <li className="hover:text-blue-500 cursor-pointer">Reporting issues</li>
+                <li className="hover:text-blue-500 cursor-pointer">Contact support</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* FAQ Section */}
+        <div className="max-w-3xl mx-auto mb-12">
+          <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center">Frequently Asked Questions</h2>
+          
+          <Tabs defaultValue="general" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="sharing">Sharing Toys</TabsTrigger>
+              <TabsTrigger value="account">Account</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="general" className="pt-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger className="text-blue-700">What is ToyShare?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    ToyShare is a community platform where families can share gently-used toys they no longer need
+                    with other families. It promotes sustainability, reduces waste, and helps build community connections.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-2">
+                  <AccordionTrigger className="text-blue-700">Is ToyShare free to use?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    Yes! ToyShare is completely free to use. There are no membership fees or charges for
+                    listing or requesting toys. The platform is built around the principle of sharing and community.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-3">
+                  <AccordionTrigger className="text-blue-700">What types of toys can be shared?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    Almost any gently-used, clean, and safe toys can be shared. This includes board games, puzzles,
+                    stuffed animals, educational toys, outdoor play equipment, and more. We ask that all toys
+                    be in good condition, with all parts included, and suitable for the age ranges specified.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-4">
+                  <AccordionTrigger className="text-blue-700">What are sustainability badges?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    Sustainability badges are earned by active members who regularly share toys and complete
+                    successful exchanges. They represent your contribution to reducing waste and building
+                    a more sustainable community. The more you share, the higher your badge level becomes!
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </TabsContent>
+            
+            <TabsContent value="sharing" className="pt-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger className="text-blue-700">How do I list a toy for sharing?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    To list a toy, click the "Add Toy" button from the home page or your profile. Fill out the toy
+                    details including title, description, condition, age range, and category. Add clear photos
+                    of the toy and relevant tags to help others find it. Once submitted, your toy will be visible to the community.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-2">
+                  <AccordionTrigger className="text-blue-700">How do I arrange a toy exchange?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    When you find a toy you're interested in, click the "Request" button on the listing. Write a message
+                    to the owner explaining why you're interested. If they accept, you'll use our in-app messaging
+                    to arrange a meeting time and public location for the exchange.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-3">
+                  <AccordionTrigger className="text-blue-700">What if a toy is in high demand?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    When multiple families request the same toy, the owner can choose which request to accept.
+                    We encourage choosing based on need, pickup convenience, and the requester's community involvement.
+                    All other requesters will be notified if their request wasn't selected.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-4">
+                  <AccordionTrigger className="text-blue-700">Do I need to clean toys before sharing?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    Yes, please thoroughly clean and sanitize all toys before sharing. Remove batteries if applicable,
+                    ensure all parts are included, and check for any damage or safety concerns. Be honest about
+                    the toy's condition in your listing description.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </TabsContent>
+            
+            <TabsContent value="account" className="pt-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger className="text-blue-700">How do I update my profile information?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    Navigate to your profile page by clicking on your avatar in the top right corner and selecting "Profile".
+                    Click the "Edit Profile" button to update your personal information, change your profile picture,
+                    or modify your location.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-2">
+                  <AccordionTrigger className="text-blue-700">Can I delete my account?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    Yes, you can delete your account by going to your profile settings and selecting "Delete Account"
+                    at the bottom of the page. This will permanently remove your account and all associated listings.
+                    Please note that completed exchanges and messages cannot be deleted from other users' histories.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-3">
+                  <AccordionTrigger className="text-blue-700">How do I change my password?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    To change your password, go to your profile settings and select "Security". You'll need to
+                    enter your current password and then set a new password. For security reasons, make sure
+                    to choose a strong, unique password.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="item-4">
+                  <AccordionTrigger className="text-blue-700">What if I forget my password?</AccordionTrigger>
+                  <AccordionContent className="text-blue-600">
+                    If you forget your password, click "Forgot Password" on the login page. Enter the email
+                    address associated with your account, and we'll send you a password reset link.
+                    Follow the instructions in the email to set a new password.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </TabsContent>
+          </Tabs>
+        </div>
+        
+        {/* Contact Support Section */}
+        <div className="bg-blue-50 rounded-xl p-6 lg:p-8 max-w-3xl mx-auto mb-12">
+          <div className="flex flex-col md:flex-row gap-6 items-center">
+            <div className="md:w-2/3">
+              <h2 className="text-xl font-bold text-blue-800 mb-2">Still Need Help?</h2>
+              <p className="text-blue-700 mb-4">
+                Can't find what you're looking for? Our support team is ready to help.
+                We typically respond within 24 hours on business days.
+              </p>
+              <div className="flex gap-4">
+                <Button className="bg-blue-700 hover:bg-blue-800">
+                  <Mail className="mr-2 h-4 w-4" /> Email Support
+                </Button>
+                <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-100">
+                  <MessageSquare className="mr-2 h-4 w-4" /> Live Chat
+                </Button>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <Link href="/resources/faq" className="text-blue-700 hover:underline font-medium">
-              View all FAQs
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 ml-1 inline"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
+            </div>
+            <div className="hidden md:block md:w-1/3">
+              <div className="w-32 h-32 bg-blue-200 rounded-full flex items-center justify-center mx-auto">
+                <Users className="h-16 w-16 text-blue-600" />
+              </div>
+            </div>
           </div>
         </div>
-      )}
-
-      {/* Help Resources */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-blue-50 rounded-lg p-6 text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto text-blue-700 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">Contact Support</h3>
-          <p className="text-blue-700 mb-4">Need personal assistance? Our support team is here to help.</p>
-          <Link
-            href="/resources/contact-support"
-            className="inline-block bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm transition-colors"
-          >
-            Contact Us
-          </Link>
-        </div>
-
-        <div className="bg-blue-50 rounded-lg p-6 text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto text-blue-700 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">Community Guidelines</h3>
-          <p className="text-blue-700 mb-4">Learn about our community values and expected behaviors.</p>
-          <Link
-            href="/resources/community-guidelines"
-            className="inline-block bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm transition-colors"
-          >
-            View Guidelines
-          </Link>
-        </div>
-
-        <div className="bg-blue-50 rounded-lg p-6 text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto text-blue-700 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">Safety Center</h3>
-          <p className="text-blue-700 mb-4">Find resources for staying safe while using ToyShare.</p>
-          <Link
-            href="/safety-center"
-            className="inline-block bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm transition-colors"
-          >
-            Visit Safety Center
-          </Link>
+        
+        {/* Community Resources */}
+        <div className="text-center max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-blue-800 mb-6">Community Resources</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <Card className="border-blue-100 transition-all hover:shadow-md cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="font-semibold text-blue-800 mb-2">User Guide</h3>
+                <p className="text-blue-600 text-sm">
+                  Complete documentation on using all ToyShare features.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-blue-100 transition-all hover:shadow-md cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="font-semibold text-blue-800 mb-2">Community Forum</h3>
+                <p className="text-blue-600 text-sm">
+                  Connect with other families and share toy sharing tips.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-blue-100 transition-all hover:shadow-md cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Send className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="font-semibold text-blue-800 mb-2">Newsletter</h3>
+                <p className="text-blue-600 text-sm">
+                  Sign up for monthly updates and toy sharing inspiration.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
