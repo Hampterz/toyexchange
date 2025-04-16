@@ -7,19 +7,15 @@ import { Button } from "@/components/ui/button";
 
 interface ToyListProps {
   filters?: Record<string, any>;
-  searchQuery?: string;
 }
 
-export function ToyList({ filters = {}, searchQuery = "" }: ToyListProps) {
+export function ToyList({ filters = {} }: ToyListProps) {
   const [selectedToy, setSelectedToy] = useState<Toy | null>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [visibleToys, setVisibleToys] = useState(8); // Initial number of toys to show
   
-  // Combine filters and search query
+  // Use filters directly
   const combinedFilters = { ...filters };
-  if (searchQuery) {
-    combinedFilters.search = searchQuery;
-  }
   
   // Build query parameters
   const queryParams = Object.entries(combinedFilters)

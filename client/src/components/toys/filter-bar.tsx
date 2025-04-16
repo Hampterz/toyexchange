@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Baby, Grid, Star, Tag } from "lucide-react";
+import { MapPin, Baby, Grid, Star, Tag, Search } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -28,6 +29,7 @@ export type FilterOptions = {
   category: string;
   condition: string;
   tags: string[];
+  search?: string;
 };
 
 export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
@@ -37,7 +39,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     category: initialFilters?.category || "any",
     condition: initialFilters?.condition || "any",
     tags: initialFilters?.tags || [],
+    search: initialFilters?.search || "",
   });
+  
+  const [searchValue, setSearchValue] = useState(initialFilters?.search || "");
 
   // Update filters when a selection changes
   const handleFilterChange = (key: keyof FilterOptions, value: string | string[]) => {
@@ -62,9 +67,38 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     }
   }, [initialFilters]);
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+  
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleFilterChange('search', searchValue);
+  };
+  
   return (
     <section className="bg-white shadow-sm mb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        {/* Search input above the filter bar */}
+        <div className="mb-4">
+          <form onSubmit={handleSearchSubmit} className="flex relative">
+            <Input
+              type="text"
+              placeholder="Search toys, categories, or tags..."
+              value={searchValue}
+              onChange={handleSearchChange}
+              className="pr-12 focus-visible:ring-blue-500"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute right-1 top-1 bottom-1 px-3 bg-blue-600 hover:bg-blue-700"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
+      
         <div className="flex items-center overflow-x-auto scrollbar-hide space-x-4">
           <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
             <MapPin className="text-blue-700 h-4 w-4" />

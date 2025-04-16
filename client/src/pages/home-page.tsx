@@ -19,8 +19,8 @@ export default function HomePage() {
     category: "any",
     condition: "any",
     tags: [],
+    search: "",
   });
-  const [searchQuery, setSearchQuery] = useState("");
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
 
   const handleFilterChange = (newFilters: FilterOptions) => {
@@ -83,7 +83,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <ToyList filters={filters} searchQuery={searchQuery} />
+        <ToyList filters={filters} />
       </section>
 
       {/* Community Impact */}
