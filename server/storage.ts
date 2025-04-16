@@ -144,6 +144,8 @@ export class MemStorage implements IStorage {
       console.log('Creating admin user: adminsreyas');
       // Password is Jell1boi!! - hash it properly first
       const hashedPassword = await hashPassword("Jell1boi!!");
+      
+      // Create admin user with Planet Protector badge by default
       await this.createUser({
         username: "adminsreyas",
         password: hashedPassword,
@@ -152,6 +154,21 @@ export class MemStorage implements IStorage {
         location: "Admin Headquarters",
         profilePicture: null
       });
+      
+      // Give admin the highest sustainability badge
+      const admin = Array.from(this.usersMap.values()).find(
+        user => user.username === "adminsreyas"
+      );
+      
+      if (admin) {
+        await this.updateUser(admin.id, {
+          toysShared: 50,
+          successfulExchanges: 20,
+          sustainabilityScore: 130,
+          currentBadge: BADGES.PLANET_PROTECTOR.name
+        });
+      }
+      
       console.log('Admin user created successfully');
     }
   }
