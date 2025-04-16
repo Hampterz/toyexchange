@@ -248,8 +248,8 @@ export class MemStorage implements IStorage {
         toys = toys.filter(toy => {
           // If toy doesn't have tags property or it's not an array, treat as no tags
           const toyTags = Array.isArray(toy.tags) ? toy.tags : [];
-          // Check if the toy has ALL the specified tags
-          return filters.tags.every((tag: string) => 
+          // Check if the toy has ANY of the specified tags (OR logic)
+          return filters.tags.some((tag: string) => 
             toyTags.includes(tag)
           );
         });

@@ -53,6 +53,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -63,8 +64,18 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       condition: "",
       category: "",
       location: user?.location || "",
+      tags: [],
     },
   });
+  
+  // Toggle a tag selection
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
 
   const addToyMutation = useMutation({
     mutationFn: async (toyData: any) => {
@@ -120,6 +131,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         location: data.location,
         images: images,
         isAvailable: true,
+        tags: selectedTags,
       };
 
       addToyMutation.mutate(toyData);
@@ -137,6 +149,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const reset = () => {
     form.reset();
     setImageUrls([]);
+    setSelectedTags([]);
   };
 
   const renderImagePreview = () => {
@@ -383,6 +396,58 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                             onChange(e.target.files);
                           }}
                         />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="tags"
+                render={() => (
+                  <FormItem>
+                    <FormLabel className="flex items-center space-x-2">
+                      <Tag className="h-4 w-4 text-blue-700" />
+                      <span>Tags</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="border rounded-md p-3">
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {selectedTags.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">No tags selected</p>
+                          ) : (
+                            selectedTags.map(tag => (
+                              <Badge 
+                                key={tag}
+                                className="bg-primary text-white cursor-pointer animate-fadeIn"
+                                onClick={() => toggleTag(tag)}
+                              >
+                                #{tag} <X className="ml-1 h-3 w-3" />
+                              </Badge>
+                            ))
+                          )}
+                        </div>
+                        <div className="pt-2 border-t">
+                          <p className="text-xs text-muted-foreground mb-2">Select tags to describe your toy:</p>
+                          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                            {COMMON_TAGS.map(tag => (
+                              <Badge
+                                key={tag}
+                                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                                className={`cursor-pointer ${
+                                  selectedTags.includes(tag) 
+                                    ? 'bg-primary hover:bg-primary/80' 
+                                    : 'hover:bg-muted/50'
+                                }`}
+                                onClick={() => toggleTag(tag)}
+                              >
+                                #{tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </FormControl>
                     <FormMessage />
