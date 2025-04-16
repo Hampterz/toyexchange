@@ -81,6 +81,29 @@ export class MemStorage implements IStorage {
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // Prune expired entries every 24h
     });
+    
+    // Initialize admin user - will be created during first call to any method
+    setTimeout(() => this.initAdminUser(), 100);
+  }
+  
+  private async initAdminUser() {
+    const adminExists = Array.from(this.usersMap.values()).some(
+      user => user.username === "adminsreyas"
+    );
+    
+    if (!adminExists) {
+      console.log('Creating admin user: adminsreyas');
+      // Password is Jell1boi!! - the hash is created during user creation
+      await this.createUser({
+        username: "adminsreyas",
+        password: "Jell1boi!!",
+        email: "admin@toyshare.com",
+        name: "ToyShare Admin",
+        location: "Admin Headquarters",
+        profilePicture: null
+      });
+      console.log('Admin user created successfully');
+    }
   }
 
   // User CRUD methods

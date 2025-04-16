@@ -109,7 +109,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Toy not found" });
       }
       
-      if (toy.userId !== req.user!.id) {
+      // Allow both the toy owner and admin user to delete toys
+      const isAdmin = req.user!.username === "adminsreyas";
+      if (toy.userId !== req.user!.id && !isAdmin) {
         return res.status(403).json({ message: "Not authorized to delete this toy" });
       }
       
@@ -415,14 +417,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all contact messages (admin only - would have authorization in real app)
-  app.get("/api/contact/messages", ensureAuthenticated, async (req, res) => {
+  // Admin middleware to check if user is an admin
+  const ensureAdmin = (req: any, res: any, next: any) => {
+    if (req.isAuthenticated() && req.user.username === "adminsreyas") {
+      return next();
+    }
+    res.status(403).json({ message: "Access denied. Admin privileges required." });
+  };
+
+  // Get all contact messages (admin only)
+  app.get("/api/contact-messages", ensureAuthenticated, ensureAdmin, async (req, res) => {
     try {
-      // In a real app, this would check for admin role
       const messages = await storage.getAllContactMessages();
       res.json(messages);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch contact messages" });
+    }
+  });
+  
+  // Get all toys (admin only)
+  app.get("/api/toys/all", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const toys = await storage.getToys({});
+      res.json(toys);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch all toys" });
     }
   });
 
