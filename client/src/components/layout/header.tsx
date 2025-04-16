@@ -40,11 +40,11 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <div className="flex items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+            <div className="h-11 w-11 rounded-full bg-primary flex items-center justify-center shadow-md">
               <i className="fas fa-gamepad text-white text-xl"></i>
             </div>
-            <span className="text-xl font-bold font-heading text-primary hidden sm:block">ToyShare</span>
+            <span className="text-xl font-bold font-heading text-primary block">ToyShare</span>
           </Link>
         </div>
         

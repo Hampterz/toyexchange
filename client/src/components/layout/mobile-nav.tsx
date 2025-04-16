@@ -24,9 +24,11 @@ export function MobileNav({ onAddToyClick }: MobileNavProps) {
     <>
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-blue-100 shadow-lg z-40">
         <div className="flex items-center justify-around">
-          <Link href="/" className={`flex flex-col items-center py-3 px-2 ${location === '/' ? 'text-blue-700' : 'text-blue-400'}`}>
-            <Home className="h-5 w-5" />
-            <span className="text-xs mt-1">Home</span>
+          <Link href="/" className={`flex flex-col items-center py-3 px-2 ${location === '/' ? 'text-primary font-medium' : 'text-blue-400'}`}>
+            <div className={`h-6 w-6 rounded-full ${location === '/' ? 'bg-primary' : 'bg-blue-400'} flex items-center justify-center text-white`}>
+              <i className="fas fa-gamepad text-xs"></i>
+            </div>
+            <span className="text-xs mt-1">ToyShare</span>
           </Link>
           <Link href="/favorites" className={`flex flex-col items-center py-3 px-2 ${location === '/favorites' ? 'text-blue-700' : 'text-blue-400'}`}>
             <Heart className="h-5 w-5" />
@@ -54,6 +56,14 @@ export function MobileNav({ onAddToyClick }: MobileNavProps) {
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[60vh]">
               <SheetHeader className="text-left">
+                <div className="flex items-center mb-4">
+                  <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+                    <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-md mr-2">
+                      <i className="fas fa-gamepad text-white text-lg"></i>
+                    </div>
+                    <span className="text-xl font-bold text-primary">ToyShare</span>
+                  </Link>
+                </div>
                 <SheetTitle>Resources</SheetTitle>
                 <SheetDescription>
                   Help, safety, and community resources

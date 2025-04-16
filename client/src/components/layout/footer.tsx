@@ -8,12 +8,12 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+            <Link href="/" className="flex items-center space-x-2 mb-4 hover:opacity-80 transition-opacity">
+              <div className="h-11 w-11 rounded-full bg-primary flex items-center justify-center shadow-md">
                 <i className="fas fa-gamepad text-white text-xl"></i>
               </div>
               <span className="text-xl font-bold font-heading">ToyShare</span>
-            </div>
+            </Link>
             <p className="text-neutral-400 text-sm">
               Connecting families to share joy and reduce waste, one toy at a time.
             </p>
