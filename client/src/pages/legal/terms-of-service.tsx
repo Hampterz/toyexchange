@@ -12,149 +12,207 @@ export default function TermsOfService() {
           Back to Home
         </Link>
         <h1 className="text-3xl font-bold text-blue-900 mb-2">Terms of Service</h1>
-        <p className="text-blue-700 border-b border-blue-100 pb-4">Last Updated: April 15, 2023</p>
+        <p className="text-blue-700 border-b border-blue-100 pb-4">Last Updated: April 15, 2024</p>
       </div>
 
       <div className="prose prose-blue max-w-none">
-        <p className="font-semibold">
-          Please read these Terms of Service ("Terms") carefully before using the ToyShare platform.
-        </p>
+        <div className="bg-blue-50 p-6 rounded-lg mb-8">
+          <p className="font-medium text-blue-800 mb-0">
+            Please read these Terms of Service ("Terms") carefully before using ToyShare. By accessing or using our service, 
+            you agree to be bound by these Terms. If you disagree with any part of the Terms, you may not access the service.
+          </p>
+        </div>
 
         <h2>1. Acceptance of Terms</h2>
         <p>
-          By accessing or using ToyShare, whether through our website, mobile application, or any other means, you agree to be bound by these Terms. If you do not agree to these Terms, you may not use ToyShare.
+          By creating an account with ToyShare, or by accessing or using our website or mobile applications, 
+          you acknowledge that you have read, understood, and agree to be bound by these Terms, as well as our 
+          Privacy Policy and Community Guidelines.
         </p>
 
         <h2>2. Description of Service</h2>
         <p>
-          ToyShare is a platform that enables parents and caregivers to share toys with other families in their community. The service allows users to list toys they no longer need, browse available toys, and arrange exchanges with other community members.
+          ToyShare is a community platform that enables families to share gently-used toys with one another. 
+          Our service includes the website, mobile applications, and any related services, features, content, or applications 
+          (collectively, the "Service").
+        </p>
+        <p>
+          We do not own, sell, rent, or lease any toys. We provide a platform for users to connect, communicate,
+          and arrange the sharing of toys directly with one another. ToyShare is not a party to any agreement between 
+          users regarding the exchange of toys.
         </p>
 
-        <h2>3. Eligibility</h2>
+        <h2>3. Account Registration</h2>
         <p>
-          You must be at least 18 years old to create an account and use ToyShare. By using ToyShare, you represent and warrant that you are at least 18 years old and have the legal capacity to enter into these Terms.
-        </p>
-
-        <h2>4. User Accounts</h2>
-        <p>
-          To use certain features of ToyShare, you must create an account. You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete.
-        </p>
-        <p>
-          You are responsible for safeguarding your account credentials and for all activities that occur under your account. You agree to notify ToyShare immediately of any unauthorized use of your account.
-        </p>
-        <p>
-          ToyShare reserves the right to disable any user account at any time, including if you have violated these Terms or if your account shows signs of malicious activity.
-        </p>
-
-        <h2>5. User Content</h2>
-        <p>
-          When you submit content to ToyShare (including toy listings, messages, reviews, and profile information), you grant ToyShare a non-exclusive, worldwide, royalty-free license to use, copy, modify, and display that content in connection with the services.
-        </p>
-        <p>
-          You represent and warrant that you own or have the necessary rights to the content you post and that your content does not violate the rights of any third party or any applicable law.
-        </p>
-
-        <h2>6. Prohibited Activities</h2>
-        <p>
-          You agree not to:
+          To use certain features of the Service, you must register for an account. When you register, you agree to:
         </p>
         <ul>
-          <li>Use ToyShare for any illegal purpose or in violation of any local, state, national, or international law</li>
-          <li>List or exchange recalled, dangerous, or prohibited items</li>
+          <li>Provide accurate, current, and complete information</li>
+          <li>Maintain and promptly update your account information</li>
+          <li>Maintain the security of your account and password</li>
+          <li>Accept responsibility for all activities that occur under your account</li>
+          <li>Notify us immediately of any unauthorized use of your account</li>
+        </ul>
+        <p>
+          We reserve the right to refuse service, terminate accounts, or remove content at our discretion.
+        </p>
+
+        <h2>4. User Conduct</h2>
+        <p>
+          As a user of ToyShare, you agree not to:
+        </p>
+        <ul>
+          <li>Violate any local, state, national, or international law or regulation</li>
+          <li>Post false, misleading, or deceptive content</li>
+          <li>Share toys that are recalled, unsafe, inappropriate for children, or prohibited by law</li>
           <li>Harass, abuse, or harm another person, including sending unwelcome communications</li>
-          <li>Impersonate or misrepresent your affiliation with any person or entity</li>
-          <li>Upload or transmit viruses, malware, or other malicious code</li>
-          <li>Attempt to circumvent any security or access restrictions of the service</li>
-          <li>Use ToyShare for commercial purposes without prior written consent</li>
-          <li>Exchange toys for money or other consideration</li>
-          <li>Post misleading or inaccurate content</li>
+          <li>Impersonate any person or entity</li>
+          <li>Sell or attempt to sell toys through our platform</li>
+          <li>Use the Service for commercial purposes without our prior written consent</li>
+          <li>Interfere with or disrupt the Service or servers or networks connected to the Service</li>
+          <li>Attempt to gain unauthorized access to any portion of the Service</li>
+          <li>Collect or store personal data about other users without their express consent</li>
+          <li>Use the Service in any way that could damage, disable, overburden, or impair the Service</li>
         </ul>
 
-        <h2>7. Toy Exchanges</h2>
+        <h2>5. Toy Listings and Content</h2>
         <p>
-          ToyShare is a platform that facilitates connections between users wishing to share toys. ToyShare does not guarantee the quality, safety, or legality of toys exchanged, nor the accuracy of toy listings.
-        </p>
-        <p>
-          All exchanges are arranged and conducted at the users' own risk. ToyShare is not a party to any agreement between users and has no control over the conduct of users or the toys they share.
-        </p>
-        <p>
-          Users are solely responsible for checking toys for recalls, damage, and safety before exchanging or using them.
-        </p>
-
-        <h2>8. Safety</h2>
-        <p>
-          While ToyShare strives to create a safe community, we cannot guarantee the behavior of users. We strongly recommend:
+          You are solely responsible for the toys you list and the content you post on ToyShare, including:
         </p>
         <ul>
-          <li>Meeting in public places for toy exchanges</li>
-          <li>Inspecting toys carefully before accepting them</li>
-          <li>Reviewing user profiles and ratings before arranging an exchange</li>
-          <li>Following all safety guidelines provided on the platform</li>
+          <li>Photos, descriptions, and information about toys</li>
+          <li>Messages sent to other users</li>
+          <li>Reviews, comments, and feedback</li>
+          <li>Any other content you submit to the Service</li>
+        </ul>
+        <p>
+          By posting content on ToyShare, you grant us a non-exclusive, transferable, sub-licensable, royalty-free, 
+          worldwide license to use, modify, publicly display, reproduce, and distribute such content on and through the Service.
+        </p>
+        <p>
+          We do not claim ownership of your content, but we need these rights to operate and improve the Service.
+        </p>
+
+        <h2>6. Toy Safety and Condition</h2>
+        <p>
+          When listing toys, you agree to:
+        </p>
+        <ul>
+          <li>Verify that the toy has not been recalled</li>
+          <li>Ensure the toy is safe, clean, and suitable for its intended age group</li>
+          <li>Provide accurate descriptions of the toy's condition, including any defects or missing parts</li>
+          <li>Comply with all applicable safety standards and regulations</li>
+        </ul>
+        <p>
+          ToyShare reserves the right to remove any toy listing that we believe, in our sole discretion, violates these 
+          requirements or otherwise poses a safety risk.
+        </p>
+
+        <h2>7. Exchanges and Meetups</h2>
+        <p>
+          ToyShare is not responsible for arranging or facilitating physical exchanges of toys between users. Users 
+          are solely responsible for arranging and conducting toy exchanges safely and appropriately.
+        </p>
+        <p>
+          We recommend following these safety guidelines:
+        </p>
+        <ul>
+          <li>Meet in public, well-lit places</li>
+          <li>Inform a friend or family member about your meetup plans</li>
+          <li>Be cautious about sharing personal information</li>
+          <li>Trust your instincts and leave if you feel uncomfortable</li>
         </ul>
 
-        <h2>9. Privacy</h2>
+        <h2>8. Disclaimers and Limitation of Liability</h2>
         <p>
-          Your use of ToyShare is also governed by our Privacy Policy, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand our practices.
-        </p>
-
-        <h2>10. Disclaimer of Warranties</h2>
-        <p>
-          ToyShare is provided "as is" and "as available" without any warranties of any kind, either express or implied. To the fullest extent permitted by law, ToyShare disclaims all warranties, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement.
+          THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </p>
         <p>
-          ToyShare does not warrant that the service will be uninterrupted, secure, or error-free, that defects will be corrected, or that the service or the servers that make it available are free of viruses or other harmful components.
-        </p>
-
-        <h2>11. Limitation of Liability</h2>
-        <p>
-          To the fullest extent permitted by law, ToyShare and its officers, directors, employees, and agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, use, or goodwill, arising out of or in connection with these Terms or your use of the service.
+          TO THE FULLEST EXTENT PERMITTED BY LAW, TOYSHARE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING 
+          IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
         </p>
         <p>
-          In no event shall ToyShare's total liability to you for all claims arising out of or relating to these Terms or your use of the service exceed one hundred dollars ($100).
-        </p>
-
-        <h2>12. Indemnification</h2>
-        <p>
-          You agree to indemnify, defend, and hold harmless ToyShare and its officers, directors, employees, and agents from and against any and all claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising from:
+          TOYSHARE DOES NOT WARRANT THAT:
         </p>
         <ul>
-          <li>Your use of the service</li>
+          <li>THE SERVICE WILL BE SECURE OR AVAILABLE AT ANY PARTICULAR TIME OR LOCATION</li>
+          <li>ANY DEFECTS OR ERRORS WILL BE CORRECTED</li>
+          <li>THE SERVICE IS FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS</li>
+          <li>THE RESULTS OF USING THE SERVICE WILL MEET YOUR REQUIREMENTS</li>
+        </ul>
+        <p>
+          TO THE FULLEST EXTENT PERMITTED BY LAW, TOYSHARE SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, 
+          CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, 
+          OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM:
+        </p>
+        <ul>
+          <li>YOUR ACCESS TO OR USE OF OR INABILITY TO ACCESS OR USE THE SERVICE</li>
+          <li>ANY CONDUCT OR CONTENT OF ANY THIRD PARTY ON THE SERVICE</li>
+          <li>ANY CONTENT OBTAINED FROM THE SERVICE</li>
+          <li>UNAUTHORIZED ACCESS, USE, OR ALTERATION OF YOUR TRANSMISSIONS OR CONTENT</li>
+          <li>INTERACTIONS YOU HAVE WITH OTHER USERS OF THE SERVICE OR ANY TOY EXCHANGES ARRANGED THROUGH THE SERVICE</li>
+        </ul>
+
+        <h2>9. Indemnification</h2>
+        <p>
+          You agree to defend, indemnify, and hold harmless ToyShare and its officers, directors, employees, and agents 
+          from and against any claims, liabilities, damages, losses, and expenses, including, without limitation, reasonable 
+          legal fees, arising out of or in any way connected with:
+        </p>
+        <ul>
+          <li>Your access to or use of the Service</li>
           <li>Your violation of these Terms</li>
-          <li>Your violation of any rights of another person or entity</li>
-          <li>Your conduct in connection with the service</li>
+          <li>Your violation of any third-party right, including without limitation any intellectual property right or privacy right</li>
+          <li>Any claim that your content caused damage to a third party</li>
+          <li>Any toy exchanges or interactions with other users</li>
         </ul>
 
-        <h2>13. Modifications to the Terms</h2>
+        <h2>10. Modifications to the Service and Terms</h2>
         <p>
-          ToyShare reserves the right to modify these Terms at any time. We will provide notice of significant changes through the service or by other means. Your continued use of ToyShare after such changes constitutes acceptance of the modified Terms.
+          ToyShare reserves the right to modify or discontinue, temporarily or permanently, the Service (or any part thereof) with 
+          or without notice. We shall not be liable to you or to any third party for any modification, suspension, or discontinuance 
+          of the Service.
+        </p>
+        <p>
+          We may revise these Terms from time to time. The most current version will always be on our website. By continuing 
+          to access or use the Service after those revisions become effective, you agree to be bound by the revised Terms.
         </p>
 
-        <h2>14. Termination</h2>
+        <h2>11. Governing Law</h2>
         <p>
-          ToyShare may terminate or suspend your account and access to the service at any time, with or without cause and with or without notice. Upon termination, your right to use the service will immediately cease.
+          These Terms shall be governed by and construed in accordance with the laws of the state of California, without 
+          regard to its conflict of law provisions.
+        </p>
+        <p>
+          Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. 
+          If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of 
+          these Terms will remain in effect.
         </p>
 
-        <h2>15. Governing Law</h2>
+        <h2>12. Entire Agreement</h2>
         <p>
-          These Terms shall be governed by and construed in accordance with the laws of the State of Washington, without regard to its conflict of law provisions.
+          These Terms, together with our Privacy Policy and any other legal notices published by ToyShare on the Service, 
+          shall constitute the entire agreement between you and ToyShare concerning the Service.
         </p>
 
-        <h2>16. Dispute Resolution</h2>
-        <p>
-          Any dispute arising from or relating to these Terms or your use of ToyShare shall be resolved through binding arbitration in accordance with the American Arbitration Association's rules.
-        </p>
-        <p>
-          Any arbitration shall be conducted in English and take place in Seattle, Washington. The decision of the arbitrator shall be final and binding.
-        </p>
-
-        <h2>17. Contact Information</h2>
+        <h2>13. Contact Information</h2>
         <p>
           If you have any questions about these Terms, please contact us at legal@toyshare.example.com.
         </p>
+      </div>
 
-        <p className="mt-8 text-sm text-gray-600">
-          By using ToyShare, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
-        </p>
+      <div className="mt-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+        <Link href="/legal/privacy-policy" className="text-blue-700 hover:underline font-medium">
+          Privacy Policy
+        </Link>
+        <span className="hidden sm:inline text-gray-300">|</span>
+        <Link href="/legal/cookie-policy" className="text-blue-700 hover:underline font-medium">
+          Cookie Policy
+        </Link>
+        <span className="hidden sm:inline text-gray-300">|</span>
+        <Link href="/legal/accessibility" className="text-blue-700 hover:underline font-medium">
+          Accessibility
+        </Link>
       </div>
     </div>
   );

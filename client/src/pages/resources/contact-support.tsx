@@ -1,50 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  subject: z.string().min(1, { message: "Please select a subject." }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters." }).max(1000, { message: "Message cannot exceed 1000 characters." }),
-});
 
 export default function ContactSupport() {
   const { toast } = useToast();
-  
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    },
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+    category: "general"
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-    // In a real implementation, this would send the data to an API endpoint
-    toast({
-      title: "Support request submitted",
-      description: "We've received your message and will respond within 24-48 hours.",
-    });
-    form.reset();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast({
+        title: "Message Sent",
+        description: "We've received your message and will respond within 24-48 hours.",
+      });
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+        category: "general"
+      });
+    }, 1500);
   };
 
   return (
@@ -57,133 +57,230 @@ export default function ContactSupport() {
           Back to Home
         </Link>
         <h1 className="text-3xl font-bold text-blue-900 mb-2">Contact Support</h1>
-        <p className="text-blue-700 border-b border-blue-100 pb-4">We're here to help with any questions or issues</p>
+        <p className="text-blue-700 border-b border-blue-100 pb-4">Get help from our support team</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1">
-          <div className="bg-blue-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold text-blue-800 mb-4">Support Hours</h2>
-            <p className="text-gray-700 mb-4">
-              Our support team is available:
-            </p>
-            <p className="text-gray-700 mb-1">
-              <strong>Monday-Friday:</strong> 9am - 8pm EST
-            </p>
-            <p className="text-gray-700 mb-4">
-              <strong>Saturday-Sunday:</strong> 10am - 6pm EST
-            </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="md:col-span-2">
+          <div className="bg-white border border-blue-100 rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-blue-900 mb-6">Send Us a Message</h2>
             
-            <h2 className="text-xl font-semibold text-blue-800 mb-4 mt-6">Alternative Contact</h2>
-            <p className="text-gray-700 mb-2">
-              <strong>Email:</strong> support@toyshare.example.com
-            </p>
-            <p className="text-gray-700">
-              <strong>Phone:</strong> (555) 123-4567
-            </p>
-            
-            <div className="mt-8 p-4 bg-white rounded-lg border border-blue-100">
-              <h3 className="text-blue-800 font-medium mb-2">Emergency?</h3>
-              <p className="text-sm text-gray-700">
-                For urgent safety concerns or emergencies, please contact your local authorities.
-              </p>
-            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Your Name
+                  </label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full border-blue-200"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full border-blue-200"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-blue-200 p-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent"
+                >
+                  <option value="general">General Inquiry</option>
+                  <option value="account">Account Issues</option>
+                  <option value="technical">Technical Problems</option>
+                  <option value="safety">Safety Concerns</option>
+                  <option value="feature">Feature Request</option>
+                  <option value="feedback">Feedback</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2 mb-4">
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
+                  Subject
+                </label>
+                <Input
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  className="w-full border-blue-200"
+                />
+              </div>
+              
+              <div className="space-y-2 mb-6">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+                  Your Message
+                </label>
+                <Textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows={6}
+                  className="w-full border-blue-200"
+                />
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="bg-blue-700 hover:bg-blue-800"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : "Send Message"}
+              </Button>
+            </form>
           </div>
         </div>
         
-        <div className="md:col-span-2">
-          <div className="bg-white rounded-lg border border-blue-100 p-6">
-            <h2 className="text-xl font-semibold text-blue-800 mb-4">Send Us a Message</h2>
+        <div>
+          <div className="bg-blue-50 rounded-lg p-6 mb-6">
+            <h2 className="text-lg font-semibold text-blue-900 mb-4">Contact Information</h2>
             
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-blue-800">Your Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your full name" className="border-blue-200 focus-visible:ring-blue-700" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-blue-800">Email Address</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="your.email@example.com" className="border-blue-200 focus-visible:ring-blue-700" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="subject"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-blue-800">Subject</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="border-blue-200 focus:ring-blue-700">
-                            <SelectValue placeholder="Select a topic" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="account">Account Issues</SelectItem>
-                          <SelectItem value="technical">Technical Problems</SelectItem>
-                          <SelectItem value="safety">Safety Concerns</SelectItem>
-                          <SelectItem value="feedback">Feedback & Suggestions</SelectItem>
-                          <SelectItem value="report">Report a User</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-blue-800">Message</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Please describe your issue or question in detail..." 
-                          className="min-h-[120px] border-blue-200 focus-visible:ring-blue-700"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      <p className="text-xs text-blue-600 mt-1">
-                        {form.watch("message")?.length || 0}/1000 characters
-                      </p>
-                    </FormItem>
-                  )}
-                />
-                
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-700 hover:bg-blue-800"
-                >
-                  Submit Support Request
-                </Button>
-              </form>
-            </Form>
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700 mt-0.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900">Email</h3>
+                  <p className="text-gray-700">support@toyshare.example.com</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700 mt-0.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900">Support Hours</h3>
+                  <p className="text-gray-700">Monday - Friday<br />9:00 AM - 6:00 PM EST</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700 mt-0.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900">Response Time</h3>
+                  <p className="text-gray-700">We aim to respond to all inquiries within 24-48 hours during business days.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white border border-blue-100 rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-blue-900 mb-4">Quick Links</h2>
             
-            <p className="text-xs text-gray-600 mt-6">
-              By submitting this form, you acknowledge that the information provided will be handled in accordance with our <Link href="/legal/privacy-policy" className="text-blue-700 hover:underline">Privacy Policy</Link>.
-            </p>
+            <ul className="space-y-3">
+              <li>
+                <Link href="/resources/faq" className="text-blue-700 hover:underline flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  Frequently Asked Questions
+                </Link>
+              </li>
+              <li>
+                <Link href="/help-center" className="text-blue-700 hover:underline flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link href="/safety-center" className="text-blue-700 hover:underline flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  Safety Center
+                </Link>
+              </li>
+              <li>
+                <Link href="/resources/community-guidelines" className="text-blue-700 hover:underline flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  Community Guidelines
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-blue-50 rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-blue-900 mb-4">Common Support Topics</h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg p-4 border border-blue-100 flex flex-col">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Account Issues</h3>
+            <p className="text-gray-700 text-sm mb-3 flex-grow">Help with account settings, password resets, and profile management.</p>
+            <Link href="/help-center" className="text-blue-700 hover:underline text-sm">Learn more</Link>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-blue-100 flex flex-col">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Toy Listings</h3>
+            <p className="text-gray-700 text-sm mb-3 flex-grow">Assistance with creating, editing, or removing toy listings.</p>
+            <Link href="/help-center" className="text-blue-700 hover:underline text-sm">Learn more</Link>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-blue-100 flex flex-col">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Messaging</h3>
+            <p className="text-gray-700 text-sm mb-3 flex-grow">Help with the messaging system, notifications, and communication problems.</p>
+            <Link href="/help-center" className="text-blue-700 hover:underline text-sm">Learn more</Link>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-blue-100 flex flex-col">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Safety Concerns</h3>
+            <p className="text-gray-700 text-sm mb-3 flex-grow">Reporting safety issues, suspicious activity, or inappropriate content.</p>
+            <Link href="/safety-center" className="text-blue-700 hover:underline text-sm">Learn more</Link>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-blue-100 flex flex-col">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Technical Issues</h3>
+            <p className="text-gray-700 text-sm mb-3 flex-grow">Help with app functionality, bugs, and technical problems.</p>
+            <Link href="/resources/faq" className="text-blue-700 hover:underline text-sm">Learn more</Link>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 border border-blue-100 flex flex-col">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Feature Requests</h3>
+            <p className="text-gray-700 text-sm mb-3 flex-grow">Submit ideas for new features or improvements to ToyShare.</p>
+            <Link href="/help-center" className="text-blue-700 hover:underline text-sm">Learn more</Link>
           </div>
         </div>
       </div>
