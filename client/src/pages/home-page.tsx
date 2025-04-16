@@ -62,12 +62,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Search and Filter Section */}
+      {/* Filter Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div className="bg-white p-4 rounded-xl shadow-sm">
-          <div className="mb-4">
-            <ToySearch onSearch={setSearchQuery} initialValue={searchQuery} />
-          </div>
           <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
         </div>
       </section>
