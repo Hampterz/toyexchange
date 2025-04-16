@@ -385,6 +385,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // USER ROUTES
+  // Get user details (for profile viewing and sustainability badges)
+  app.get("/api/users/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Do not send password in response
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user details" });
+    }
+  });
+  
+  // Update user profile
+  app.patch("/api/users/:userId", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Only allow users to update their own profile
+      if (userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to update this user" });
+      }
+      
+      // Only allow updating certain fields
+      const allowedUpdates = {
+        name: req.body.name,
+        email: req.body.email,
+        location: req.body.location,
+        profilePicture: req.body.profilePicture
+      };
+      
+      // Remove undefined fields
+      const filteredUpdates = Object.entries(allowedUpdates)
+        .filter(([_, value]) => value !== undefined)
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+      
+      if (Object.keys(filteredUpdates).length === 0) {
+        return res.status(400).json({ message: "No valid fields to update" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, filteredUpdates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Do not send password in response
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update user profile" });
+    }
+  });
+
   // CONTACT MESSAGE ROUTES
   // Submit a contact form message
   app.post("/api/contact", async (req, res) => {

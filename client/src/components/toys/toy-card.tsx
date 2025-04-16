@@ -123,25 +123,44 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
           {toy.description}
         </p>
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <MapPin className="text-neutral-500 mr-1 h-3 w-3" />
-            <span className="text-neutral-500 text-xs">{toy.location}</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <MapPin className="text-neutral-500 mr-1 h-3 w-3" />
+              <span className="text-neutral-500 text-xs">{toy.location}</span>
+            </div>
+            
+            {!isOwner && (
+              <Button 
+                variant="link" 
+                className="text-primary font-medium text-sm p-0 h-auto hover:underline"
+                onClick={() => onRequestClick(toy)}
+              >
+                Request
+              </Button>
+            )}
+            
+            {isOwner && (
+              <span className="text-xs text-neutral-500 italic">Your listing</span>
+            )}
           </div>
           
-          {!isOwner && (
-            <Button 
-              variant="link" 
-              className="text-primary font-medium text-sm p-0 h-auto hover:underline"
-              onClick={() => onRequestClick(toy)}
-            >
-              Request
-            </Button>
+          {/* Sustainability Badge */}
+          {toyOwner && !isOwner && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs text-neutral-600">
+                <span>Shared by:</span>
+                <span className="font-medium">{toyOwner.name}</span>
+              </div>
+              {toyOwner.currentBadge && (
+                <SustainabilityBadge 
+                  user={toyOwner} 
+                  className="text-xs py-0.5 scale-90 origin-right"
+                />
+              )}
+            </div>
           )}
           
-          {isOwner && (
-            <span className="text-xs text-neutral-500 italic">Your listing</span>
-          )}
         </div>
       </div>
     </div>
