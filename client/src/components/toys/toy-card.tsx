@@ -38,6 +38,13 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   // Query to get the owner user details (including sustainability badge)
   const { data: toyOwner } = useQuery({
     queryKey: [`/api/users/${toy.userId}`],
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${toy.userId}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch toy owner');
+      }
+      return await res.json();
+    },
     enabled: true,
   });
   
