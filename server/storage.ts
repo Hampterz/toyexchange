@@ -1,6 +1,7 @@
 import { users, type User, type InsertUser, toys, type Toy, type InsertToy, messages, type Message, type InsertMessage, toyRequests, type ToyRequest, type InsertToyRequest, favorites, type Favorite, type InsertFavorite, contactMessages, type ContactMessage, type InsertContactMessage } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import { hashPassword } from "./auth";
 
 const MemoryStore = createMemoryStore(session);
 
@@ -93,10 +94,11 @@ export class MemStorage implements IStorage {
     
     if (!adminExists) {
       console.log('Creating admin user: adminsreyas');
-      // Password is Jell1boi!! - the hash is created during user creation
+      // Password is Jell1boi!! - hash it properly first
+      const hashedPassword = await hashPassword("Jell1boi!!");
       await this.createUser({
         username: "adminsreyas",
-        password: "Jell1boi!!",
+        password: hashedPassword,
         email: "admin@toyshare.com",
         name: "ToyShare Admin",
         location: "Admin Headquarters",
