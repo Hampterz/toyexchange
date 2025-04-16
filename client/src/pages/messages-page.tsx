@@ -95,7 +95,7 @@ export default function MessagesPage() {
   const isLoading = isLoadingMessages || isLoadingConversations;
 
   return (
-    <>
+    <div className="page-transition">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold mb-6 flex items-center">
           <MessageSquare className="mr-2 h-6 w-6 text-primary" />
@@ -115,7 +115,7 @@ export default function MessagesPage() {
             </p>
             <Button 
               onClick={() => window.location.href = "/"} 
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 btn-animated"
             >
               Browse Toys
             </Button>
@@ -138,7 +138,7 @@ export default function MessagesPage() {
                     return (
                       <div 
                         key={otherUser.id}
-                        className={`p-4 cursor-pointer hover:bg-muted/50 transition ${
+                        className={`p-4 cursor-pointer hover:bg-muted/50 transition hover:scale-[1.01] ${
                           selectedUser === otherUser.id ? 'bg-muted' : ''
                         }`}
                         onClick={() => setSelectedUser(otherUser.id)}
@@ -192,6 +192,6 @@ export default function MessagesPage() {
         isOpen={isAddToyModalOpen}
         onClose={() => setIsAddToyModalOpen(false)}
       />
-    </>
+    </div>
   );
 }
