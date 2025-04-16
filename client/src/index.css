@@ -11,3 +11,51 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Button animations */
+  .btn-animated {
+    @apply transform transition-transform duration-200 active:scale-95 hover:scale-105;
+  }
+  
+  /* Card animations */
+  .card-animated {
+    @apply transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  /* Badge animations */
+  .badge-animated {
+    @apply transform transition-all duration-300 hover:scale-110;
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+  
+  /* Click effects */
+  .click-scale {
+    @apply transition-transform duration-100 active:scale-95;
+  }
+  
+  /* Smooth fade in/out effects */
+  .fade-transition {
+    @apply transition-opacity duration-300;
+  }
+}
+
+/* Custom keyframe animations */
+@keyframes pulse-badge {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+.badge-pulse {
+  animation: pulse-badge 2s infinite;
+}

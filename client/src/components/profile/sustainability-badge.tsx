@@ -71,12 +71,16 @@ export function SustainabilityBadge({
   
   // Simple badge display for non-detailed views like toy cards
   if (!showDetails) {
+    // Apply special pulse animation for the highest badge
+    const isPlanetProtector = currentBadge === BADGES.PLANET_PROTECTOR.name;
+    
     return (
       <div 
         className={cn(
-          "flex items-center gap-1.5 text-sm px-2 py-1 rounded-full", 
+          "flex items-center gap-1.5 text-sm px-2 py-1 rounded-full badge-animated", 
           badgeInfo.bgColor, 
           badgeInfo.color,
+          isPlanetProtector && "badge-pulse",
           className
         )}
       >
@@ -87,11 +91,14 @@ export function SustainabilityBadge({
   }
   
   // Full badge card with details for profile page
+  // Special styling for the highest badge
+  const isPlanetProtector = currentBadge === BADGES.PLANET_PROTECTOR.name;
+  
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden card-animated", className)}>
       <CardHeader className={cn("pb-2", badgeInfo.bgColor)}>
         <CardTitle className="flex items-center gap-2">
-          <span className="text-2xl">{badgeInfo.icon}</span>
+          <span className={cn("text-2xl", isPlanetProtector && "badge-pulse")}>{badgeInfo.icon}</span>
           <span className={cn("font-bold", badgeInfo.color)}>{currentBadge}</span>
         </CardTitle>
         <CardDescription>
@@ -124,7 +131,7 @@ export function SustainabilityBadge({
                   {nextBadge.icon} {nextBadge.name}
                 </span>
               </div>
-              <Progress value={progressPercent} className="h-2" />
+              <Progress value={progressPercent} className="h-2 transition-all duration-1000" />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>{score} points</span>
                 <span>{nextBadge.minScore} points needed</span>

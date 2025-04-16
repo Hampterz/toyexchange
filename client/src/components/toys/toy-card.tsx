@@ -88,7 +88,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   const mainImage = toy.images && toy.images.length > 0 ? toy.images[0] : '';
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition card-animated">
       <div className="relative pb-[75%] bg-neutral-100">
         {mainImage ? (
           <img 
@@ -104,7 +104,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
         
         <button 
           onClick={handleFavoriteClick}
-          className="absolute top-3 right-3 h-9 w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition"
+          className="absolute top-3 right-3 h-9 w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale"
           aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
           disabled={toggleFavoriteMutation.isPending}
         >
@@ -140,7 +140,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             {!isOwner && (
               <Button 
                 variant="link" 
-                className="text-primary font-medium text-sm p-0 h-auto hover:underline"
+                className="text-primary font-medium text-sm p-0 h-auto hover:underline click-scale"
                 onClick={() => onRequestClick(toy)}
               >
                 Request

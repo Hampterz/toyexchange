@@ -88,7 +88,7 @@ export default function ProfilePage() {
                 <div className="flex justify-between items-center">
                   <CardTitle>Your Profile</CardTitle>
                   {!isEditing && (
-                    <Button variant="ghost" onClick={handleEditProfile}>
+                    <Button variant="ghost" onClick={handleEditProfile} className="click-scale">
                       Edit
                     </Button>
                   )}
@@ -176,7 +176,7 @@ export default function ProfilePage() {
             </div>
 
             <Button 
-              className="w-full mt-4 bg-orange-500 hover:bg-orange-600" 
+              className="w-full mt-4 bg-orange-500 hover:bg-orange-600 btn-animated" 
               onClick={() => setIsAddToyModalOpen(true)}
             >
               <i className="fas fa-plus mr-2"></i> Share a New Toy
