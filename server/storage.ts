@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, toys, type Toy, type InsertToy, messages, type Message, type InsertMessage, toyRequests, type ToyRequest, type InsertToyRequest, favorites, type Favorite, type InsertFavorite } from "@shared/schema";
+import { users, type User, type InsertUser, toys, type Toy, type InsertToy, messages, type Message, type InsertMessage, toyRequests, type ToyRequest, type InsertToyRequest, favorites, type Favorite, type InsertFavorite, contactMessages, type ContactMessage, type InsertContactMessage } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -44,6 +44,11 @@ export interface IStorage {
   createFavorite(favorite: InsertFavorite): Promise<Favorite>;
   deleteFavorite(id: number): Promise<boolean>;
 
+  // ContactMessage CRUD
+  getContactMessage(id: number): Promise<ContactMessage | undefined>;
+  getAllContactMessages(): Promise<ContactMessage[]>;
+  createContactMessage(contactMessage: InsertContactMessage): Promise<ContactMessage>;
+
   // Session store
   sessionStore: session.SessionStore;
 }
@@ -54,12 +59,14 @@ export class MemStorage implements IStorage {
   private messagesMap: Map<number, Message>;
   private toyRequestsMap: Map<number, ToyRequest>;
   private favoritesMap: Map<number, Favorite>;
+  private contactMessagesMap: Map<number, ContactMessage>;
   
   private userCurrentId: number = 1;
   private toyCurrentId: number = 1;
   private messageCurrentId: number = 1;
   private toyRequestCurrentId: number = 1;
   private favoriteCurrentId: number = 1;
+  private contactMessageCurrentId: number = 1;
   
   sessionStore: session.SessionStore;
 
@@ -69,6 +76,7 @@ export class MemStorage implements IStorage {
     this.messagesMap = new Map();
     this.toyRequestsMap = new Map();
     this.favoritesMap = new Map();
+    this.contactMessagesMap = new Map();
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // Prune expired entries every 24h
