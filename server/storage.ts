@@ -242,12 +242,31 @@ export class MemStorage implements IStorage {
       if (filters.isAvailable !== undefined) {
         toys = toys.filter(toy => toy.isAvailable === filters.isAvailable);
       }
+      
+      // Tags filter (supports multiple tags)
+      if (filters.tags && Array.isArray(filters.tags) && filters.tags.length > 0) {
+        toys = toys.filter(toy => {
+          // If toy doesn't have tags property or it's not an array, treat as no tags
+          const toyTags = Array.isArray(toy.tags) ? toy.tags : [];
+          // Check if the toy has ALL the specified tags
+          return filters.tags.every((tag: string) => 
+            toyTags.includes(tag)
+          );
+        });
+      }
+      
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        toys = toys.filter(toy => 
-          toy.title.toLowerCase().includes(searchLower) || 
-          toy.description.toLowerCase().includes(searchLower)
-        );
+        toys = toys.filter(toy => {
+          const toyTags = Array.isArray(toy.tags) ? toy.tags : [];
+          const matchInTags = toyTags.some(tag => 
+            tag.toLowerCase().includes(searchLower)
+          );
+          
+          return toy.title.toLowerCase().includes(searchLower) || 
+                 toy.description.toLowerCase().includes(searchLower) ||
+                 matchInTags;
+        });
       }
     }
     
@@ -264,7 +283,17 @@ export class MemStorage implements IStorage {
   async createToy(insertToy: InsertToy): Promise<Toy> {
     const id = this.toyCurrentId++;
     const createdAt = new Date();
-    const toy: Toy = { ...insertToy, id, createdAt };
+    
+    // Ensure tags is an array
+    const tags = Array.isArray(insertToy.tags) ? insertToy.tags : [];
+    
+    const toy: Toy = { 
+      ...insertToy, 
+      id, 
+      createdAt,
+      tags 
+    };
+    
     this.toysMap.set(id, toy);
     
     // Update the user's sustainability metrics when they share a toy

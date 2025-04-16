@@ -66,6 +66,35 @@ export const BADGES = {
   }
 };
 
+// Predefined common tags for toys
+export const COMMON_TAGS = [
+  "plush",
+  "educational",
+  "outdoor",
+  "baby",
+  "STEM",
+  "books",
+  "games",
+  "like-new",
+  "3-5yrs",
+  "6-8yrs",
+  "9-12yrs",
+  "teen",
+  "wooden",
+  "electronic",
+  "musical",
+  "sports",
+  "art",
+  "puzzles",
+  "seasonal",
+  "building",
+  "action-figures",
+  "cars",
+  "dolls",
+  "pretend-play",
+  "collectible"
+];
+
 // Toy model
 export const toys = pgTable("toys", {
   id: serial("id").primaryKey(),
@@ -77,6 +106,7 @@ export const toys = pgTable("toys", {
   category: text("category").notNull(),
   images: jsonb("images").notNull().$type<string[]>(),
   location: text("location").notNull(),
+  tags: jsonb("tags").notNull().$type<string[]>().default([]),
   isAvailable: boolean("is_available").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -90,6 +120,7 @@ export const insertToySchema = createInsertSchema(toys).pick({
   category: true,
   images: true,
   location: true,
+  tags: true,
   isAvailable: true,
 });
 
