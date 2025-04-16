@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import React, { useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,6 +12,9 @@ import MessagesPage from "@/pages/messages-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 // Resources Pages
 import CommunityGuidelines from "@/pages/resources/community-guidelines";
@@ -34,43 +38,120 @@ import Reporting from "@/pages/safety-center/reporting";
 // Help Center Pages
 import HelpCenter from "@/pages/help-center";
 
-function Router() {
+// Layout component that wraps all pages with consistent header/footer
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  };
+  
+  const handleAddToyClick = () => {
+    // In a production app, we would show the add toy modal here
+    console.log("Add toy clicked");
+  };
+  
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header onSearchChange={handleSearchChange} searchValue={searchQuery} />
+      <main className="flex-grow">
+        {children}
+      </main>
+      <Footer />
+      <MobileNav onAddToyClick={handleAddToyClick} />
+    </div>
+  );
+};
+
+const Router = () => {
   return (
     <Switch>
       {/* Main App Routes */}
-      <Route path="/" component={HomePage} />
-      <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/profile" component={ProfilePage} />
-      <ProtectedRoute path="/favorites" component={FavoritesPage} />
-      <ProtectedRoute path="/messages" component={MessagesPage} />
+      <Route path="/">
+        {() => <Layout><HomePage /></Layout>}
+      </Route>
+      <Route path="/auth">
+        {() => <Layout><AuthPage /></Layout>}
+      </Route>
+      <Route path="/profile">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/profile" component={ProfilePage} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/favorites">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/favorites" component={FavoritesPage} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/messages">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/messages" component={MessagesPage} />
+          </Layout>
+        )}
+      </Route>
       
       {/* Resource Pages */}
-      <Route path="/resources/community-guidelines" component={CommunityGuidelines} />
-      <Route path="/resources/safety-tips" component={SafetyTips} />
-      <Route path="/resources/faq" component={FAQ} />
-      <Route path="/resources/contact-support" component={ContactSupport} />
-      <Route path="/resources/community-standards" component={CommunityStandards} />
+      <Route path="/resources/community-guidelines">
+        {() => <Layout><CommunityGuidelines /></Layout>}
+      </Route>
+      <Route path="/resources/safety-tips">
+        {() => <Layout><SafetyTips /></Layout>}
+      </Route>
+      <Route path="/resources/faq">
+        {() => <Layout><FAQ /></Layout>}
+      </Route>
+      <Route path="/resources/contact-support">
+        {() => <Layout><ContactSupport /></Layout>}
+      </Route>
+      <Route path="/resources/community-standards">
+        {() => <Layout><CommunityStandards /></Layout>}
+      </Route>
       
       {/* Legal Pages */}
-      <Route path="/legal/terms-of-service" component={TermsOfService} />
-      <Route path="/legal/privacy-policy" component={PrivacyPolicy} />
-      <Route path="/legal/cookie-policy" component={CookiePolicy} />
-      <Route path="/legal/accessibility" component={Accessibility} />
+      <Route path="/legal/terms-of-service">
+        {() => <Layout><TermsOfService /></Layout>}
+      </Route>
+      <Route path="/legal/privacy-policy">
+        {() => <Layout><PrivacyPolicy /></Layout>}
+      </Route>
+      <Route path="/legal/cookie-policy">
+        {() => <Layout><CookiePolicy /></Layout>}
+      </Route>
+      <Route path="/legal/accessibility">
+        {() => <Layout><Accessibility /></Layout>}
+      </Route>
       
       {/* Safety Center Pages */}
-      <Route path="/safety-center" component={SafetyCenter} />
-      <Route path="/safety-center/account-security" component={AccountSecurity} />
-      <Route path="/safety-center/toy-safety" component={ToySafety} />
-      <Route path="/safety-center/reporting" component={Reporting} />
+      <Route path="/safety-center">
+        {() => <Layout><SafetyCenter /></Layout>}
+      </Route>
+      <Route path="/safety-center/account-security">
+        {() => <Layout><AccountSecurity /></Layout>}
+      </Route>
+      <Route path="/safety-center/toy-safety">
+        {() => <Layout><ToySafety /></Layout>}
+      </Route>
+      <Route path="/safety-center/reporting">
+        {() => <Layout><Reporting /></Layout>}
+      </Route>
       
       {/* Help Center Pages */}
-      <Route path="/help-center" component={HelpCenter} />
+      <Route path="/help-center">
+        {() => <Layout><HelpCenter /></Layout>}
+      </Route>
       
       {/* Fallback for 404 */}
-      <Route component={NotFound} />
+      <Route>
+        {() => <Layout><NotFound /></Layout>}
+      </Route>
     </Switch>
   );
-}
+};
 
 function App() {
   return (
