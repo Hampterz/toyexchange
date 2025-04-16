@@ -59,7 +59,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <>
+    <div className="page-transition">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="flex items-center mb-4 md:mb-0">
@@ -90,7 +90,7 @@ export default function FavoritesPage() {
             </p>
             <Button 
               onClick={() => window.location.href = "/"} 
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 btn-animated"
             >
               Browse Toys
             </Button>
@@ -126,6 +126,6 @@ export default function FavoritesPage() {
         isOpen={isAddToyModalOpen}
         onClose={() => setIsAddToyModalOpen(false)}
       />
-    </>
+    </div>
   );
 }

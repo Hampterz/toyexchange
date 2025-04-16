@@ -78,8 +78,8 @@ export default function AuthPage() {
 
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4 bg-blue-50">
-              <TabsTrigger value="login" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Sign In</TabsTrigger>
-              <TabsTrigger value="register" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Create Account</TabsTrigger>
+              <TabsTrigger value="login" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white click-scale">Sign In</TabsTrigger>
+              <TabsTrigger value="register" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white click-scale">Create Account</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
@@ -217,7 +217,7 @@ export default function AuthPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full bg-blue-700 hover:bg-blue-800"
+                        className="w-full bg-blue-700 hover:bg-blue-800 btn-animated"
                         disabled={registerMutation.isPending}
                       >
                         {registerMutation.isPending ? "Creating account..." : "Create Account"}
