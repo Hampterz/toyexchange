@@ -11,6 +11,10 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   location: text("location").notNull(),
   profilePicture: text("profile_picture"),
+  toysShared: integer("toys_shared").default(0),
+  successfulExchanges: integer("successful_exchanges").default(0),
+  sustainabilityScore: integer("sustainability_score").default(0),
+  currentBadge: text("current_badge").default("Newcomer"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -22,6 +26,45 @@ export const insertUserSchema = createInsertSchema(users).pick({
   location: true,
   profilePicture: true,
 });
+
+// Sustainability badge definitions
+export const BADGES = {
+  NEWCOMER: {
+    name: "Newcomer",
+    minScore: 0,
+    color: "text-gray-500",
+    bgColor: "bg-gray-100",
+    icon: "🌱"
+  },
+  ECO_FRIEND: {
+    name: "Eco Friend",
+    minScore: 10,
+    color: "text-green-500",
+    bgColor: "bg-green-100",
+    icon: "🌿"
+  },
+  SUSTAINABILITY_HERO: {
+    name: "Sustainability Hero",
+    minScore: 25,
+    color: "text-blue-500",
+    bgColor: "bg-blue-100",
+    icon: "🌊"
+  },
+  EARTH_GUARDIAN: {
+    name: "Earth Guardian",
+    minScore: 50,
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-100",
+    icon: "🌍"
+  },
+  PLANET_PROTECTOR: {
+    name: "Planet Protector",
+    minScore: 100,
+    color: "text-purple-500",
+    bgColor: "bg-purple-100",
+    icon: "⭐"
+  }
+};
 
 // Toy model
 export const toys = pgTable("toys", {

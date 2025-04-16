@@ -1,9 +1,57 @@
-import { users, type User, type InsertUser, toys, type Toy, type InsertToy, messages, type Message, type InsertMessage, toyRequests, type ToyRequest, type InsertToyRequest, favorites, type Favorite, type InsertFavorite, contactMessages, type ContactMessage, type InsertContactMessage } from "@shared/schema";
+import { users, type User, type InsertUser, toys, type Toy, type InsertToy, messages, type Message, type InsertMessage, toyRequests, type ToyRequest, type InsertToyRequest, favorites, type Favorite, type InsertFavorite, contactMessages, type ContactMessage, type InsertContactMessage, BADGES } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import { hashPassword } from "./auth";
 
 const MemoryStore = createMemoryStore(session);
+
+// Utility function to calculate badge based on sustainability score
+function calculateBadge(score: number): string {
+  if (score >= BADGES.PLANET_PROTECTOR.minScore) {
+    return BADGES.PLANET_PROTECTOR.name;
+  } else if (score >= BADGES.EARTH_GUARDIAN.minScore) {
+    return BADGES.EARTH_GUARDIAN.name;
+  } else if (score >= BADGES.SUSTAINABILITY_HERO.minScore) {
+    return BADGES.SUSTAINABILITY_HERO.name;
+  } else if (score >= BADGES.ECO_FRIEND.minScore) {
+    return BADGES.ECO_FRIEND.name;
+  } else {
+    return BADGES.NEWCOMER.name;
+  }
+}
+
+// Utility function to update a user's sustainability metrics
+async function updateUserSustainabilityMetrics(
+  storage: IStorage, 
+  userId: number, 
+  { toysSharedIncrement = 0, successfulExchangesIncrement = 0 }:
+  { toysSharedIncrement?: number, successfulExchangesIncrement?: number }
+): Promise<User | undefined> {
+  const user = await storage.getUser(userId);
+  if (!user) return undefined;
+  
+  // Default values if they don't exist
+  const currentToysShared = user.toysShared || 0;
+  const currentExchanges = user.successfulExchanges || 0;
+  
+  // Calculate new values
+  const newToysShared = currentToysShared + toysSharedIncrement;
+  const newExchanges = currentExchanges + successfulExchangesIncrement;
+  
+  // Calculate sustainability score (toys shared * 5 + successful exchanges * 3)
+  const newScore = (newToysShared * 5) + (newExchanges * 3);
+  
+  // Calculate the appropriate badge based on the score
+  const newBadge = calculateBadge(newScore);
+  
+  // Update the user
+  return storage.updateUser(userId, {
+    toysShared: newToysShared,
+    successfulExchanges: newExchanges,
+    sustainabilityScore: newScore,
+    currentBadge: newBadge
+  });
+}
 
 // modify the interface with any CRUD methods
 // you might need
@@ -190,6 +238,10 @@ export class MemStorage implements IStorage {
     const createdAt = new Date();
     const toy: Toy = { ...insertToy, id, createdAt };
     this.toysMap.set(id, toy);
+    
+    // Update the user's sustainability metrics when they share a toy
+    await updateUserSustainabilityMetrics(this, insertToy.userId, { toysSharedIncrement: 1 });
+    
     return toy;
   }
 
@@ -280,6 +332,26 @@ export class MemStorage implements IStorage {
     
     const updatedRequest = { ...request, status };
     this.toyRequestsMap.set(id, updatedRequest);
+    
+    // If the request is approved, increment the successful exchanges counter for both users
+    if (status === 'approved') {
+      // Update owner's sustainability metrics (shared a toy successfully)
+      await updateUserSustainabilityMetrics(this, request.ownerId, { 
+        successfulExchangesIncrement: 1 
+      });
+      
+      // Update requester's sustainability metrics (received a toy)
+      await updateUserSustainabilityMetrics(this, request.requesterId, { 
+        successfulExchangesIncrement: 1 
+      });
+      
+      // Update the toy to mark it as no longer available
+      const toy = await this.getToy(request.toyId);
+      if (toy) {
+        await this.updateToy(toy.id, { isAvailable: false });
+      }
+    }
+    
     return updatedRequest;
   }
 
