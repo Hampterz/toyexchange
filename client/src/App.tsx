@@ -38,6 +38,9 @@ import Reporting from "@/pages/safety-center/reporting";
 // Help Center Pages
 import HelpCenter from "@/pages/help-center";
 
+// Admin Pages
+import AdminDashboard from "@/pages/admin/dashboard";
+
 // Layout component that wraps all pages with consistent header/footer
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -143,6 +146,15 @@ const Router = () => {
       {/* Help Center Pages */}
       <Route path="/help-center">
         {() => <Layout><HelpCenter /></Layout>}
+      </Route>
+      
+      {/* Admin Pages */}
+      <Route path="/admin/dashboard">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/admin/dashboard" component={AdminDashboard} />
+          </Layout>
+        )}
       </Route>
       
       {/* Fallback for 404 */}
