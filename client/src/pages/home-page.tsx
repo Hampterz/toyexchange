@@ -15,6 +15,7 @@ export default function HomePage() {
     ageRange: "any",
     category: "any",
     condition: "any",
+    tags: [],
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);

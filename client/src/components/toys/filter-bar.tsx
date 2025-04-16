@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Baby, Grid, Star } from "lucide-react";
+import { MapPin, Baby, Grid, Star, Tag } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -7,7 +7,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
+import { COMMON_TAGS } from "@shared/schema";
 
 type FilterBarProps = {
   onFilterChange: (filters: FilterOptions) => void;
@@ -19,6 +27,7 @@ export type FilterOptions = {
   ageRange: string;
   category: string;
   condition: string;
+  tags: string[];
 };
 
 export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
@@ -27,13 +36,23 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     ageRange: initialFilters?.ageRange || "any",
     category: initialFilters?.category || "any",
     condition: initialFilters?.condition || "any",
+    tags: initialFilters?.tags || [],
   });
 
   // Update filters when a selection changes
-  const handleFilterChange = (key: keyof FilterOptions, value: string) => {
+  const handleFilterChange = (key: keyof FilterOptions, value: string | string[]) => {
     const updatedFilters = { ...filters, [key]: value };
     setFilters(updatedFilters);
     onFilterChange(updatedFilters);
+  };
+  
+  // Toggle a tag in the selected tags array
+  const toggleTag = (tag: string) => {
+    const newTags = filters.tags.includes(tag)
+      ? filters.tags.filter(t => t !== tag)
+      : [...filters.tags, tag];
+    
+    handleFilterChange('tags', newTags);
   };
 
   // Initialize filters with any provided initial values
@@ -117,6 +136,56 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
+            <Tag className="text-blue-700 h-4 w-4" />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="link" 
+                  className="text-blue-800 font-medium text-sm pl-0"
+                >
+                  Tags
+                  {filters.tags.length > 0 && (
+                    <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
+                      {filters.tags.length}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="start">
+                <div className="p-4">
+                  <h4 className="text-sm font-medium mb-2">Filter by tags</h4>
+                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                    {COMMON_TAGS.map(tag => (
+                      <Badge
+                        key={tag}
+                        variant={filters.tags.includes(tag) ? "default" : "outline"}
+                        className={`cursor-pointer ${
+                          filters.tags.includes(tag) 
+                            ? 'bg-primary hover:bg-primary/80' 
+                            : 'hover:bg-muted/80'
+                        }`}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                  {filters.tags.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() => handleFilterChange('tags', [])}
+                    >
+                      Clear all tags
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>
