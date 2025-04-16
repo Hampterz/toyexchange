@@ -12,117 +12,234 @@ export default function CookiePolicy() {
           Back to Home
         </Link>
         <h1 className="text-3xl font-bold text-blue-900 mb-2">Cookie Policy</h1>
-        <p className="text-blue-700 border-b border-blue-100 pb-4">Last Updated: April 15, 2023</p>
+        <p className="text-blue-700 border-b border-blue-100 pb-4">Last Updated: April 15, 2024</p>
       </div>
 
       <div className="prose prose-blue max-w-none">
-        <p className="font-semibold">
-          This Cookie Policy explains how ToyShare ("we", "us", or "our") uses cookies and similar technologies on our website and application.
-        </p>
+        <div className="bg-blue-50 p-6 rounded-lg mb-8">
+          <p className="font-medium text-blue-800 mb-0">
+            This Cookie Policy explains how ToyShare ("we", "us", or "our") uses cookies and similar technologies 
+            on our website and mobile applications. It explains what these technologies are and why we use them, 
+            as well as your rights to control our use of them.
+          </p>
+        </div>
 
         <h2>What Are Cookies?</h2>
         <p>
-          Cookies are small text files that are stored on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to the website owners. Cookies can be "persistent" or "session" cookies. Persistent cookies remain on your device when you go offline, while session cookies are deleted as soon as you close your web browser.
+          Cookies are small text files that are stored on your computer or mobile device when you visit a website. 
+          They are widely used to make websites work more efficiently and to provide information to the owners of the site.
+        </p>
+        <p>
+          Cookies allow a website to recognize your device and remember if you've been to the website before. Cookies can 
+          store your preferences and other information to enhance your browsing experience and gather analytics about how 
+          you use the website.
         </p>
 
-        <h2>How We Use Cookies</h2>
+        <h2>Types of Cookies We Use</h2>
         <p>
-          We use different types of cookies for various purposes:
+          ToyShare uses the following types of cookies:
         </p>
 
         <h3>Essential Cookies</h3>
         <p>
-          These cookies are necessary for the website to function properly and cannot be disabled in our systems. They are usually set in response to actions you take such as setting your privacy preferences, logging in, or filling in forms. These include:
+          These cookies are necessary for the website to function properly. They enable basic functions like page navigation, 
+          secure areas access, and toy listing availability. The website cannot function properly without these cookies.
+        </p>
+        <table className="min-w-full border border-blue-100 mb-6">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Cookie Name</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Purpose</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">session</td>
+              <td className="py-2 px-4 border-b border-blue-100">Maintains your session state across page visits</td>
+              <td className="py-2 px-4 border-b border-blue-100">Session</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">auth</td>
+              <td className="py-2 px-4 border-b border-blue-100">Keeps you logged in</td>
+              <td className="py-2 px-4 border-b border-blue-100">30 days</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">csrf_token</td>
+              <td className="py-2 px-4 border-b border-blue-100">Prevents cross-site request forgery attacks</td>
+              <td className="py-2 px-4 border-b border-blue-100">Session</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Preference Cookies</h3>
+        <p>
+          These cookies allow the website to remember choices you make and provide enhanced, personalized features. 
+          They may be set by us or by third-party providers whose services we have added to our pages.
+        </p>
+        <table className="min-w-full border border-blue-100 mb-6">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Cookie Name</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Purpose</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">language</td>
+              <td className="py-2 px-4 border-b border-blue-100">Remembers your preferred language</td>
+              <td className="py-2 px-4 border-b border-blue-100">1 year</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">location</td>
+              <td className="py-2 px-4 border-b border-blue-100">Stores your preferred location for toy searches</td>
+              <td className="py-2 px-4 border-b border-blue-100">30 days</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">recent_searches</td>
+              <td className="py-2 px-4 border-b border-blue-100">Remembers your recent toy searches</td>
+              <td className="py-2 px-4 border-b border-blue-100">30 days</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Analytics Cookies</h3>
+        <p>
+          These cookies collect information about how you use our website, which pages you visit, and if you experience any errors. 
+          This helps us improve how our website works and understand user interests. All data is collected anonymously.
+        </p>
+        <table className="min-w-full border border-blue-100 mb-6">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Cookie Name</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Purpose</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">_ga</td>
+              <td className="py-2 px-4 border-b border-blue-100">Google Analytics - Distinguishes users</td>
+              <td className="py-2 px-4 border-b border-blue-100">2 years</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">_gid</td>
+              <td className="py-2 px-4 border-b border-blue-100">Google Analytics - Distinguishes users</td>
+              <td className="py-2 px-4 border-b border-blue-100">24 hours</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">_gat</td>
+              <td className="py-2 px-4 border-b border-blue-100">Google Analytics - Throttles request rate</td>
+              <td className="py-2 px-4 border-b border-blue-100">1 minute</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Marketing Cookies</h3>
+        <p>
+          These cookies track your online activity to help advertisers deliver more relevant advertising or to limit how many times you see an ad. 
+          These cookies can share that information with other organizations or advertisers.
+        </p>
+        <table className="min-w-full border border-blue-100 mb-6">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Cookie Name</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Purpose</th>
+              <th className="py-2 px-4 border-b border-blue-100 text-left">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">_fbp</td>
+              <td className="py-2 px-4 border-b border-blue-100">Facebook - Used to deliver, measure, and improve advertisements</td>
+              <td className="py-2 px-4 border-b border-blue-100">3 months</td>
+            </tr>
+            <tr>
+              <td className="py-2 px-4 border-b border-blue-100">ads_prefs</td>
+              <td className="py-2 px-4 border-b border-blue-100">Stores advertisement preferences</td>
+              <td className="py-2 px-4 border-b border-blue-100">1 year</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Third-Party Cookies</h2>
+        <p>
+          In addition to our own cookies, we may also use various third-party cookies to report usage statistics of the service, 
+          deliver advertisements, and so on. These cookies may be placed on your device when you visit our website or when you 
+          use certain features of our service.
+        </p>
+
+        <h2>How to Control Cookies</h2>
+        <p>
+          You can control and manage cookies in various ways. Please keep in mind that removing or blocking cookies can impact your user experience and 
+          some features of the website may no longer be fully accessible.
+        </p>
+
+        <h3>Browser Controls</h3>
+        <p>
+          Most browsers allow you to view, delete, and block cookies by adjusting the settings in your browser. To find out more about cookies, including 
+          how to see what cookies have been set and how to manage and delete them, visit:
         </p>
         <ul>
-          <li>Session management cookies</li>
-          <li>Authentication cookies</li>
-          <li>Security cookies</li>
+          <li><a href="https://support.google.com/chrome/answer/95647" className="text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer">Google Chrome</a></li>
+          <li><a href="https://support.mozilla.org/en-US/kb/enable-and-disable-cookies-website-preferences" className="text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer">Mozilla Firefox</a></li>
+          <li><a href="https://support.apple.com/guide/safari/manage-cookies-and-website-data-sfri11471/mac" className="text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer">Safari</a></li>
+          <li><a href="https://support.microsoft.com/en-us/windows/microsoft-edge-browsing-data-and-privacy-bb8174ba-9d73-dcf2-9b4a-c582b4e640dd" className="text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer">Microsoft Edge</a></li>
         </ul>
 
-        <h3>Performance and Analytics Cookies</h3>
+        <h3>Cookie Preference Center</h3>
         <p>
-          These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us understand which pages are the most and least popular and see how visitors move around the site. All information these cookies collect is aggregated. These include:
-        </p>
-        <ul>
-          <li>Google Analytics cookies</li>
-          <li>Page load time monitoring cookies</li>
-          <li>User behavior tracking cookies</li>
-        </ul>
-
-        <h3>Functionality Cookies</h3>
-        <p>
-          These cookies enable enhanced functionality and personalization, such as remembering your preferences and settings. They may be set by us or by third-party providers whose services we have added to our pages. These include:
-        </p>
-        <ul>
-          <li>Language preference cookies</li>
-          <li>Location cookies</li>
-          <li>User interface customization cookies</li>
-        </ul>
-
-        <h3>Targeting and Advertising Cookies</h3>
-        <p>
-          These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant advertisements on other sites. They do not directly store personal information, but are based on uniquely identifying your browser and internet device. These include:
-        </p>
-        <ul>
-          <li>Social media cookies</li>
-          <li>Advertising cookies</li>
-          <li>Retargeting cookies</li>
-        </ul>
-
-        <h2>Similar Technologies</h2>
-        <p>
-          In addition to cookies, we may use other similar technologies, such as:
-        </p>
-        <ul>
-          <li><strong>Web Beacons:</strong> Small graphic images (also known as "pixel tags" or "clear GIFs") that may be included on our sites, apps, and emails, that help us understand how you interact with those websites, apps, and emails.</li>
-          <li><strong>Local Storage:</strong> Browser web storage that allows websites to store data in a browser on a device. Local storage is typically used to display content based on browsing history and store user preferences.</li>
-          <li><strong>Session Replay:</strong> Technologies that help us understand how you interact with our website by recreating your actions, such as mouse movements, clicks, and scrolling.</li>
-        </ul>
-
-        <h2>Your Cookie Choices</h2>
-        <p>
-          Most web browsers allow you to manage your cookie preferences. You can set your browser to refuse cookies or delete certain cookies. Generally, you should also be able to:
-        </p>
-        <ul>
-          <li>Set your browser to block all cookies</li>
-          <li>Allow only "trusted" websites to set them</li>
-          <li>Set your browser to clear cookies each time you close it</li>
-          <li>Accept cookies from websites only for the duration of your visit</li>
-          <li>Block third-party cookies</li>
-        </ul>
-        <p>
-          Please note that if you choose to block or delete cookies, you may not be able to take full advantage of the website and some features may not work properly.
+          You can manage your cookie preferences through our Cookie Preference Center, which you can access by clicking on "Cookie Settings" 
+          in the footer of our website.
         </p>
 
-        <h3>Managing Cookies in Popular Browsers</h3>
-        <ul>
-          <li><strong>Google Chrome:</strong> Settings &gt; Privacy and security &gt; Cookies and other site data</li>
-          <li><strong>Mozilla Firefox:</strong> Menu &gt; Options &gt; Privacy &amp; Security &gt; Cookies and Site Data</li>
-          <li><strong>Safari:</strong> Preferences &gt; Privacy &gt; Cookies and website data</li>
-          <li><strong>Microsoft Edge:</strong> Settings &gt; Cookies and site permissions &gt; Cookies and site data</li>
-        </ul>
-
-        <h2>Our Cookie Consent Tool</h2>
+        <h3>Do Not Track</h3>
         <p>
-          When you first visit our website, you will be shown a cookie banner that allows you to accept or decline non-essential cookies. You can change your preferences at any time by clicking on the "Cookie Settings" link in the footer of our website.
+          Some browsers have a "Do Not Track" feature that lets you tell websites that you do not want to have your online activities tracked. 
+          At this time, we do not respond to browser "Do Not Track" signals.
         </p>
 
         <h2>Updates to This Cookie Policy</h2>
         <p>
-          We may update this Cookie Policy from time to time to reflect changes in technology, law, our business operations, or any other reason we determine is necessary or appropriate. When we make changes, we will update the "Last Updated" date at the top of this policy and post the updated policy on our website.
+          We may update this Cookie Policy from time to time in order to reflect changes to the cookies we use or for other operational, legal, or regulatory reasons. 
+          Please revisit this Cookie Policy regularly to stay informed about our use of cookies and related technologies.
+        </p>
+        <p>
+          The date at the top of this Cookie Policy indicates when it was last updated.
         </p>
 
         <h2>Contact Us</h2>
         <p>
-          If you have any questions about our use of cookies or this Cookie Policy, please contact us at privacy@toyshare.example.com.
+          If you have any questions about our use of cookies or this Cookie Policy, please contact us at:
+        </p>
+        <p>
+          Email: <a href="mailto:privacy@toyshare.example.com" className="text-blue-700 hover:underline">privacy@toyshare.example.com</a><br />
+          Postal Address: ToyShare Privacy Team, 123 Main Street, San Francisco, CA 94105
         </p>
 
-        <div className="bg-blue-50 p-4 rounded-lg mt-8">
-          <p className="text-sm text-gray-700">
-            By continuing to use our website, you consent to our use of cookies as described in this Cookie Policy.
+        <div className="bg-blue-50 p-6 rounded-lg mt-8">
+          <h3 className="text-blue-900 mt-0 mb-2">Your Consent</h3>
+          <p className="mb-0">
+            By using our website, you consent to our use of cookies in accordance with this Cookie Policy. 
+            If you do not accept the use of cookies, please disable them following the instructions in this Cookie Policy 
+            so that cookies from this website cannot be placed on your device.
           </p>
         </div>
+      </div>
+
+      <div className="mt-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
+        <Link href="/legal/terms-of-service" className="text-blue-700 hover:underline font-medium">
+          Terms of Service
+        </Link>
+        <span className="hidden sm:inline text-gray-300">|</span>
+        <Link href="/legal/privacy-policy" className="text-blue-700 hover:underline font-medium">
+          Privacy Policy
+        </Link>
+        <span className="hidden sm:inline text-gray-300">|</span>
+        <Link href="/legal/accessibility" className="text-blue-700 hover:underline font-medium">
+          Accessibility
+        </Link>
       </div>
     </div>
   );
