@@ -1,227 +1,170 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Phone } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const contactFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  subject: z.string().min(5, {
-    message: "Subject must be at least 5 characters.",
-  }),
-  message: z.string().min(10, {
-    message: "Message must be at least 10 characters.",
-  }),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
+import React from "react";
+import { Mail, MapPin, Phone, MessageSquare, Globe, Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ContactForm } from "@/components/layout/contact-form";
 
 export default function ContactSupport() {
-  const { toast } = useToast();
-  
-  const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    },
-  });
-
-  async function onSubmit(data: ContactFormValues) {
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        toast({
-          title: "Message sent",
-          description: "We'll get back to you as soon as possible.",
-        });
-        form.reset();
-      } else {
-        toast({
-          title: "Error",
-          description: result.message || "Failed to send message. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again later.",
-        variant: "destructive",
-      });
-    }
-  }
-
   return (
-    <div className="container mx-auto py-12 px-4 max-w-7xl">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold tracking-tight mb-4">Contact Support</h1>
-        <p className="text-muted-foreground max-w-3xl mx-auto">
-          Need help with your ToyShare account or have questions about our platform? 
-          Our support team is here to assist you.
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Send us a message</CardTitle>
-              <CardDescription>
-                Fill out the form below and we'll get back to you as soon as possible.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Your name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Your email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Subject</FormLabel>
-                        <FormControl>
-                          <Input placeholder="What's this about?" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="How can we help you?" 
-                            className="min-h-[150px]" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button type="submit" className="w-full sm:w-auto">Send Message</Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col">
+        <div className="text-center mb-10">
+          <div className="inline-flex justify-center items-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+            <Mail className="h-8 w-8 text-blue-700" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-4">Contact Support</h1>
+          <p className="text-lg text-blue-700 max-w-2xl mx-auto">
+            Have questions, feedback, or need assistance? Our team is here to help.
+            Reach out to us and we'll get back to you as soon as possible.
+          </p>
         </div>
         
-        <div>
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-              <CardDescription>
-                Our support team is available Monday through Friday from 9am to 5pm.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start">
-                <Mail className="h-5 w-5 mr-3 text-primary mt-0.5" />
-                <div>
-                  <h3 className="font-medium">Email</h3>
-                  <p className="text-sm text-muted-foreground">donotreplymail92@gmail.com</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <Phone className="h-5 w-5 mr-3 text-primary mt-0.5" />
-                <div>
-                  <h3 className="font-medium">Phone</h3>
-                  <p className="text-sm text-muted-foreground">(555) 123-4567</p>
-                  <p className="text-xs text-muted-foreground">Mon-Fri 9am-5pm</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="md:col-span-2">
+            <ContactForm 
+              title="Send us a message" 
+              description="Fill out the form below and we'll respond within 24-48 hours on business days."
+            />
+          </div>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Frequently Asked Questions</CardTitle>
-              <CardDescription>
-                Find quick answers to common questions.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li>
-                  <a href="/resources/faq" className="text-primary hover:underline block">
-                    How do I reset my password?
-                  </a>
-                </li>
-                <li>
-                  <a href="/resources/faq" className="text-primary hover:underline block">
-                    Is my information secure?
-                  </a>
-                </li>
-                <li>
-                  <a href="/resources/faq" className="text-primary hover:underline block">
-                    How do I report a problem with a toy?
-                  </a>
-                </li>
-                <li>
-                  <a href="/resources/faq" className="text-primary hover:underline block">
-                    View all FAQs →
-                  </a>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-blue-600" /> Our Office
+                </h3>
+                <address className="not-italic text-blue-700">
+                  <p>ToyShare Headquarters</p>
+                  <p>123 Sharing Street</p>
+                  <p>San Francisco, CA 94107</p>
+                </address>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                  <MessageSquare className="h-5 w-5 mr-2 text-blue-600" /> Get in Touch
+                </h3>
+                <div className="space-y-3 text-blue-700">
+                  <p className="flex items-center">
+                    <Phone className="h-4 w-4 mr-3 text-blue-600" />
+                    <span>(555) 123-4567</span>
+                  </p>
+                  <p className="flex items-center">
+                    <Mail className="h-4 w-4 mr-3 text-blue-600" />
+                    <span>support@toyshare.com</span>
+                  </p>
+                  <p className="flex items-center">
+                    <Globe className="h-4 w-4 mr-3 text-blue-600" />
+                    <span>www.toyshare.com</span>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                  <Clock className="h-5 w-5 mr-2 text-blue-600" /> Support Hours
+                </h3>
+                <div className="space-y-3 text-blue-700">
+                  <p className="flex justify-between">
+                    <span>Monday - Friday:</span>
+                    <span>9:00 AM - 6:00 PM PT</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span>Saturday:</span>
+                    <span>10:00 AM - 4:00 PM PT</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span>Sunday:</span>
+                    <span>Closed</span>
+                  </p>
+                  <p className="text-sm mt-4 text-blue-600">
+                    Response times may vary during weekends and holidays.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        
+        <div className="bg-blue-50 rounded-xl p-8 mb-12">
+          <h2 className="text-2xl font-bold text-blue-800 mb-6 text-center">Frequently Asked Questions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">How long does it take to get a response?</h3>
+              <p className="text-blue-700">
+                We typically respond to all inquiries within 24-48 hours during business days.
+                For urgent matters, please include "URGENT" in your subject line.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">I'm having trouble with a toy exchange</h3>
+              <p className="text-blue-700">
+                Please provide details about the exchange, including the toy ID and the username
+                of the other party. We'll look into the issue and help resolve any conflicts.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">How do I report inappropriate content?</h3>
+              <p className="text-blue-700">
+                You can report inappropriate content directly on the platform using the "Report"
+                button, or contact us here with the details of the content.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Can I get help with my account?</h3>
+              <p className="text-blue-700">
+                Yes! For account-related issues, please provide your username (not password)
+                and a description of the problem you're experiencing.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-center mb-12">
+          <h2 className="text-2xl font-bold text-blue-800 mb-6">Other Ways to Get Help</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <Card className="border-blue-100 hover:border-blue-300 transition-all cursor-pointer">
+              <CardContent className="p-6 flex flex-col items-center">
+                <div className="bg-blue-100 rounded-full p-3 mb-4">
+                  <Globe className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="font-semibold text-blue-800 mb-2">Help Center</h3>
+                <p className="text-blue-700 text-sm text-center">
+                  Browse our extensive knowledge base for answers to common questions.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-blue-100 hover:border-blue-300 transition-all cursor-pointer">
+              <CardContent className="p-6 flex flex-col items-center">
+                <div className="bg-blue-100 rounded-full p-3 mb-4">
+                  <MessageSquare className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="font-semibold text-blue-800 mb-2">Community Forum</h3>
+                <p className="text-blue-700 text-sm text-center">
+                  Connect with other members and share experiences and solutions.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-blue-100 hover:border-blue-300 transition-all cursor-pointer">
+              <CardContent className="p-6 flex flex-col items-center">
+                <div className="bg-blue-100 rounded-full p-3 mb-4">
+                  <Mail className="h-6 w-6 text-blue-700" />
+                </div>
+                <h3 className="font-semibold text-blue-800 mb-2">Email Support</h3>
+                <p className="text-blue-700 text-sm text-center">
+                  For private inquiries, email us directly at support@toyshare.com.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

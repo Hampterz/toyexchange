@@ -22,6 +22,7 @@ import SafetyTips from "@/pages/resources/safety-tips";
 import FAQ from "@/pages/resources/faq";
 import ContactSupport from "@/pages/resources/contact-support";
 import CommunityStandards from "@/pages/resources/community-standards";
+import ExchangeGuide from "@/pages/resources/exchange-guide";
 
 // Legal Pages
 import TermsOfService from "@/pages/legal/terms-of-service";
@@ -113,6 +114,9 @@ const Router = () => {
       </Route>
       <Route path="/resources/community-standards">
         {() => <Layout><CommunityStandards /></Layout>}
+      </Route>
+      <Route path="/resources/exchange-guide">
+        {() => <Layout><ExchangeGuide /></Layout>}
       </Route>
       
       {/* Legal Pages */}

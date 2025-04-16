@@ -5,7 +5,10 @@ import { ToyList } from "@/components/toys/toy-list";
 import { AddToyModal } from "@/components/toys/add-toy-modal";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { Plus } from "lucide-react";
+import { Plus, Search, Gift, BookOpen, Shield, MessageSquare } from "lucide-react";
+import { ToySearch } from "@/components/toys/toy-search";
+import { NewsletterSignup } from "@/components/layout/newsletter-signup";
+import { Testimonials } from "@/components/layout/testimonials";
 
 export default function HomePage() {
   const { user } = useAuth();
