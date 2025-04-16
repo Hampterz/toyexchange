@@ -62,8 +62,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Filter Bar */}
-      <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
+      {/* Search and Filter Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="bg-white p-4 rounded-xl shadow-sm">
+          <div className="mb-4">
+            <ToySearch onSearch={setSearchQuery} initialValue={searchQuery} />
+          </div>
+          <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
+        </div>
+      </section>
 
       {/* Toy Listings */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
@@ -95,31 +102,43 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-2xl shadow-md text-center transform hover:scale-105 transition duration-300">
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-recycle text-blue-700 text-2xl"></i>
+                <Gift className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">61</h3>
               <p className="text-blue-800">Toys saved from landfill</p>
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-md text-center transform hover:scale-105 transition duration-300">
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-users text-blue-700 text-2xl"></i>
+                <MessageSquare className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
-              <p className="text-blue-800">Families sharing toys</p>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">47</h3>
+              <p className="text-blue-800">Families connected</p>
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-md text-center transform hover:scale-105 transition duration-300">
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-hand-holding-heart text-blue-700 text-2xl"></i>
+                <Shield className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
-              <p className="text-blue-800">Successful exchanges</p>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">124</h3>
+              <p className="text-blue-800">Kg of waste saved</p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold font-heading mb-4 text-blue-800">What Our Community Says</h2>
+          <p className="text-blue-700 max-w-2xl mx-auto">
+            Join hundreds of families who are already sharing toys and creating lasting connections.
+          </p>
+        </div>
+        
+        <Testimonials />
+      </section>
+      
       {/* How It Works */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="text-center mb-10">
@@ -168,6 +187,60 @@ export default function HomePage() {
           >
             <Plus className="mr-2 h-4 w-4" /> Share Your First Toy
           </Button>
+        </div>
+      </section>
+
+      {/* Newsletter Signup */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold font-heading mb-4 text-blue-800">Stay Connected</h2>
+          <p className="text-blue-700 max-w-2xl mx-auto mb-8">
+            Sign up for our newsletter to receive toy sharing tips, community stories, and updates on new features.
+          </p>
+        </div>
+        
+        <div className="max-w-2xl mx-auto">
+          <NewsletterSignup />
+        </div>
+      </section>
+
+      {/* Resource Links */}
+      <section className="bg-blue-50 py-10 mb-12 rounded-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <BookOpen className="h-8 w-8 text-blue-700 mx-auto mb-3" />
+              <h3 className="font-bold text-blue-800 mb-2">Exchange Guide</h3>
+              <p className="text-blue-600 mb-3 text-sm">Learn the best practices for successful toy exchanges</p>
+              <Link href="/resources/exchange-guide">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
+                  Read Guide
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <Shield className="h-8 w-8 text-blue-700 mx-auto mb-3" />
+              <h3 className="font-bold text-blue-800 mb-2">Safety Center</h3>
+              <p className="text-blue-600 mb-3 text-sm">Everything you need to know to stay safe while sharing</p>
+              <Link href="/safety-center">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
+                  Visit Safety Center
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <MessageSquare className="h-8 w-8 text-blue-700 mx-auto mb-3" />
+              <h3 className="font-bold text-blue-800 mb-2">Get Support</h3>
+              <p className="text-blue-600 mb-3 text-sm">Have questions? Our support team is ready to help</p>
+              <Link href="/resources/contact-support">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
+                  Contact Us
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
