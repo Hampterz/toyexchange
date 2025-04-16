@@ -75,6 +75,36 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
               </Link>
             </>
           )}
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center space-x-1 text-neutral-700 hover:text-primary font-medium text-sm">
+                <span>Resources</span>
+                <ChevronDown className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href="/help-center" className="cursor-pointer w-full">Help Center</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/safety-center" className="cursor-pointer w-full">Safety Center</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/resources/community-standards" className="cursor-pointer w-full">Community Standards</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/resources/safety-tips" className="cursor-pointer w-full">Safety Tips</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/resources/faq" className="cursor-pointer w-full">FAQ</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/resources/contact-support" className="cursor-pointer w-full">Contact Support</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {user ? (
             <DropdownMenu>

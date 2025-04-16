@@ -22,20 +22,20 @@ export function Footer() {
           <div>
             <h4 className="font-bold font-heading mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Community Guidelines</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Safety Tips</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">FAQ</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Contact Support</Link></li>
+              <li><Link href="/resources/community-standards" className="text-neutral-400 hover:text-white text-sm">Community Guidelines</Link></li>
+              <li><Link href="/resources/safety-tips" className="text-neutral-400 hover:text-white text-sm">Safety Tips</Link></li>
+              <li><Link href="/resources/faq" className="text-neutral-400 hover:text-white text-sm">FAQ</Link></li>
+              <li><Link href="/resources/contact-support" className="text-neutral-400 hover:text-white text-sm">Contact Support</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold font-heading mb-4">Legal</h4>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Terms of Service</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Privacy Policy</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Cookie Policy</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white text-sm">Accessibility</Link></li>
+              <li><Link href="/legal/terms-of-service" className="text-neutral-400 hover:text-white text-sm">Terms of Service</Link></li>
+              <li><Link href="/legal/privacy-policy" className="text-neutral-400 hover:text-white text-sm">Privacy Policy</Link></li>
+              <li><Link href="/legal/cookie-policy" className="text-neutral-400 hover:text-white text-sm">Cookie Policy</Link></li>
+              <li><Link href="/legal/accessibility" className="text-neutral-400 hover:text-white text-sm">Accessibility</Link></li>
             </ul>
           </div>
 
@@ -70,9 +70,9 @@ export function Footer() {
         <div className="border-t border-neutral-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-neutral-400 text-sm">&copy; {new Date().getFullYear()} ToyShare. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="#" className="text-neutral-400 hover:text-white text-sm">Help Center</Link>
-            <Link href="#" className="text-neutral-400 hover:text-white text-sm">Safety Center</Link>
-            <Link href="#" className="text-neutral-400 hover:text-white text-sm">Community Standards</Link>
+            <Link href="/help-center" className="text-neutral-400 hover:text-white text-sm">Help Center</Link>
+            <Link href="/safety-center" className="text-neutral-400 hover:text-white text-sm">Safety Center</Link>
+            <Link href="/resources/community-standards" className="text-neutral-400 hover:text-white text-sm">Community Standards</Link>
           </div>
         </div>
       </div>
