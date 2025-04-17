@@ -9,6 +9,7 @@ import { Plus, Search, Gift, BookOpen, Shield, MessageSquare } from "lucide-reac
 import { ToySearch } from "@/components/toys/toy-search";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { Testimonials } from "@/components/layout/testimonials";
+import { useQuery } from "@tanstack/react-query";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -22,6 +23,12 @@ export default function HomePage() {
     search: "",
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
+  
+  // Query for community metrics
+  const { data: communityMetrics } = useQuery({
+    queryKey: ['/api/community-metrics'],
+    staleTime: 60000, // Cache for 1 minute
+  });
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -101,7 +108,9 @@ export default function HomePage() {
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Gift className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">
+                {communityMetrics?.toysSaved || 0}
+              </h3>
               <p className="text-blue-800">Toys saved from landfill</p>
             </div>
 
@@ -109,7 +118,9 @@ export default function HomePage() {
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">
+                {communityMetrics?.familiesConnected || 0}
+              </h3>
               <p className="text-blue-800">Families connected</p>
             </div>
 
@@ -117,7 +128,9 @@ export default function HomePage() {
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">
+                {communityMetrics?.wasteReduced || 0}
+              </h3>
               <p className="text-blue-800">Kg of waste saved</p>
             </div>
           </div>

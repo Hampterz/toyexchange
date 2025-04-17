@@ -504,6 +504,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch all toys" });
     }
   });
+  
+  // Community metrics endpoint
+  app.get("/api/community-metrics", async (_req, res) => {
+    try {
+      const metrics = await storage.getCommunityMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching community metrics:", error);
+      res.status(500).json({ error: "Failed to fetch community metrics" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
