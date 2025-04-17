@@ -85,6 +85,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   // Mark toy as traded mutation
   const markAsTradedMutation = useMutation({
     mutationFn: async (toyId: number) => {
+      // Update the toy status
       await apiRequest("PATCH", `/api/toys/${toyId}`, { 
         status: "traded",
         isAvailable: false
@@ -95,10 +96,19 @@ export function ProfileToys({ userId }: ProfileToysProps) {
         toysSaved: 1, // Increment by 1
         familiesConnected: 1 // Increment by 1
       });
+      
+      // Update the user's sustainability metrics
+      await apiRequest("PATCH", `/api/users/${userId}/sustainability`, {
+        toysShared: 1,
+        successfulExchanges: 1
+      });
     },
     onSuccess: () => {
+      // Invalidate queries to update UI
       queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/toys`] });
       queryClient.invalidateQueries({ queryKey: ['/api/community-metrics'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}`] });
+      
       toast({
         title: "Toy Marked as Traded",
         description: "Thank you for sharing and making a difference!",

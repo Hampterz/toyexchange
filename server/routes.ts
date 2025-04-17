@@ -539,6 +539,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update community metrics" });
     }
   });
+  
+  // Update user sustainability metrics
+  app.patch("/api/users/:userId/sustainability", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const increments = req.body;
+      
+      // Only allow users to update their own sustainability metrics or admin user
+      const isAdmin = req.user!.username === "adminsreyas";
+      if (userId !== req.user!.id && !isAdmin) {
+        return res.status(403).json({ message: "Not authorized to update this user's metrics" });
+      }
+      
+      // Get current user
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Calculate new metrics
+      const updatedMetrics = {
+        toysShared: (user.toysShared || 0) + (increments.toysShared || 0),
+        successfulExchanges: (user.successfulExchanges || 0) + (increments.successfulExchanges || 0),
+      };
+      
+      // Calculate sustainability score: toysShared * 10 + successfulExchanges * 5
+      const newScore = updatedMetrics.toysShared * 10 + updatedMetrics.successfulExchanges * 5;
+      
+      // Determine badge level
+      let newBadge = "ECO_STARTER";
+      if (newScore >= 100) {
+        newBadge = "PLANET_PROTECTOR";
+      } else if (newScore >= 50) {
+        newBadge = "SUSTAINABILITY_CHAMPION";
+      } else if (newScore >= 25) {
+        newBadge = "COMMUNITY_CONTRIBUTOR";
+      }
+      
+      const finalUpdates = {
+        ...updatedMetrics,
+        sustainabilityScore: newScore,
+        currentBadge: newBadge
+      };
+      
+      // Update user
+      const updatedUser = await storage.updateUser(userId, finalUpdates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Failed to update user" });
+      }
+      
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating user sustainability metrics:", error);
+      res.status(500).json({ message: "Failed to update sustainability metrics" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
