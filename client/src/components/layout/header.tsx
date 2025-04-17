@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ToySearch } from "@/components/toys/toy-search";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Logo } from "@/components/layout/logo";
 
 type HeaderProps = {
   onSearchChange?: (value: string) => void;
@@ -57,10 +58,7 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold text-blue-700 mr-1">Toy</span>
-              <span className="text-2xl font-bold text-blue-500">Share</span>
-            </Link>
+            <Logo />
           </div>
 
           {onSearchChange && !isMobile && (
@@ -213,6 +211,9 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
         {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden py-3 space-y-3">
+            <div className="py-2 mb-3 border-b">
+              <Logo />
+            </div>
             {onSearchChange && (
               <div className="relative mt-3">
                 <ToySearch onSearch={handleSearch} initialValue={searchValue} />

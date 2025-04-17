@@ -25,7 +25,11 @@ export default function HomePage() {
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
   
   // Query for community metrics
-  const { data: communityMetrics } = useQuery({
+  const { data: communityMetrics } = useQuery<{ 
+    toysSaved: number; 
+    familiesConnected: number;
+    wasteReduced: number;
+  }>({
     queryKey: ['/api/community-metrics'],
     staleTime: 60000, // Cache for 1 minute
   });
