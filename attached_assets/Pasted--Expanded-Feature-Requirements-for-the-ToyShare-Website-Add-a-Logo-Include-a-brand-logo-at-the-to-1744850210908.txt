@@ -1,0 +1,76 @@
+✅ Expanded Feature Requirements for the ToyShare Website
+Add a Logo:
+
+Include a brand logo at the top of every page in the navigation bar.
+
+It should appear on desktop and mobile layouts.
+
+Make sure it scales well and links back to the homepage when clicked.
+
+User Dashboard to View Listings:
+
+Add a “My Listings” section or dashboard where logged-in users can view only the toys they’ve posted.
+
+It should list all their active, pending, and completed (traded) toys.
+
+Delete or Mark as Traded:
+
+In the “My Listings” section, each toy should have buttons:
+
+Delete: Removes the listing permanently.
+
+Mark as Traded: Marks the listing as completed and removes it from public view.
+
+Every time a toy is marked as traded, increment a global counter called “Toys Rehomed” or “Making a Difference Together” visible on the homepage or dashboard.
+
+Remove Fake Reviews:
+
+If there are placeholder reviews or testimonials that aren’t real, remove them.
+
+Replace them later with real reviews or remove the review section entirely until it's ready.
+
+Photos and Videos on Listings:
+
+Allow users to upload multiple images (e.g., up to 5) and optional video clips when posting a toy.
+
+Show previews of uploaded content on the listing page.
+
+Accept common formats like JPG, PNG, MP4.
+
+Reduce Amount of Blue in the UI:
+
+The current design uses too much blue. Adjust the color palette to include more neutral tones or a mix of soft pastels (e.g., soft gray, beige, or green) to keep it playful but clean.
+
+FAQ Page with Answers:
+
+Add a proper FAQ page that answers commonly expected questions, like:
+
+“Is ToyShare free to use?”
+
+“How do I contact someone about a toy?”
+
+“What happens after I request a toy?”
+
+“Is my location shared publicly?”
+
+“Can I edit or delete my listing later?”
+
+Email Notification System for Toy Matches:
+
+Let users opt in to email alerts for toys that match their selected:
+
+Location (e.g. ZIP or city)
+
+Tags (e.g. #books, #3-5yrs, #STEM)
+
+When a toy is posted that matches those filters, the user should receive a friendly email notification with a link to view it.
+
+Expanded Tagging System:
+
+Add a larger preset list of tags covering categories like:
+
+#books, #STEM, #outdoor, #puzzles, #vehicles, #games, #infant, #toddler, #7-9yrs, #10+yrs, #girl, #boy, etc.
+
+Let users also create custom tags when posting a toy if the tag they want doesn’t exist yet.
+
+Display tags as clickable filters on the browse/search page.

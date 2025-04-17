@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import { Loader2, Edit, Trash2, HandshakeIcon, Tag, Film } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,8 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [toyToDelete, setToyToDelete] = useState<number | null>(null);
+  const [toyToMarkAsTraded, setToyToMarkAsTraded] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("active");
 
   // Query user's toys
   const { data: toys, isLoading } = useQuery({
@@ -72,6 +75,38 @@ export function ProfileToys({ userId }: ProfileToysProps) {
       toast({
         title: "Update Failed",
         description: "Failed to update availability. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Mark toy as traded mutation
+  const markAsTradedMutation = useMutation({
+    mutationFn: async (toyId: number) => {
+      await apiRequest("PATCH", `/api/toys/${toyId}`, { 
+        status: "traded",
+        isAvailable: false
+      });
+      
+      // Update the community metrics to increment toys saved count
+      await apiRequest("PATCH", "/api/community-metrics", {
+        toysSaved: 1, // Increment by 1
+        familiesConnected: 1 // Increment by 1
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/toys`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/community-metrics'] });
+      toast({
+        title: "Toy Marked as Traded",
+        description: "Thank you for sharing and making a difference!",
+      });
+      setToyToMarkAsTraded(null);
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to mark toy as traded. Please try again.",
         variant: "destructive",
       });
     },

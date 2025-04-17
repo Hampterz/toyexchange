@@ -108,6 +108,8 @@ export const toys = pgTable("toys", {
   location: text("location").notNull(),
   tags: jsonb("tags").notNull().$type<string[]>().default([]),
   isAvailable: boolean("is_available").default(true),
+  status: text("status").notNull().default("active"), // active, traded, deleted
+  videos: jsonb("videos").default([]).$type<string[]>(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -122,6 +124,8 @@ export const insertToySchema = createInsertSchema(toys).pick({
   location: true,
   tags: true,
   isAvailable: true,
+  status: true,
+  videos: true,
 });
 
 // Message model
