@@ -33,7 +33,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   const [activeTab, setActiveTab] = useState<string>("active");
 
   // Query user's toys
-  const { data: toys, isLoading } = useQuery({
+  const { data: toys, isLoading } = useQuery<Toy[]>({
     queryKey: [`/api/users/${userId}/toys`],
   });
 
@@ -142,89 +142,203 @@ export function ProfileToys({ userId }: ProfileToysProps) {
     );
   }
 
+  // Filter toys based on status
+  const activeToys = Array.isArray(toys) ? toys.filter(toy => toy.status === 'active') : [];
+  const tradedToys = Array.isArray(toys) ? toys.filter(toy => toy.status === 'traded') : [];
+
   return (
     <div className="space-y-4">
-      {toys.map(toy => (
-        <Card key={toy.id} className="overflow-hidden">
-          <CardContent className="p-0">
-            <div className="flex flex-col sm:flex-row">
-              <div className="sm:w-1/3 h-48 sm:h-auto bg-neutral-100">
-                {toy.images && toy.images.length > 0 ? (
-                  <img 
-                    src={toy.images[0]} 
-                    alt={toy.title} 
-                    className="w-full h-full object-cover" 
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                    <i className="fas fa-image text-4xl"></i>
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-4 sm:w-2/3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-lg mb-1">{toy.title}</h3>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <Badge variant="outline">{toy.category}</Badge>
-                      <Badge variant="outline">Ages {toy.ageRange}</Badge>
-                      <Badge variant="outline">{toy.condition}</Badge>
-                      <Badge 
-                        variant={toy.isAvailable ? "success" : "destructive"}
-                        className={toy.isAvailable ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}
-                      >
-                        {toy.isAvailable ? "Available" : "Not Available"}
-                      </Badge>
+      <Tabs 
+        defaultValue="active" 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger 
+            value="active" 
+            className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+          >
+            Active Listings ({activeToys.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="traded" 
+            className="data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
+          >
+            Traded Toys ({tradedToys.length})
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="active" className="mt-4 space-y-4">
+          {activeToys.length === 0 ? (
+            <div className="text-center py-8 bg-blue-50 rounded-lg">
+              <p className="text-blue-700">You don't have any active toy listings.</p>
+            </div>
+          ) : (
+            activeToys.map(toy => (
+              <Card key={toy.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="flex flex-col sm:flex-row">
+                    <div className="sm:w-1/3 h-48 sm:h-auto bg-neutral-100">
+                      {toy.images && toy.images.length > 0 ? (
+                        <img 
+                          src={toy.images[0]} 
+                          alt={toy.title} 
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                          <i className="fas fa-image text-4xl"></i>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="p-4 sm:w-2/3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-lg mb-1">{toy.title}</h3>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            <Badge variant="outline">{toy.category}</Badge>
+                            <Badge variant="outline">Ages {toy.ageRange}</Badge>
+                            <Badge variant="outline">{toy.condition}</Badge>
+                            <Badge 
+                              className={toy.isAvailable ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}
+                            >
+                              {toy.isAvailable ? "Available" : "Not Available"}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="flex space-x-2">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit toy">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-destructive" 
+                            onClick={() => setToyToDelete(toy.id)}
+                            title="Delete toy"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
+                        {toy.description}
+                      </p>
+                      
+                      <div className="mt-auto flex flex-wrap justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                          <Switch 
+                            id={`availability-${toy.id}`}
+                            checked={toy.isAvailable}
+                            onCheckedChange={() => handleToggleAvailability(toy.id, toy.isAvailable)}
+                            disabled={toggleAvailabilityMutation.isPending}
+                          />
+                          <Label 
+                            htmlFor={`availability-${toy.id}`}
+                            className="cursor-pointer"
+                          >
+                            {toy.isAvailable ? "Available" : "Not available"}
+                          </Label>
+                        </div>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="mt-2 sm:mt-0 text-green-700 border-green-200 bg-green-50 hover:bg-green-100"
+                          onClick={() => setToyToMarkAsTraded(toy.id)}
+                        >
+                          <HandshakeIcon className="h-4 w-4 mr-2" />
+                          Mark as Traded
+                        </Button>
+                        
+                        <div className="mt-2 sm:mt-0 text-sm text-neutral-500 w-full sm:w-auto">
+                          Posted on {new Date(toy.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit toy">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-destructive" 
-                      onClick={() => setToyToDelete(toy.id)}
-                      title="Delete toy"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
-                  {toy.description}
-                </p>
-                
-                <div className="mt-auto flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Switch 
-                      id={`availability-${toy.id}`}
-                      checked={toy.isAvailable}
-                      onCheckedChange={() => handleToggleAvailability(toy.id, toy.isAvailable)}
-                      disabled={toggleAvailabilityMutation.isPending}
-                    />
-                    <Label 
-                      htmlFor={`availability-${toy.id}`}
-                      className="ml-2 cursor-pointer"
-                    >
-                      {toy.isAvailable ? "Available for sharing" : "Not available"}
-                    </Label>
-                  </div>
-                  
-                  <div className="text-sm text-neutral-500">
-                    Posted on {new Date(toy.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+        
+        <TabsContent value="traded" className="mt-4 space-y-4">
+          {tradedToys.length === 0 ? (
+            <div className="text-center py-8 bg-green-50 rounded-lg">
+              <p className="text-green-700">You haven't traded any toys yet.</p>
             </div>
-          </CardContent>
-        </Card>
-      ))}
+          ) : (
+            tradedToys.map(toy => (
+              <Card key={toy.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <div className="absolute top-0 left-0 w-full h-full bg-green-900/10 z-10 flex items-center justify-center">
+                      <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-lg font-bold transform -rotate-6 shadow-md">
+                        Traded
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row">
+                      <div className="sm:w-1/3 h-48 sm:h-auto bg-neutral-100">
+                        {toy.images && toy.images.length > 0 ? (
+                          <img 
+                            src={toy.images[0]} 
+                            alt={toy.title} 
+                            className="w-full h-full object-cover filter grayscale opacity-75" 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                            <i className="fas fa-image text-4xl"></i>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="p-4 sm:w-2/3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-bold text-lg mb-1">{toy.title}</h3>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              <Badge variant="outline">{toy.category}</Badge>
+                              <Badge variant="outline">Ages {toy.ageRange}</Badge>
+                              <Badge variant="outline">{toy.condition}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
+                          {toy.description}
+                        </p>
+                        
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="text-sm text-neutral-500">
+                            <span className="text-green-700 font-medium">Traded on:</span> {new Date(toy.createdAt).toLocaleDateString()}
+                          </div>
+                          
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="text-red-500"
+                            onClick={() => setToyToDelete(toy.id)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
 
+      {/* Delete Toy Dialog */}
       <AlertDialog open={toyToDelete !== null} onOpenChange={() => setToyToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -250,6 +364,42 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                 </>
               ) : (
                 "Delete Toy"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Mark as Traded Dialog */}
+      <AlertDialog open={toyToMarkAsTraded !== null} onOpenChange={() => setToyToMarkAsTraded(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark as Traded</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will mark your toy as "Traded" and remove it from active listings. This action also 
+              increases our community impact metrics.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (toyToMarkAsTraded !== null) {
+                  markAsTradedMutation.mutate(toyToMarkAsTraded);
+                }
+              }}
+              className="bg-green-600 text-white hover:bg-green-700"
+            >
+              {markAsTradedMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <HandshakeIcon className="mr-2 h-4 w-4" />
+                  Confirm Trade
+                </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

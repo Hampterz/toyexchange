@@ -505,7 +505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Community metrics endpoint
+  // Community metrics endpoint - GET
   app.get("/api/community-metrics", async (_req, res) => {
     try {
       const metrics = await storage.getCommunityMetrics();
@@ -513,6 +513,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching community metrics:", error);
       res.status(500).json({ error: "Failed to fetch community metrics" });
+    }
+  });
+  
+  // Update community metrics - PATCH
+  app.patch("/api/community-metrics", ensureAuthenticated, async (req, res) => {
+    try {
+      const { toysSaved, familiesConnected, wasteReduced } = req.body;
+      
+      // Get current metrics
+      const currentMetrics = await storage.getCommunityMetrics();
+      
+      // Calculate new values with increments
+      const updatedMetrics = {
+        toysSaved: toysSaved ? currentMetrics.toysSaved + parseInt(toysSaved) : currentMetrics.toysSaved,
+        familiesConnected: familiesConnected ? currentMetrics.familiesConnected + parseInt(familiesConnected) : currentMetrics.familiesConnected,
+        wasteReduced: wasteReduced ? currentMetrics.wasteReduced + parseInt(wasteReduced) : currentMetrics.wasteReduced
+      };
+      
+      // Update metrics
+      const metrics = await storage.updateCommunityMetrics(updatedMetrics);
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error updating community metrics:", error);
+      res.status(500).json({ error: "Failed to update community metrics" });
     }
   });
 
