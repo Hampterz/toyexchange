@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Edit, Trash2, HandshakeIcon, Tag, Film } from "lucide-react";
+import { Loader2, Edit, Trash2, Tag, Film } from "lucide-react";
+import { HandshakeIcon } from "@/components/ui/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Toy } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertDialog,
@@ -202,9 +204,10 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                             <Badge variant="outline">Ages {toy.ageRange}</Badge>
                             <Badge variant="outline">{toy.condition}</Badge>
                             <Badge 
-                              className={toy.isAvailable ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}
+                              variant={!!toy.isAvailable ? "default" : "destructive"}
+                              className={!!toy.isAvailable ? "bg-green-100 text-green-800 hover:bg-green-100" : "bg-red-100 text-red-800 hover:bg-red-100"}
                             >
-                              {toy.isAvailable ? "Available" : "Not Available"}
+                              {!!toy.isAvailable ? "Available" : "Not Available"}
                             </Badge>
                           </div>
                         </div>
@@ -233,15 +236,15 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                         <div className="flex items-center space-x-2">
                           <Switch 
                             id={`availability-${toy.id}`}
-                            checked={toy.isAvailable}
-                            onCheckedChange={() => handleToggleAvailability(toy.id, toy.isAvailable)}
+                            checked={!!toy.isAvailable}
+                            onCheckedChange={() => handleToggleAvailability(toy.id, !!toy.isAvailable)}
                             disabled={toggleAvailabilityMutation.isPending}
                           />
                           <Label 
                             htmlFor={`availability-${toy.id}`}
                             className="cursor-pointer"
                           >
-                            {toy.isAvailable ? "Available" : "Not available"}
+                            {!!toy.isAvailable ? "Available" : "Not available"}
                           </Label>
                         </div>
                         
@@ -256,7 +259,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                         </Button>
                         
                         <div className="mt-2 sm:mt-0 text-sm text-neutral-500 w-full sm:w-auto">
-                          Posted on {new Date(toy.createdAt).toLocaleDateString()}
+                          Posted on {toy.createdAt ? new Date(toy.createdAt).toLocaleDateString() : 'Unknown date'}
                         </div>
                       </div>
                     </div>
@@ -315,7 +318,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                         
                         <div className="mt-auto flex items-center justify-between">
                           <div className="text-sm text-neutral-500">
-                            <span className="text-green-700 font-medium">Traded on:</span> {new Date(toy.createdAt).toLocaleDateString()}
+                            <span className="text-green-700 font-medium">Traded on:</span> {toy.createdAt ? new Date(toy.createdAt).toLocaleDateString() : 'Unknown date'}
                           </div>
                           
                           <Button 
