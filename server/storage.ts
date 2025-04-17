@@ -55,6 +55,13 @@ async function updateUserSustainabilityMetrics(
 
 // modify the interface with any CRUD methods
 // you might need
+// Interface for community metrics
+export interface CommunityMetrics {
+  toysSaved: number;
+  familiesConnected: number;
+  wasteReduced: number; // in kg
+}
+
 export interface IStorage {
   // User CRUD
   getUser(id: number): Promise<User | undefined>;
@@ -98,6 +105,10 @@ export interface IStorage {
   getAllContactMessages(): Promise<ContactMessage[]>;
   createContactMessage(contactMessage: InsertContactMessage): Promise<ContactMessage>;
 
+  // Community metrics
+  getCommunityMetrics(): Promise<CommunityMetrics>;
+  updateCommunityMetrics(metrics: Partial<CommunityMetrics>): Promise<CommunityMetrics>;
+
   // Session store
   sessionStore: session.SessionStore;
 }
@@ -109,6 +120,7 @@ export class MemStorage implements IStorage {
   private toyRequestsMap: Map<number, ToyRequest>;
   private favoritesMap: Map<number, Favorite>;
   private contactMessagesMap: Map<number, ContactMessage>;
+  private communityMetrics: CommunityMetrics;
   
   private userCurrentId: number = 1;
   private toyCurrentId: number = 1;
@@ -126,6 +138,13 @@ export class MemStorage implements IStorage {
     this.toyRequestsMap = new Map();
     this.favoritesMap = new Map();
     this.contactMessagesMap = new Map();
+    
+    // Initialize community metrics
+    this.communityMetrics = {
+      toysSaved: 0,
+      familiesConnected: 0,
+      wasteReduced: 0
+    };
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // Prune expired entries every 24h
@@ -406,6 +425,13 @@ export class MemStorage implements IStorage {
       const toy = await this.getToy(request.toyId);
       if (toy) {
         await this.updateToy(toy.id, { isAvailable: false });
+        
+        // Update community metrics
+        await this.updateCommunityMetrics({
+          toysSaved: this.communityMetrics.toysSaved + 1,
+          familiesConnected: this.communityMetrics.familiesConnected + 1,
+          wasteReduced: this.communityMetrics.wasteReduced + 2 // Assuming each toy is ~2kg of waste saved
+        });
       }
     }
     
@@ -461,6 +487,19 @@ export class MemStorage implements IStorage {
     const contactMessage: ContactMessage = { ...insertContactMessage, id, createdAt };
     this.contactMessagesMap.set(id, contactMessage);
     return contactMessage;
+  }
+  
+  // Community metrics methods
+  async getCommunityMetrics(): Promise<CommunityMetrics> {
+    return { ...this.communityMetrics };
+  }
+  
+  async updateCommunityMetrics(metrics: Partial<CommunityMetrics>): Promise<CommunityMetrics> {
+    this.communityMetrics = {
+      ...this.communityMetrics,
+      ...metrics
+    };
+    return this.communityMetrics;
   }
 }
 

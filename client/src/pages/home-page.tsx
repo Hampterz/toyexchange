@@ -101,7 +101,7 @@ export default function HomePage() {
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Gift className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">61</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
               <p className="text-blue-800">Toys saved from landfill</p>
             </div>
 
@@ -109,7 +109,7 @@ export default function HomePage() {
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">47</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
               <p className="text-blue-800">Families connected</p>
             </div>
 
@@ -117,7 +117,7 @@ export default function HomePage() {
               <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-7 w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">124</h3>
+              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">0</h3>
               <p className="text-blue-800">Kg of waste saved</p>
             </div>
           </div>
