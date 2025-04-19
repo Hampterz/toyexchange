@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import ProfilePage from "@/pages/profile-page";
+import UserProfilePage from "@/pages/user-profile-page";
 import FavoritesPage from "@/pages/favorites-page";
 import MessagesPage from "@/pages/messages-page";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -97,6 +98,11 @@ const Router = () => {
             <ProtectedRoute path="/messages" component={MessagesPage} />
           </Layout>
         )}
+      </Route>
+
+      {/* Public user profile page - accessible to all users */}
+      <Route path="/users/:userId">
+        {() => <Layout><UserProfilePage /></Layout>}
       </Route>
       
       {/* Resource Pages */}
