@@ -37,11 +37,21 @@ import AccountSecurity from "@/pages/safety-center/account-security";
 import ToySafety from "@/pages/safety-center/toy-safety";
 import Reporting from "@/pages/safety-center/reporting";
 
+// Community Features Pages
+import GroupsPage from "@/pages/community/groups-page";
+import GroupDetailsPage from "@/pages/community/group-details-page";
+import MeetupLocationsPage from "@/pages/community/meetup-locations-page";
+import ToyMapView from "@/pages/community/toy-map-view";
+import LeaderboardPage from "@/pages/community/leaderboard-page";
+
 // Help Center Pages
 import HelpCenter from "@/pages/help-center";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/dashboard";
+import ReportsManagement from "@/pages/admin/reports-management";
+import SafetyTipsManagement from "@/pages/admin/safety-tips-management";
+import MeetupLocationVerification from "@/pages/admin/meetup-location-verification";
 
 // Layout component that wraps all pages with consistent header/footer
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -158,11 +168,49 @@ const Router = () => {
         {() => <Layout><HelpCenter /></Layout>}
       </Route>
       
+      {/* Community Features */}
+      <Route path="/community/groups">
+        {() => <Layout><GroupsPage /></Layout>}
+      </Route>
+      <Route path="/community/groups/:groupId">
+        {() => <Layout><GroupDetailsPage /></Layout>}
+      </Route>
+      <Route path="/community/meetup-locations">
+        {() => <Layout><MeetupLocationsPage /></Layout>}
+      </Route>
+      <Route path="/community/toy-map">
+        {() => <Layout><ToyMapView /></Layout>}
+      </Route>
+      <Route path="/community/leaderboard">
+        {() => <Layout><LeaderboardPage /></Layout>}
+      </Route>
+
       {/* Admin Pages */}
       <Route path="/admin/dashboard">
         {() => (
           <Layout>
             <ProtectedRoute path="/admin/dashboard" component={AdminDashboard} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/admin/reports">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/admin/reports" component={ReportsManagement} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/admin/safety-tips">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/admin/safety-tips" component={SafetyTipsManagement} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/admin/meetup-locations">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/admin/meetup-locations" component={MeetupLocationVerification} />
           </Layout>
         )}
       </Route>
