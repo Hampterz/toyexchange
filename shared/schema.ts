@@ -151,9 +151,13 @@ export const insertToySchema = createInsertSchema(toys).pick({
   category: true,
   images: true,
   location: true,
+  latitude: true,
+  longitude: true,
   tags: true,
   isAvailable: true,
   status: true,
+  recommendedAges: true,
+  safetyNotes: true,
   videos: true,
 });
 

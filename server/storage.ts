@@ -1,4 +1,19 @@
-import { users, type User, type InsertUser, toys, type Toy, type InsertToy, messages, type Message, type InsertMessage, toyRequests, type ToyRequest, type InsertToyRequest, favorites, type Favorite, type InsertFavorite, contactMessages, type ContactMessage, type InsertContactMessage, BADGES } from "@shared/schema";
+import { 
+  users, type User, type InsertUser, 
+  toys, type Toy, type InsertToy, 
+  messages, type Message, type InsertMessage, 
+  toyRequests, type ToyRequest, type InsertToyRequest, 
+  favorites, type Favorite, type InsertFavorite, 
+  contactMessages, type ContactMessage, type InsertContactMessage,
+  groups, type Group, type InsertGroup,
+  groupMembers, type GroupMember, type InsertGroupMember,
+  follows, type Follow, type InsertFollow,
+  reports, type Report, type InsertReport,
+  meetupLocations, type MeetupLocation, type InsertMeetupLocation,
+  toyHistories, type ToyHistory, type InsertToyHistory,
+  safetyTips, type SafetyTip, type InsertSafetyTip,
+  BADGES 
+} from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import { hashPassword } from "./auth";
@@ -105,6 +120,52 @@ export interface IStorage {
   getAllContactMessages(): Promise<ContactMessage[]>;
   createContactMessage(contactMessage: InsertContactMessage): Promise<ContactMessage>;
 
+  // Group CRUD
+  getGroup(id: number): Promise<Group | undefined>;
+  getGroups(filters?: Record<string, any>): Promise<Group[]>;
+  getGroupsByUser(userId: number): Promise<Group[]>;
+  createGroup(group: InsertGroup): Promise<Group>;
+  updateGroup(id: number, group: Partial<Group>): Promise<Group | undefined>;
+  deleteGroup(id: number): Promise<boolean>;
+  joinGroup(userId: number, groupId: number, role?: string): Promise<GroupMember>;
+  leaveGroup(userId: number, groupId: number): Promise<boolean>;
+  getGroupMembers(groupId: number): Promise<GroupMember[]>;
+  updateGroupMemberRole(userId: number, groupId: number, role: string): Promise<GroupMember | undefined>;
+
+  // Follow system
+  followUser(followerId: number, followingId: number): Promise<Follow>;
+  unfollowUser(followerId: number, followingId: number): Promise<boolean>;
+  getFollowers(userId: number): Promise<Follow[]>;
+  getFollowing(userId: number): Promise<Follow[]>;
+  isFollowing(followerId: number, followingId: number): Promise<boolean>;
+
+  // Report system
+  createReport(report: InsertReport): Promise<Report>;
+  getReport(id: number): Promise<Report | undefined>;
+  getReports(status?: string): Promise<Report[]>;
+  getReportsByUser(userId: number): Promise<Report[]>;
+  updateReportStatus(id: number, status: string, reviewedBy: number): Promise<Report | undefined>;
+
+  // Meetup locations
+  createMeetupLocation(location: InsertMeetupLocation): Promise<MeetupLocation>;
+  getMeetupLocation(id: number): Promise<MeetupLocation | undefined>;
+  getMeetupLocations(filters?: Record<string, any>): Promise<MeetupLocation[]>;
+  getMeetupLocationsByUser(userId: number): Promise<MeetupLocation[]>;
+  updateMeetupLocation(id: number, location: Partial<MeetupLocation>): Promise<MeetupLocation | undefined>;
+  verifyMeetupLocation(id: number, isVerified: boolean): Promise<MeetupLocation | undefined>;
+
+  // Toy history
+  createToyHistory(history: InsertToyHistory): Promise<ToyHistory>;
+  getToyHistoryByToy(toyId: number): Promise<ToyHistory[]>;
+  addStoryToToyHistory(id: number, story: string, photos?: string[]): Promise<ToyHistory | undefined>;
+
+  // Safety tips
+  createSafetyTip(tip: InsertSafetyTip): Promise<SafetyTip>;
+  getSafetyTip(id: number): Promise<SafetyTip | undefined>;
+  getSafetyTipsByCategory(category: string): Promise<SafetyTip[]>;
+  getAllSafetyTips(): Promise<SafetyTip[]>;
+  updateSafetyTip(id: number, tip: Partial<SafetyTip>): Promise<SafetyTip | undefined>;
+
   // Community metrics
   getCommunityMetrics(): Promise<CommunityMetrics>;
   updateCommunityMetrics(metrics: Partial<CommunityMetrics>): Promise<CommunityMetrics>;
@@ -122,12 +183,30 @@ export class MemStorage implements IStorage {
   private contactMessagesMap: Map<number, ContactMessage>;
   private communityMetrics: CommunityMetrics;
   
+  // New storage maps for additional features
+  private groupsMap: Map<number, Group>;
+  private groupMembersMap: Map<number, GroupMember>;
+  private followsMap: Map<number, Follow>;
+  private reportsMap: Map<number, Report>;
+  private meetupLocationsMap: Map<number, MeetupLocation>;
+  private toyHistoriesMap: Map<number, ToyHistory>;
+  private safetyTipsMap: Map<number, SafetyTip>;
+  
   private userCurrentId: number = 1;
   private toyCurrentId: number = 1;
   private messageCurrentId: number = 1;
   private toyRequestCurrentId: number = 1;
   private favoriteCurrentId: number = 1;
   private contactMessageCurrentId: number = 1;
+  
+  // New IDs for additional features
+  private groupCurrentId: number = 1;
+  private groupMemberCurrentId: number = 1;
+  private followCurrentId: number = 1;
+  private reportCurrentId: number = 1;
+  private meetupLocationCurrentId: number = 1;
+  private toyHistoryCurrentId: number = 1;
+  private safetyTipCurrentId: number = 1;
   
   sessionStore: session.SessionStore;
 
@@ -138,6 +217,15 @@ export class MemStorage implements IStorage {
     this.toyRequestsMap = new Map();
     this.favoritesMap = new Map();
     this.contactMessagesMap = new Map();
+    
+    // Initialize new storage maps
+    this.groupsMap = new Map();
+    this.groupMembersMap = new Map();
+    this.followsMap = new Map();
+    this.reportsMap = new Map();
+    this.meetupLocationsMap = new Map();
+    this.toyHistoriesMap = new Map();
+    this.safetyTipsMap = new Map();
     
     // Initialize community metrics
     this.communityMetrics = {
