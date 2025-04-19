@@ -577,6 +577,166 @@ export class MemStorage implements IStorage {
     return contactMessage;
   }
   
+  // Meetup locations methods
+  async createMeetupLocation(location: InsertMeetupLocation): Promise<MeetupLocation> {
+    const id = this.meetupLocationCurrentId++;
+    const createdAt = new Date();
+    
+    const newLocation: MeetupLocation = {
+      ...location,
+      id,
+      createdAt,
+      isVerified: false
+    };
+    
+    this.meetupLocationsMap.set(id, newLocation);
+    return newLocation;
+  }
+  
+  async getMeetupLocation(id: number): Promise<MeetupLocation | undefined> {
+    return this.meetupLocationsMap.get(id);
+  }
+  
+  async getMeetupLocations(filters?: Record<string, any>): Promise<MeetupLocation[]> {
+    let locations = Array.from(this.meetupLocationsMap.values());
+    
+    if (filters) {
+      if (filters.city) {
+        const searchCity = filters.city.toLowerCase();
+        locations = locations.filter(location => 
+          location.city.toLowerCase().includes(searchCity)
+        );
+      }
+      
+      if (filters.state) {
+        const searchState = filters.state.toLowerCase();
+        locations = locations.filter(location => 
+          location.state.toLowerCase().includes(searchState)
+        );
+      }
+      
+      if (filters.locationType) {
+        const searchType = filters.locationType.toLowerCase();
+        locations = locations.filter(location => 
+          location.locationType.toLowerCase().includes(searchType)
+        );
+      }
+      
+      if (filters.isVerified !== undefined) {
+        locations = locations.filter(location => 
+          location.isVerified === filters.isVerified
+        );
+      }
+    }
+    
+    return locations.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  
+  async getMeetupLocationsByUser(userId: number): Promise<MeetupLocation[]> {
+    return Array.from(this.meetupLocationsMap.values())
+      .filter(location => location.addedBy === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  
+  async updateMeetupLocation(id: number, updates: Partial<MeetupLocation>): Promise<MeetupLocation | undefined> {
+    const location = this.meetupLocationsMap.get(id);
+    if (!location) return undefined;
+    
+    const updatedLocation = { ...location, ...updates };
+    this.meetupLocationsMap.set(id, updatedLocation);
+    return updatedLocation;
+  }
+  
+  async verifyMeetupLocation(id: number, isVerified: boolean): Promise<MeetupLocation | undefined> {
+    const location = this.meetupLocationsMap.get(id);
+    if (!location) return undefined;
+    
+    const updatedLocation = { ...location, isVerified };
+    this.meetupLocationsMap.set(id, updatedLocation);
+    return updatedLocation;
+  }
+  
+  // Toy history methods
+  async createToyHistory(history: InsertToyHistory): Promise<ToyHistory> {
+    const id = this.toyHistoryCurrentId++;
+    const transferDate = new Date();
+    
+    const newHistory: ToyHistory = {
+      ...history,
+      id,
+      transferDate,
+      photos: history.photos || []
+    };
+    
+    this.toyHistoriesMap.set(id, newHistory);
+    return newHistory;
+  }
+  
+  async getToyHistoryByToy(toyId: number): Promise<ToyHistory[]> {
+    return Array.from(this.toyHistoriesMap.values())
+      .filter(history => history.toyId === toyId)
+      .sort((a, b) => b.transferDate.getTime() - a.transferDate.getTime());
+  }
+  
+  async addStoryToToyHistory(id: number, story: string, photos?: string[]): Promise<ToyHistory | undefined> {
+    const history = this.toyHistoriesMap.get(id);
+    if (!history) return undefined;
+    
+    const updatedPhotos = [...(history.photos || [])];
+    if (photos && photos.length > 0) {
+      updatedPhotos.push(...photos);
+    }
+    
+    const updatedHistory = { ...history, story, photos: updatedPhotos };
+    this.toyHistoriesMap.set(id, updatedHistory);
+    return updatedHistory;
+  }
+  
+  // Safety tips methods
+  async createSafetyTip(tip: InsertSafetyTip): Promise<SafetyTip> {
+    const id = this.safetyTipCurrentId++;
+    const createdAt = new Date();
+    
+    const newTip: SafetyTip = {
+      ...tip,
+      id,
+      createdAt,
+      updatedAt: createdAt
+    };
+    
+    this.safetyTipsMap.set(id, newTip);
+    return newTip;
+  }
+  
+  async getSafetyTip(id: number): Promise<SafetyTip | undefined> {
+    return this.safetyTipsMap.get(id);
+  }
+  
+  async getSafetyTipsByCategory(category: string): Promise<SafetyTip[]> {
+    return Array.from(this.safetyTipsMap.values())
+      .filter(tip => tip.category === category)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  
+  async getAllSafetyTips(): Promise<SafetyTip[]> {
+    return Array.from(this.safetyTipsMap.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  
+  async updateSafetyTip(id: number, updates: Partial<SafetyTip>): Promise<SafetyTip | undefined> {
+    const tip = this.safetyTipsMap.get(id);
+    if (!tip) return undefined;
+    
+    const updatedTip = { 
+      ...tip, 
+      ...updates, 
+      updatedAt: new Date() 
+    };
+    
+    this.safetyTipsMap.set(id, updatedTip);
+    return updatedTip;
+  }
+  
   // Community metrics methods
   async getCommunityMetrics(): Promise<CommunityMetrics> {
     return { ...this.communityMetrics };

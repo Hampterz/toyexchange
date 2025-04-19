@@ -7,7 +7,14 @@ import {
   insertMessageSchema,
   insertToyRequestSchema,
   insertFavoriteSchema,
-  insertContactMessageSchema
+  insertContactMessageSchema,
+  insertGroupSchema,
+  insertGroupMemberSchema,
+  insertFollowSchema,
+  insertReportSchema,
+  insertMeetupLocationSchema,
+  insertToyHistorySchema,
+  insertSafetyTipSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -617,6 +624,546 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating user sustainability metrics:", error);
       res.status(500).json({ message: "Failed to update sustainability metrics" });
+    }
+  });
+
+  // GROUPS ROUTES
+  // Get all groups with optional filters
+  app.get("/api/groups", async (req, res) => {
+    try {
+      const filters: Record<string, any> = {};
+      
+      // Parse query parameters
+      if (req.query.name) filters.name = req.query.name as string;
+      if (req.query.location) filters.location = req.query.location as string;
+      if (req.query.isPublic) filters.isPublic = req.query.isPublic === "true";
+      
+      const groups = await storage.getGroups(filters);
+      res.json(groups);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch groups" });
+    }
+  });
+
+  // Get a specific group
+  app.get("/api/groups/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const group = await storage.getGroup(id);
+      
+      if (!group) {
+        return res.status(404).json({ message: "Group not found" });
+      }
+      
+      res.json(group);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch group" });
+    }
+  });
+
+  // Create a new group
+  app.post("/api/groups", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const groupData = { ...req.body, creatorId: userId };
+      
+      const validatedData = insertGroupSchema.parse(groupData);
+      const newGroup = await storage.createGroup(validatedData);
+      
+      res.status(201).json(newGroup);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid group data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create group" });
+    }
+  });
+
+  // Update a group
+  app.patch("/api/groups/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const group = await storage.getGroup(id);
+      
+      if (!group) {
+        return res.status(404).json({ message: "Group not found" });
+      }
+      
+      // Check if user is admin of the group
+      const members = await storage.getGroupMembers(id);
+      const userMembership = members.find(m => m.userId === req.user!.id && m.role === 'admin');
+      
+      if (!userMembership) {
+        return res.status(403).json({ message: "Not authorized to update this group" });
+      }
+      
+      const updatedGroup = await storage.updateGroup(id, req.body);
+      res.json(updatedGroup);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update group" });
+    }
+  });
+
+  // Join a group
+  app.post("/api/groups/:id/join", ensureAuthenticated, async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      
+      const group = await storage.getGroup(groupId);
+      if (!group) {
+        return res.status(404).json({ message: "Group not found" });
+      }
+      
+      // Check if user is already a member
+      const members = await storage.getGroupMembers(groupId);
+      const isMember = members.some(m => m.userId === userId);
+      
+      if (isMember) {
+        return res.status(400).json({ message: "Already a member of this group" });
+      }
+      
+      const membership = await storage.joinGroup(userId, groupId);
+      res.status(201).json(membership);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to join group" });
+    }
+  });
+
+  // Leave a group
+  app.delete("/api/groups/:id/leave", ensureAuthenticated, async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.id);
+      const userId = req.user!.id;
+      
+      const success = await storage.leaveGroup(userId, groupId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Group membership not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to leave group" });
+    }
+  });
+
+  // Get groups the current user is a member of
+  app.get("/api/my-groups", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const groups = await storage.getGroupsByUser(userId);
+      res.json(groups);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch your groups" });
+    }
+  });
+
+  // FOLLOW SYSTEM ROUTES
+  // Follow a user
+  app.post("/api/users/:userId/follow", ensureAuthenticated, async (req, res) => {
+    try {
+      const followerId = req.user!.id;
+      const followingId = parseInt(req.params.userId);
+      
+      if (followerId === followingId) {
+        return res.status(400).json({ message: "Cannot follow yourself" });
+      }
+      
+      const userToFollow = await storage.getUser(followingId);
+      if (!userToFollow) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const follow = await storage.followUser(followerId, followingId);
+      res.status(201).json(follow);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to follow user" });
+    }
+  });
+
+  // Unfollow a user
+  app.delete("/api/users/:userId/unfollow", ensureAuthenticated, async (req, res) => {
+    try {
+      const followerId = req.user!.id;
+      const followingId = parseInt(req.params.userId);
+      
+      const success = await storage.unfollowUser(followerId, followingId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Follow relationship not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to unfollow user" });
+    }
+  });
+
+  // Get followers of a user
+  app.get("/api/users/:userId/followers", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const follows = await storage.getFollowers(userId);
+      
+      // Get the follower user details
+      const followerPromises = follows.map(async follow => {
+        const follower = await storage.getUser(follow.followerId);
+        if (follower) {
+          const { password, ...followerWithoutPassword } = follower;
+          return { follow, follower: followerWithoutPassword };
+        }
+        return null;
+      });
+      
+      const followers = (await Promise.all(followerPromises)).filter(f => f !== null);
+      res.json(followers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch followers" });
+    }
+  });
+
+  // Get users followed by a user
+  app.get("/api/users/:userId/following", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const follows = await storage.getFollowing(userId);
+      
+      // Get the followed user details
+      const followingPromises = follows.map(async follow => {
+        const following = await storage.getUser(follow.followingId);
+        if (following) {
+          const { password, ...followingWithoutPassword } = following;
+          return { follow, following: followingWithoutPassword };
+        }
+        return null;
+      });
+      
+      const following = (await Promise.all(followingPromises)).filter(f => f !== null);
+      res.json(following);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch following" });
+    }
+  });
+
+  // Check if a user is following another user
+  app.get("/api/users/:userId/is-following/:targetId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const targetId = parseInt(req.params.targetId);
+      
+      const isFollowing = await storage.isFollowing(userId, targetId);
+      res.json({ isFollowing });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check follow status" });
+    }
+  });
+
+  // REPORT SYSTEM ROUTES
+  // Create a report
+  app.post("/api/reports", ensureAuthenticated, async (req, res) => {
+    try {
+      const reporterId = req.user!.id;
+      const reportData = { ...req.body, reporterId };
+      
+      const validatedData = insertReportSchema.parse(reportData);
+      const newReport = await storage.createReport(validatedData);
+      
+      res.status(201).json(newReport);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid report data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create report" });
+    }
+  });
+
+  // Get reports (admin only)
+  app.get("/api/reports", ensureAuthenticated, async (req, res) => {
+    try {
+      // Verify user is admin
+      if (req.user!.username !== "adminsreyas") {
+        return res.status(403).json({ message: "Not authorized to view reports" });
+      }
+      
+      const status = req.query.status as string | undefined;
+      const reports = await storage.getReports(status);
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reports" });
+    }
+  });
+
+  // Update report status (admin only)
+  app.patch("/api/reports/:id/status", ensureAuthenticated, async (req, res) => {
+    try {
+      // Verify user is admin
+      if (req.user!.username !== "adminsreyas") {
+        return res.status(403).json({ message: "Not authorized to update reports" });
+      }
+      
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || !["pending", "investigating", "resolved", "dismissed"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      
+      const report = await storage.getReport(id);
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      
+      const updatedReport = await storage.updateReportStatus(id, status, req.user!.id);
+      res.json(updatedReport);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update report status" });
+    }
+  });
+
+  // MEETUP LOCATIONS ROUTES
+  // Get all meetup locations with optional filters
+  app.get("/api/meetup-locations", async (req, res) => {
+    try {
+      const filters: Record<string, any> = {};
+      
+      // Parse query parameters
+      if (req.query.city) filters.city = req.query.city as string;
+      if (req.query.state) filters.state = req.query.state as string;
+      if (req.query.locationType) filters.locationType = req.query.locationType as string;
+      if (req.query.isVerified) filters.isVerified = req.query.isVerified === "true";
+      
+      const locations = await storage.getMeetupLocations(filters);
+      res.json(locations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch meetup locations" });
+    }
+  });
+
+  // Get a specific meetup location
+  app.get("/api/meetup-locations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const location = await storage.getMeetupLocation(id);
+      
+      if (!location) {
+        return res.status(404).json({ message: "Meetup location not found" });
+      }
+      
+      res.json(location);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch meetup location" });
+    }
+  });
+
+  // Add a new meetup location
+  app.post("/api/meetup-locations", ensureAuthenticated, async (req, res) => {
+    try {
+      const addedBy = req.user!.id;
+      const locationData = { ...req.body, addedBy };
+      
+      const validatedData = insertMeetupLocationSchema.parse(locationData);
+      const newLocation = await storage.createMeetupLocation(validatedData);
+      
+      res.status(201).json(newLocation);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid location data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create meetup location" });
+    }
+  });
+
+  // Verify a meetup location (admin only)
+  app.patch("/api/meetup-locations/:id/verify", ensureAuthenticated, async (req, res) => {
+    try {
+      // Verify user is admin
+      if (req.user!.username !== "adminsreyas") {
+        return res.status(403).json({ message: "Not authorized to verify locations" });
+      }
+      
+      const id = parseInt(req.params.id);
+      const { isVerified } = req.body;
+      
+      if (typeof isVerified !== "boolean") {
+        return res.status(400).json({ message: "Invalid verification status" });
+      }
+      
+      const location = await storage.getMeetupLocation(id);
+      if (!location) {
+        return res.status(404).json({ message: "Meetup location not found" });
+      }
+      
+      const updatedLocation = await storage.verifyMeetupLocation(id, isVerified);
+      res.json(updatedLocation);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to verify meetup location" });
+    }
+  });
+
+  // TOY HISTORY ROUTES
+  // Get toy history
+  app.get("/api/toys/:toyId/history", async (req, res) => {
+    try {
+      const toyId = parseInt(req.params.toyId);
+      
+      const toy = await storage.getToy(toyId);
+      if (!toy) {
+        return res.status(404).json({ message: "Toy not found" });
+      }
+      
+      const history = await storage.getToyHistoryByToy(toyId);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch toy history" });
+    }
+  });
+
+  // Add toy history entry
+  app.post("/api/toys/:toyId/history", ensureAuthenticated, async (req, res) => {
+    try {
+      const toyId = parseInt(req.params.toyId);
+      const userId = req.user!.id;
+      
+      const toy = await storage.getToy(toyId);
+      if (!toy) {
+        return res.status(404).json({ message: "Toy not found" });
+      }
+      
+      // Check if user is previous or current owner
+      if (toy.userId !== userId) {
+        const toyRequests = await storage.getToyRequestsByToy(toyId);
+        const isRecipient = toyRequests.some(
+          request => request.requesterId === userId && request.status === "approved"
+        );
+        
+        if (!isRecipient) {
+          return res.status(403).json({ message: "Not authorized to add to this toy's history" });
+        }
+      }
+      
+      const historyData = { ...req.body, toyId, addedByUserId: userId };
+      
+      const validatedData = insertToyHistorySchema.parse(historyData);
+      const newHistoryEntry = await storage.createToyHistory(validatedData);
+      
+      res.status(201).json(newHistoryEntry);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid history data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to add toy history" });
+    }
+  });
+
+  // Add a story to an existing history entry
+  app.patch("/api/toy-history/:id/story", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { story, photos } = req.body;
+      
+      if (!story) {
+        return res.status(400).json({ message: "Story is required" });
+      }
+      
+      const historyEntry = await storage.addStoryToToyHistory(id, story, photos);
+      
+      if (!historyEntry) {
+        return res.status(404).json({ message: "History entry not found" });
+      }
+      
+      res.json(historyEntry);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add story to toy history" });
+    }
+  });
+
+  // SAFETY TIPS ROUTES
+  // Get all safety tips
+  app.get("/api/safety-tips", async (req, res) => {
+    try {
+      const category = req.query.category as string | undefined;
+      
+      let tips;
+      if (category) {
+        tips = await storage.getSafetyTipsByCategory(category);
+      } else {
+        tips = await storage.getAllSafetyTips();
+      }
+      
+      res.json(tips);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch safety tips" });
+    }
+  });
+
+  // Get a specific safety tip
+  app.get("/api/safety-tips/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const tip = await storage.getSafetyTip(id);
+      
+      if (!tip) {
+        return res.status(404).json({ message: "Safety tip not found" });
+      }
+      
+      res.json(tip);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch safety tip" });
+    }
+  });
+
+  // Create a safety tip (admin only)
+  app.post("/api/safety-tips", ensureAuthenticated, async (req, res) => {
+    try {
+      // Verify user is admin
+      if (req.user!.username !== "adminsreyas") {
+        return res.status(403).json({ message: "Not authorized to create safety tips" });
+      }
+      
+      const validatedData = insertSafetyTipSchema.parse(req.body);
+      const newTip = await storage.createSafetyTip(validatedData);
+      
+      res.status(201).json(newTip);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid safety tip data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create safety tip" });
+    }
+  });
+
+  // Update a safety tip (admin only)
+  app.patch("/api/safety-tips/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      // Verify user is admin
+      if (req.user!.username !== "adminsreyas") {
+        return res.status(403).json({ message: "Not authorized to update safety tips" });
+      }
+      
+      const id = parseInt(req.params.id);
+      const tip = await storage.getSafetyTip(id);
+      
+      if (!tip) {
+        return res.status(404).json({ message: "Safety tip not found" });
+      }
+      
+      const updatedTip = await storage.updateSafetyTip(id, req.body);
+      res.json(updatedTip);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update safety tip" });
     }
   });
 
