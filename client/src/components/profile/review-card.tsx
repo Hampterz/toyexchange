@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Star, ThumbsUp, Calendar, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ToyRequest } from "@shared/schema";
+import { ToyRequest, User as UserType, Toy as ToyType } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
 
@@ -12,14 +12,14 @@ interface ReviewCardProps {
 
 export function ReviewCard({ review }: ReviewCardProps) {
   // Fetch user info for the requester
-  const { data: requester } = useQuery({
+  const { data: requester } = useQuery<Omit<UserType, "password">, Error>({
     queryKey: [`/api/users/${review.requesterId}`],
     queryFn: getQueryFn({ on401: "returnNull" }),
     enabled: !!review.requesterId,
   });
   
   // Fetch toy info for context
-  const { data: toy } = useQuery({
+  const { data: toy } = useQuery<ToyType, Error>({
     queryKey: [`/api/toys/${review.toyId}`],
     queryFn: getQueryFn({ on401: "returnNull" }),
     enabled: !!review.toyId,
@@ -33,9 +33,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
       }) 
     : 'Unknown date';
   
-  // Generate stars based on review.rating
+  // Generate stars based on review.rating (safely access with optional chaining)
   const renderStars = () => {
-    const rating = review.rating || 0;
+    const rating = review?.rating || 0;
     return (
       <div className="flex">
         {[...Array(5)].map((_, index) => (
@@ -59,7 +59,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               <div className="flex items-center gap-1.5">
                 <User className="h-4 w-4 text-neutral-500" />
                 <span className="font-medium">
-                  {requester?.name || "Anonymous"}
+                  {requester && 'name' in requester ? requester.name : "Anonymous"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -75,7 +75,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               </Badge>
             </div>
             
-            {toy && (
+            {toy && typeof toy === 'object' && 'title' in toy && (
               <div className="text-sm text-neutral-600 mb-2">
                 <strong>Toy:</strong> {toy.title}
               </div>

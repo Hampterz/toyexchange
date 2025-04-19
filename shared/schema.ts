@@ -157,6 +157,8 @@ export const toyRequests = pgTable("toy_requests", {
   status: text("status").notNull().default("pending"), // pending, approved, rejected
   preferredLocation: text("preferred_location"),
   createdAt: timestamp("created_at").defaultNow(),
+  feedback: text("feedback"), // Feedback after exchange is completed
+  rating: integer("rating"), // Rating from 1-5 after exchange is completed
 });
 
 export const insertToyRequestSchema = createInsertSchema(toyRequests).pick({
@@ -166,6 +168,8 @@ export const insertToyRequestSchema = createInsertSchema(toyRequests).pick({
   message: true,
   status: true,
   preferredLocation: true,
+  feedback: true,
+  rating: true,
 });
 
 // Favorite model
