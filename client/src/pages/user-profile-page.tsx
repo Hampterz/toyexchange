@@ -157,7 +157,7 @@ export default function UserProfilePage() {
                   <h2 className="text-xl font-bold mb-4">Available Toys</h2>
                   <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     {activeToys.map(toy => (
-                      <ToyCard key={toy.id} toy={toy} />
+                      <ProfileToyCard key={toy.id} toy={toy} />
                     ))}
                   </div>
                 </div>
@@ -168,7 +168,7 @@ export default function UserProfilePage() {
                   <h2 className="text-xl font-bold mb-4">Previously Shared Toys</h2>
                   <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     {tradedToys.map(toy => (
-                      <ToyCard key={toy.id} toy={toy} />
+                      <ProfileToyCard key={toy.id} toy={toy} />
                     ))}
                   </div>
                 </div>

@@ -1,92 +1,94 @@
-import { useEffect, useState } from "react";
-import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { Star, ThumbsUp, ThumbsDown } from "lucide-react";
-import { getQueryFn } from "@/lib/queryClient";
-import { ToyRequest, Toy, User } from "@shared/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import { Star, ThumbsUp, Calendar, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ToyRequest } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 
 interface ReviewCardProps {
   review: ToyRequest;
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
-  // Fetch the toy details
-  const { data: toy } = useQuery<Toy, Error>({
-    queryKey: [`/api/toys/${review.toyId}`],
-    queryFn: getQueryFn({ on401: "returnNull" }),
-    enabled: !!review.toyId
-  });
-  
-  // Fetch the requester's details (the person who wrote the review)
-  const { data: requester } = useQuery<Omit<User, "password">, Error>({
+  // Fetch user info for the requester
+  const { data: requester } = useQuery({
     queryKey: [`/api/users/${review.requesterId}`],
     queryFn: getQueryFn({ on401: "returnNull" }),
-    enabled: !!review.requesterId
+    enabled: !!review.requesterId,
   });
   
-  // Check if this is a positive or negative review based on the request message
-  // In a real app, you would have a dedicated review schema with rating
-  const isPositive = !review.message.toLowerCase().includes("issue") && 
-                     !review.message.toLowerCase().includes("problem") &&
-                     !review.message.toLowerCase().includes("disappoint");
-
+  // Fetch toy info for context
+  const { data: toy } = useQuery({
+    queryKey: [`/api/toys/${review.toyId}`],
+    queryFn: getQueryFn({ on401: "returnNull" }),
+    enabled: !!review.toyId,
+  });
+  
+  const reviewDate = review.createdAt 
+    ? new Date(review.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }) 
+    : 'Unknown date';
+  
+  // Generate stars based on review.rating
+  const renderStars = () => {
+    const rating = review.rating || 0;
+    return (
+      <div className="flex">
+        {[...Array(5)].map((_, index) => (
+          <Star
+            key={index}
+            className={`h-4 w-4 ${
+              index < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+  
   return (
     <Card className="overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={requester?.profilePicture || undefined} alt={requester?.name} />
-              <AvatarFallback>
-                {requester?.name?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-          
+      <CardContent className="p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
-            <div className="flex justify-between items-start">
-              <div>
-                <Link href={`/users/${requester?.id}`} className="font-semibold hover:underline">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <User className="h-4 w-4 text-neutral-500" />
+                <span className="font-medium">
                   {requester?.name || "Anonymous"}
-                </Link>
-                
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="text-xs">
-                    {review.status === "approved" ? "Traded" : review.status}
-                  </Badge>
-                  
-                  {isPositive ? (
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                      <ThumbsUp className="h-3 w-3 mr-1" /> Positive
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-                      <ThumbsDown className="h-3 w-3 mr-1" /> Negative
-                    </Badge>
-                  )}
-                </div>
+                </span>
               </div>
-              
-              <div className="text-xs text-neutral-500">
-                {review.createdAt 
-                  ? new Date(review.createdAt).toLocaleDateString() 
-                  : 'Unknown date'}
+              <div className="flex items-center gap-2">
+                <Calendar className="h-3.5 w-3.5 text-neutral-500" />
+                <span className="text-sm text-neutral-500">{reviewDate}</span>
               </div>
             </div>
             
-            <div className="mt-2">
-              <p className="text-neutral-700">{review.message}</p>
+            <div className="flex items-center gap-2 mb-4">
+              {renderStars()}
+              <Badge variant="outline" className="ml-2">
+                {review.status}
+              </Badge>
             </div>
             
             {toy && (
-              <div className="mt-3 bg-neutral-50 p-2 rounded-md flex items-center gap-2">
-                <span className="text-xs text-neutral-500">Regarding:</span>
-                <Link href={`/toys/${toy.id}`} className="text-sm text-blue-600 hover:underline">
-                  {toy.title}
-                </Link>
+              <div className="text-sm text-neutral-600 mb-2">
+                <strong>Toy:</strong> {toy.title}
+              </div>
+            )}
+            
+            <p className="text-neutral-700">
+              {review.feedback || "No feedback provided."}
+            </p>
+            
+            {review.rating && review.rating >= 4 && (
+              <div className="flex items-center gap-1 mt-3 text-green-600 text-sm">
+                <ThumbsUp className="h-4 w-4" />
+                <span>Recommended this user</span>
               </div>
             )}
           </div>

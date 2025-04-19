@@ -404,6 +404,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get reviews for a user (from completed toy requests)
+  app.get("/api/users/:userId/reviews", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all toy requests where this user is the owner and the request was approved
+      const requests = await storage.getToyRequestsByOwner(userId);
+      const completedRequests = requests.filter(request => 
+        request.status === "approved" && request.feedback && request.rating
+      );
+      
+      res.json(completedRequests);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user reviews" });
+    }
+  });
+  
   // Update user profile
   app.patch("/api/users/:userId", ensureAuthenticated, async (req, res) => {
     try {
