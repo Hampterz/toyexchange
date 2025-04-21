@@ -93,26 +93,41 @@ A community-driven platform that enables families to share gently-used toys, pro
    ```
 
 4. Fix ES Module compatibility (required):
-   - The project uses ES Modules (`"type": "module"` in package.json), which has different syntax requirements.
-   - For local development, you'll need to create a file called `vite.config.mjs` to override the default and import URL libraries:
+   - The project uses ES Modules (`"type": "module"` in package.json), which requires specific adaptations for Node.js
+   - Since the application uses Vite with TypeScript configuration, you'll need to modify files to make them work with ES modules
+   - For Ubuntu, create a launcher script that resolves path issues:
      ```javascript
+     // start-ubuntu.js
      import { fileURLToPath } from 'url';
      import { dirname } from 'path';
-     import fs from 'fs';
+     import { spawn } from 'child_process';
+
+     // Set up ES module compatible paths
+     global.__filename = fileURLToPath(import.meta.url);
+     global.__dirname = dirname(global.__filename);
+
+     console.log('Starting ToyShare application in Ubuntu-compatible mode...');
+     console.log('Current directory:', process.cwd());
      
-     // Create a wrapper that loads the original vite.config.ts but adds __dirname equivalent
-     const __filename = fileURLToPath(import.meta.url);
-     const __dirname = dirname(__filename);
+     // Run the application with environment variables
+     const child = spawn('node', ['--experimental-specifier-resolution=node', '--loader', 'ts-node/esm', 'server/index.ts'], {
+       env: {
+         ...process.env,
+         NODE_ENV: 'development'
+       },
+       stdio: 'inherit'
+     });
      
-     // Define this globally so the original config can use it
-     global.__dirname = __dirname;
+     // Handle process termination
+     process.on('SIGINT', () => {
+       child.kill('SIGINT');
+     });
      
-     // Use dynamic import to load the original config
-     export default (async () => {
-       const originalConfig = await import('./vite.config.js');
-       return originalConfig.default;
-     })();
+     child.on('close', (code) => {
+       process.exit(code);
+     });
      ```
+   - You'll also need to install ts-node: `npm install -g ts-node`
 
 5. Start the development server:
    ```bash
@@ -168,7 +183,14 @@ A community-driven platform that enables families to share gently-used toys, pro
 - **Module not found errors**: Run `npm install` again to ensure all dependencies are installed.
 - **TypeScript errors**: Make sure TypeScript is installed by running `npm install -g typescript`.
 - **Connection refused errors**: Ensure the server is running and bound to the correct interface (0.0.0.0 instead of localhost).
-- **ES Module errors** (like `__dirname is not defined in ES module scope`): Add `"type": "commonjs"` to your package.json file. This error happens because Node.js treats `.js` files as ES modules when `"type": "module"` is set or by default in newer Node.js versions.
+- **ES Module errors** (like `__dirname is not defined in ES module scope`): This application already uses ES modules (`"type": "module"` in package.json). You'll need to use the ES module equivalent of `__dirname`:
+  ```javascript
+  import { fileURLToPath } from 'url';
+  import { dirname } from 'path';
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  ```
+  Another option is to use the start script provided above in the installation instructions.
 - **Missing dependencies**: If you see errors about missing dependencies, run `npm install <package-name>` to install them.
 - **Webpack/Vite configuration errors**: These are usually related to the build process. Make sure your Node.js version is compatible (v16+ recommended).
 
