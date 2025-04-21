@@ -33,6 +33,13 @@ export default function HomePage() {
     queryKey: ['/api/community-metrics'],
     staleTime: 60000, // Cache for 1 minute
   });
+  
+  // Query for user's toys to determine if they've already shared toys
+  const { data: userToys = [] } = useQuery({
+    queryKey: ['/api/toys/by-user'],
+    enabled: !!user,
+    staleTime: 60000, // Cache for 1 minute
+  });
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -68,6 +75,14 @@ export default function HomePage() {
               >
                 <Plus className="mr-2 h-4 w-4" /> Share a Toy
               </Button>
+              {!user && (
+                <Button 
+                  className="px-6 py-6 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105"
+                  onClick={() => navigate('/auth')}
+                >
+                  Join Now
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -194,14 +209,16 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="text-center mt-10">
-          <Button 
-            className="px-6 py-6 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-full shadow-lg hover:shadow-xl transform transition hover:scale-105"
-            onClick={handleShareToyClick}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Share Your First Toy
-          </Button>
-        </div>
+        {user && userToys.length === 0 && (
+          <div className="text-center mt-10">
+            <Button 
+              className="px-6 py-6 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-full shadow-lg hover:shadow-xl transform transition hover:scale-105"
+              onClick={handleShareToyClick}
+            >
+              <Plus className="mr-2 h-4 w-4" /> Share Your First Toy
+            </Button>
+          </div>
+        )}
       </section>
 
       {/* Newsletter Signup */}

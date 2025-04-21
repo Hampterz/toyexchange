@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Heart, MapPin } from "lucide-react";
+import { useState, useRef } from "react";
+import { Heart, MapPin, ChevronLeft, ChevronRight, Calendar, MapPinIcon, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toy } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
@@ -7,6 +7,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { SustainabilityBadge } from "@/components/profile/sustainability-badge";
+import { Badge } from "@/components/ui/badge";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ToyCardProps {
   toy: Toy;
@@ -17,6 +20,12 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const isOwner = user && toy.userId === user.id;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  
+  // Track if we're viewing videos or images
+  const [viewingVideos, setViewingVideos] = useState(false);
 
   // Query to check if the toy is favorited by the current user
   const { data: favoriteData } = useQuery({
@@ -86,6 +95,41 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
 
   // Get the first image from the array for display
   const mainImage = toy.images && toy.images.length > 0 ? toy.images[0] : '';
+  
+  // Media navigation handlers
+  const nextImage = () => {
+    if (!toy.images || toy.images.length === 0) return;
+    setCurrentImageIndex((prev) => (prev === toy.images.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevImage = () => {
+    if (!toy.images || toy.images.length === 0) return;
+    setCurrentImageIndex((prev) => (prev === 0 ? toy.images.length - 1 : prev - 1));
+  };
+
+  const nextVideo = () => {
+    if (!toy.videos || toy.videos.length === 0) return;
+    setCurrentVideoIndex((prev) => (prev === toy.videos.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevVideo = () => {
+    if (!toy.videos || toy.videos.length === 0) return;
+    setCurrentVideoIndex((prev) => (prev === 0 ? toy.videos.length - 1 : prev - 1));
+  };
+
+  const toggleMediaType = () => {
+    setViewingVideos(!viewingVideos);
+  };
+  
+  // Format the date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(date);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition card-animated">
