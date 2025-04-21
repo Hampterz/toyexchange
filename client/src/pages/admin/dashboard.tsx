@@ -19,6 +19,32 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Resolve report mutation
+  const resolveReportMutation = useMutation({
+    mutationFn: async (reportId: number) => {
+      const res = await apiRequest("PATCH", `/api/admin/reports/${reportId}/resolve`, {
+        status: "resolved",
+        reviewedBy: user?.id
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Report resolved",
+        description: "The report has been marked as resolved.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/reports"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to resolve report",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
 
   // Redirect non-admin users
   useEffect(() => {
@@ -66,22 +92,26 @@ export default function AdminDashboard() {
   });
 
   // Admin mutations
-  const removeToyMutation = useMutation({
+  // Delete toy mutation
+  const deleteToyMutation = useMutation({
     mutationFn: async (toyId: number) => {
       await apiRequest("DELETE", `/api/admin/toys/${toyId}`);
     },
     onSuccess: () => {
+      toast({
+        title: "Toy deleted",
+        description: "The toy has been successfully removed.",
+        variant: "default",
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/toys"] });
     },
-  });
-
-  const resolveReportMutation = useMutation({
-    mutationFn: async (reportId: number) => {
-      await apiRequest("PATCH", `/api/admin/reports/${reportId}/resolve`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/reports"] });
-    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to delete toy",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
 
   // Use the actual data from the server API endpoints
@@ -382,21 +412,21 @@ export default function AdminDashboard() {
                     </TableHeader>
                     <TableBody>
                       {users && users.map((user) => (
-                        <TableRow key={demoUser.id}>
-                          <TableCell className="font-medium">{demoUser.name}</TableCell>
-                          <TableCell>{demoUser.username}</TableCell>
-                          <TableCell className="hidden md:table-cell">{demoUser.email}</TableCell>
-                          <TableCell className="hidden md:table-cell">{demoUser.toysShared}</TableCell>
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.name}</TableCell>
+                          <TableCell>{user.username}</TableCell>
+                          <TableCell className="hidden md:table-cell">{user.email}</TableCell>
+                          <TableCell className="hidden md:table-cell">{user.toysShared || 0}</TableCell>
                           <TableCell className="hidden md:table-cell">
                             <Badge variant={
-                              demoUser.currentBadge === "Gold" ? "default" :
-                              demoUser.currentBadge === "Silver" ? "secondary" : "outline"
+                              user.currentBadge === "PLANET_PROTECTOR" ? "default" :
+                              user.currentBadge === "SUSTAINABILITY_CHAMPION" ? "secondary" : "outline"
                             }>
-                              {demoUser.currentBadge}
+                              {user.currentBadge || "ECO_STARTER"}
                             </Badge>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
-                            {new Date(demoUser.createdAt).toLocaleDateString()}
+                            {new Date(user.createdAt).toLocaleDateString()}
                           </TableCell>
                           <TableCell className="text-right">
                             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -433,13 +463,13 @@ export default function AdminDashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {demoToys.map((toy) => (
+                      {toys && toys.map((toy) => (
                         <TableRow key={toy.id}>
                           <TableCell className="font-medium">{toy.title}</TableCell>
                           <TableCell className="hidden md:table-cell">{toy.category}</TableCell>
                           <TableCell className="hidden md:table-cell">{toy.ageRange}</TableCell>
                           <TableCell className="hidden md:table-cell">{toy.condition}</TableCell>
-                          <TableCell>{toy.owner.name}</TableCell>
+                          <TableCell>User #{toy.userId}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end">
                               <Button variant="ghost" size="icon" className="h-8 w-8 mr-2">
@@ -484,11 +514,11 @@ export default function AdminDashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {demoReports.map((report) => (
+                      {reports && reports.map((report) => (
                         <TableRow key={report.id}>
-                          <TableCell className="font-medium">{report.reportType}</TableCell>
-                          <TableCell>{report.reportedItem.name}</TableCell>
-                          <TableCell className="hidden md:table-cell">{report.reportedBy.name}</TableCell>
+                          <TableCell className="font-medium">{report.reportType || "User Report"}</TableCell>
+                          <TableCell>Item #{report.reportedItemId}</TableCell>
+                          <TableCell className="hidden md:table-cell">User #{report.reportedById}</TableCell>
                           <TableCell className="hidden md:table-cell">
                             {new Date(report.createdAt).toLocaleDateString()}
                           </TableCell>
@@ -507,6 +537,7 @@ export default function AdminDashboard() {
                                   variant="ghost" 
                                   size="icon" 
                                   className="h-8 w-8 text-green-500 hover:text-green-700 hover:bg-green-50"
+                                  onClick={() => resolveReportMutation.mutate(report.id)}
                                 >
                                   <CheckCircle className="h-4 w-4" />
                                 </Button>
