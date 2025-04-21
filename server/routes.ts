@@ -514,7 +514,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(403).json({ message: "Access denied. Admin privileges required." });
   };
 
+  // Admin routes
+  // Get all users (admin only)
+  app.get("/api/admin/users", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Remove sensitive information like passwords before sending
+      const safeUsers = users.map(user => {
+        const { password, ...safeUser } = user;
+        return safeUser;
+      });
+      res.json(safeUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+  
+  // Get all toys (admin only)
+  app.get("/api/admin/toys", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const toys = await storage.getToys();
+      res.json(toys);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch toys" });
+    }
+  });
+  
+  // Get all reports (admin only)
+  app.get("/api/admin/reports", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const reports = await storage.getReports();
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reports" });
+    }
+  });
+  
+  // Delete toy (admin only)
+  app.delete("/api/admin/toys/:id", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const toyId = parseInt(req.params.id);
+      const success = await storage.deleteToy(toyId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Toy not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete toy" });
+    }
+  });
+  
+  // Resolve report (admin only)
+  app.patch("/api/admin/reports/:id/resolve", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const adminId = req.user!.id;
+      
+      const updatedReport = await storage.updateReportStatus(reportId, "resolved", adminId);
+      
+      if (!updatedReport) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      
+      res.json(updatedReport);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to resolve report" });
+    }
+  });
+  
   // Get all contact messages (admin only)
+  app.get("/api/admin/contact-messages", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const messages = await storage.getAllContactMessages();
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch contact messages" });
+    }
+  });
+  
+  // Get all contact messages (admin only) - keeping this for backward compatibility
   app.get("/api/contact-messages", ensureAuthenticated, ensureAdmin, async (req, res) => {
     try {
       const messages = await storage.getAllContactMessages();

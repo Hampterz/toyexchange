@@ -84,84 +84,30 @@ export default function AdminDashboard() {
     },
   });
 
-  // For demo purposes, just simulate these arrays
-  const demoUsers = Array(8).fill(null).map((_, i) => ({
-    id: i + 1,
-    name: ["Emma Wilson", "Alex Johnson", "Guest", "Michael Brown", "Olivia Davis", "James Miller", "Sophia Williams", "Matthew Jones"][i],
-    username: ["emmaW", "alexJ", "guest123", "mikeB", "olivia", "jamesM", "sophia", "mattJ"][i],
-    email: [`user${i + 1}@example.com`],
-    toysShared: Math.floor(Math.random() * 15),
-    successfulExchanges: Math.floor(Math.random() * 10),
-    currentBadge: ["Bronze", "Silver", "Bronze", "Gold", "Bronze", "Silver", "Bronze", "Silver"][i],
-    createdAt: new Date(Date.now() - Math.random() * 10000000000),
-  }));
+  // Use the actual data from the server API endpoints
+  // We already have users, toys, reports and contactMessages data from the queries above
 
-  const demoToys = Array(12).fill(null).map((_, i) => ({
-    id: i + 1,
-    title: [
-      "LEGO City Set", "Wooden Train Track", "Teddy Bear", 
-      "Puzzle 100 pcs", "Remote Control Car", "Dollhouse", 
-      "Science Kit", "Art Supplies Box", "Building Blocks",
-      "Board Game", "Toy Kitchen", "Action Figures"
-    ][i],
-    owner: demoUsers[Math.floor(Math.random() * demoUsers.length)],
-    condition: ["Like New", "Good", "Fair", "Like New", "Good", "Like New", 
-                "Good", "Fair", "Like New", "Good", "Like New", "Good"][i],
-    ageRange: ["0-2", "3-5", "3-5", "6-8", "9-12", "3-5", "6-8", "3-5", 
-               "0-2", "6-8", "3-5", "6-8"][i],
-    category: ["Educational", "Plush", "Outdoor", "Educational", "Electronic", "Pretend Play",
-               "STEM", "Arts & Crafts", "Building", "Games", "Pretend Play", "Action Figures"][i],
-    location: "New York, NY",
-    createdAt: new Date(Date.now() - Math.random() * 5000000000),
-  }));
-
-  const demoReports = Array(5).fill(null).map((_, i) => ({
-    id: i + 1,
-    reportType: ["Inappropriate Content", "Safety Concern", "Misrepresented Item", 
-                "Suspicious User", "No-show at Meetup"][i],
-    reportedItem: {
-      type: ["toy", "user", "toy", "user", "exchange"][i],
-      id: i + 1,
-      name: ["LEGO City Set", "alexJ", "Remote Control Car", "mikeB", "Board Game Exchange"][i]
-    },
-    reportedBy: demoUsers[Math.floor(Math.random() * demoUsers.length)],
-    details: [
-      "Toy description contains inappropriate language",
-      "This user asked to meet at an isolated location",
-      "Toy was described as 'like new' but arrived damaged",
-      "User is sending suspicious messages asking for personal info",
-      "User didn't show up for our scheduled exchange"
-    ][i],
-    status: ["pending", "resolved", "pending", "pending", "resolved"][i],
-    createdAt: new Date(Date.now() - Math.random() * 2000000000),
-  }));
-
-  const demoContactMessages = Array(3).fill(null).map((_, i) => ({
-    id: i + 1,
-    name: ["Sarah Thompson", "David Clark", "Jennifer White"][i],
-    email: ["sarah@example.com", "david@example.com", "jennifer@example.com"][i],
-    subject: ["Question about toy exchanges", "Bug report", "Feature suggestion"][i],
-    message: [
-      "Hi, I'm wondering how I can arrange a safe meetup for exchanging toys. Do you have any suggestions?",
-      "I found a bug when trying to upload multiple images for my toy listing. The page crashes after the third image.",
-      "Would it be possible to add a feature that allows us to rate other users after exchanges? It would help build trust in the community."
-    ][i],
-    createdAt: new Date(Date.now() - Math.random() * 5000000000),
-  }));
-
-  // Platform statistics
+  // Platform statistics based on real data
   const stats = {
-    totalUsers: demoUsers.length,
-    totalToys: demoToys.length,
-    activeExchanges: 14,
-    completedExchanges: 47,
-    averageRating: 4.7,
-    newUsersThisWeek: 5,
-    newToysThisWeek: 8,
+    totalUsers: users.length,
+    totalToys: toys.length,
+    activeExchanges: 0, // Would need to implement in the future
+    completedExchanges: users.reduce((total, user) => total + (user.successfulExchanges || 0), 0),
+    averageRating: 0, // Would need to implement in the future
+    newUsersThisWeek: users.filter(u => {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      return new Date(u.createdAt) > oneWeekAgo;
+    }).length,
+    newToysThisWeek: toys.filter(t => {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      return new Date(t.createdAt) > oneWeekAgo;
+    }).length,
     sustainabilityImpact: {
-      toysReused: 61,
-      estimatedWasteSaved: "124 kg",
-      co2Reduced: "84 kg"
+      toysReused: toys.filter(t => !t.isAvailable).length,
+      estimatedWasteSaved: `${toys.filter(t => !t.isAvailable).length * 2} kg`, // Assuming each toy saves ~2kg
+      co2Reduced: `${Math.round(toys.filter(t => !t.isAvailable).length * 1.5)} kg` // Assuming each toy saves ~1.5kg CO2
     }
   };
 
@@ -366,7 +312,7 @@ export default function AdminDashboard() {
                   <CardDescription>Recent support inquiries</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {demoContactMessages.slice(0, 2).map((message) => (
+                  {contactMessages && contactMessages.slice(0, 2).map((message) => (
                     <div key={message.id} className="mb-4 pb-4 border-b border-blue-100 last:border-0 last:mb-0 last:pb-0">
                       <div className="flex justify-between">
                         <h4 className="font-medium text-blue-700">{message.subject}</h4>
@@ -393,7 +339,7 @@ export default function AdminDashboard() {
                   <CardDescription>Issues requiring attention</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {demoReports.filter(r => r.status === "pending").slice(0, 3).map((report) => (
+                  {reports && reports.filter(r => r.status === "pending").slice(0, 3).map((report) => (
                     <div key={report.id} className="mb-4 pb-4 border-b border-blue-100 last:border-0 last:mb-0 last:pb-0">
                       <div className="flex justify-between">
                         <h4 className="font-medium text-blue-700">{report.reportType}</h4>
@@ -435,7 +381,7 @@ export default function AdminDashboard() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {demoUsers.map((demoUser) => (
+                      {users && users.map((user) => (
                         <TableRow key={demoUser.id}>
                           <TableCell className="font-medium">{demoUser.name}</TableCell>
                           <TableCell>{demoUser.username}</TableCell>

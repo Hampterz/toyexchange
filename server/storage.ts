@@ -84,6 +84,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
 
   // Toy CRUD
   getToy(id: number): Promise<Toy | undefined>;
@@ -323,6 +324,10 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...updates };
     this.usersMap.set(id, updatedUser);
     return updatedUser;
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.usersMap.values());
   }
 
   // Toy CRUD methods
