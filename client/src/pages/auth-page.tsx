@@ -18,7 +18,6 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { loginUserSchema, registerUserSchema } from "@/hooks/use-auth";
-import { FormAddressAutocomplete } from "@/components/ui/address-autocomplete";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -194,12 +193,26 @@ export default function AuthPage() {
                         )}
                       />
                       
-                      <FormAddressAutocomplete
-                        form={registerForm}
+                      <FormField
+                        control={registerForm.control}
                         name="location"
-                        label="Location (Full Address)"
-                        placeholder="Start typing your address..."
-                        description="Please provide your full address for accurate toy exchange locations. Your exact address will only be shared when you agree to exchange a toy."
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-blue-800">Location (Full Address)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="e.g. 123 Main St, Apt 4, Seattle, WA 98101" 
+                                className="border-blue-200 focus-visible:ring-blue-700" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                            <p className="text-xs text-blue-500 mt-1">
+                              Please provide your full address for accurate toy exchange locations.
+                              Your exact address will only be shared when you agree to exchange a toy.
+                            </p>
+                          </FormItem>
+                        )}
                       />
                       
                       <Button 
