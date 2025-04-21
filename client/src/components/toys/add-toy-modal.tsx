@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
+import { AGE_RANGES, CATEGORIES, CONDITIONS } from "@/lib/utils/constants";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { insertToySchema, COMMON_TAGS } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -351,23 +351,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Pickup Location</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select location" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {LOCATIONS.map((location) => (
-                            <SelectItem key={location} value={location}>
-                              {location}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input 
+                          placeholder="Enter your preferred pickup location" 
+                          {...field} 
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
