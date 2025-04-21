@@ -25,11 +25,13 @@ interface AddToyModalProps {
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/mov", "video/quicktime"];
 
 // Base schema from shared schema.ts, but with adjusted validation for form use
 const formSchema = insertToySchema
-  .omit({ userId: true, images: true, isAvailable: true })
+  .omit({ userId: true, images: true, videos: true, isAvailable: true })
   .extend({
     // Custom image upload field for the form
     imageFiles: z
@@ -43,6 +45,22 @@ const formSchema = insertToySchema
         (files) => Array.from(files).every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
         "Only .jpg, .jpeg, .png and .webp formats are supported"
       ),
+    // Custom video upload field for the form
+    videoFiles: z
+      .instanceof(FileList)
+      .optional()
+      .refine(
+        (files) => !files || files.length <= 1,
+        "Maximum of 1 video allowed"
+      )
+      .refine(
+        (files) => !files || Array.from(files).every((file) => file.size <= MAX_VIDEO_SIZE),
+        "Video must be less than 50MB"
+      )
+      .refine(
+        (files) => !files || Array.from(files).every((file) => ACCEPTED_VIDEO_TYPES.includes(file.type)),
+        "Only .mp4, .webm, and .mov formats are supported"
+      ),
   });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,6 +71,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [videoUrls, setVideoUrls] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const form = useForm<FormValues>({
@@ -105,8 +124,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
     setIsUploading(true);
 
     try {
-      // Convert the uploaded files to base64 strings for storage
-      // In a real app, you would upload these to a storage service
+      // Convert the uploaded image files to base64 strings
       const imagePromises = Array.from(data.imageFiles).map((file) => {
         return new Promise<string>((resolve) => {
           const reader = new FileReader();
@@ -120,6 +138,23 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       const images = await Promise.all(imagePromises);
       setImageUrls(images);
 
+      // Convert the uploaded video file to base64 string if exists
+      let videos: string[] = [];
+      if (data.videoFiles && data.videoFiles.length > 0) {
+        const videoPromises = Array.from(data.videoFiles).map((file) => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+          });
+        });
+        
+        videos = await Promise.all(videoPromises);
+        setVideoUrls(videos);
+      }
+
       // Prepare the toy data for submission
       const toyData = {
         userId: user.id,
@@ -130,6 +165,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         category: data.category,
         location: data.location,
         images: images,
+        videos: videos,
         isAvailable: true,
         tags: selectedTags,
       };
@@ -137,8 +173,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       addToyMutation.mutate(toyData);
     } catch (error) {
       toast({
-        title: "Image Processing Failed",
-        description: "Failed to process images. Please try again.",
+        title: "Media Processing Failed",
+        description: "Failed to process images or video. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -149,6 +185,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const reset = () => {
     form.reset();
     setImageUrls([]);
+    setVideoUrls([]);
     setSelectedTags([]);
   };
 
@@ -179,6 +216,40 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
               src={URL.createObjectURL(file)}
               alt={`Preview ${index + 1}`}
               className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+  const renderVideoPreview = () => {
+    const files = form.watch("videoFiles");
+    
+    if (!files || files.length === 0) {
+      return (
+        <div className="border-2 border-dashed border-neutral-300 rounded-md p-6 text-center">
+          <Upload className="mx-auto h-12 w-12 text-neutral-400" />
+          <div className="mt-2">
+            <p className="text-sm text-neutral-600">
+              Add a video of the toy in action
+            </p>
+            <p className="text-xs text-neutral-500 mt-1">
+              MP4, WEBM, MOV up to 50MB
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="border rounded-md overflow-hidden">
+        {Array.from(files).map((file, index) => (
+          <div key={index} className="relative h-32 bg-gray-100 flex items-center justify-center">
+            <video
+              src={URL.createObjectURL(file)}
+              controls
+              className="max-h-full max-w-full"
             />
           </div>
         ))}
@@ -377,6 +448,34 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                           type="file"
                           accept="image/*"
                           multiple
+                          className="hidden"
+                          ref={ref}
+                          name={name}
+                          onBlur={onBlur}
+                          onChange={(e) => {
+                            onChange(e.target.files);
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="videoFiles"
+                render={({ field: { ref, name, onBlur, onChange } }) => (
+                  <FormItem>
+                    <FormLabel>Video (Optional)</FormLabel>
+                    <FormControl>
+                      <div className="cursor-pointer" onClick={() => document.getElementById('video-upload')?.click()}>
+                        {renderVideoPreview()}
+                        <Input
+                          id="video-upload"
+                          type="file"
+                          accept="video/mp4,video/webm,video/mov,video/quicktime"
                           className="hidden"
                           ref={ref}
                           name={name}
