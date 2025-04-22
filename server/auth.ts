@@ -29,12 +29,11 @@ export async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  if (!process.env.SESSION_SECRET) {
-    throw new Error("Missing required SESSION_SECRET environment variable");
-  }
+  // Use a default secret for development - in production you should use an environment variable 
+  const sessionSecret = process.env.SESSION_SECRET || "toyshare-dev-secret-key-not-for-production";
   
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET,
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
