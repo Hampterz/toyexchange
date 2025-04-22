@@ -17,7 +17,7 @@ import {
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import { hashPassword } from "./auth";
-
+// Fix SessionStore typing
 const MemoryStore = createMemoryStore(session);
 
 // Utility function to calculate badge based on sustainability score
