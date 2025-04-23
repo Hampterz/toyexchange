@@ -295,7 +295,7 @@ export default function HomePage() {
       {/* Footer with name */}
       <footer className="mt-16 py-6 text-center border-t border-blue-100">
         <p className="text-sm text-blue-500">
-          Created with ❤️ by Sreyas
+          Created by Sreyas R
         </p>
       </footer>
     </div>
