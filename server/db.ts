@@ -3,13 +3,33 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 
+// Set up WebSocket constructor for Neon
 neonConfig.webSocketConstructor = ws;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+// Check for DATABASE_URL but handle its absence gracefully
+let pool: Pool | null = null;
+let db: any = null;
+
+// Function to initialize the database connection
+export function initDatabase() {
+  try {
+    if (!process.env.DATABASE_URL) {
+      console.warn("DATABASE_URL not set. Database functionality will be limited.");
+      return false;
+    }
+    
+    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    db = drizzle(pool, { schema });
+    console.log("Database connection initialized successfully");
+    return true;
+  } catch (error) {
+    console.error("Failed to initialize database connection:", error);
+    return false;
+  }
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+// Initialize database on import
+initDatabase();
+
+// Export the pool and db objects
+export { pool, db };

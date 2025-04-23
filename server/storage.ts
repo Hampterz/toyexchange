@@ -758,6 +758,18 @@ export class MemStorage implements IStorage {
 
 // Import DatabaseStorage from new file
 import { DatabaseStorage } from "./database-storage";
+import { db, pool } from "./db";
 
-// Use DatabaseStorage for persistent storage instead of in-memory storage
-export const storage = new DatabaseStorage();
+// Choose the appropriate storage implementation based on database availability
+let storage: IStorage;
+
+// If we have a database connection, use DatabaseStorage, otherwise fall back to MemStorage
+if (pool) {
+  console.log("Using persistent database storage");
+  storage = new DatabaseStorage();
+} else {
+  console.warn("DATABASE_URL not found or invalid. Using in-memory storage.");
+  storage = new MemStorage();
+}
+
+export { storage };

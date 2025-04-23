@@ -15,11 +15,12 @@ import {
   BADGES 
 } from "@shared/schema";
 import session from "express-session";
-import { IStorage, CommunityMetrics } from "./storage";
-import { db, pool } from "./db";
+import { IStorage, CommunityMetrics, MemStorage } from "./storage";
+import { db, pool, initDatabase } from "./db";
 import { eq, and, desc, sql, asc } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import { hashPassword } from "./auth";
+import createMemoryStore from "memorystore";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -80,10 +81,26 @@ export class DatabaseStorage implements IStorage {
   };
 
   constructor() {
-    this.sessionStore = new PostgresSessionStore({ pool, createTableIfMissing: true });
-    
-    // Initialize admin user in the database
-    setTimeout(() => this.initAdminUser(), 100);
+    // Check if we have a database connection
+    if (pool) {
+      // If we have a database connection, use PostgreSQL for session storage
+      this.sessionStore = new PostgresSessionStore({ 
+        pool, 
+        createTableIfMissing: true,
+        // Additional error handling
+        errorLog: (error) => console.error('PostgreSQL session store error:', error)
+      });
+      
+      // Initialize admin user in the database
+      setTimeout(() => this.initAdminUser(), 100);
+    } else {
+      // If no database connection is available, fall back to memory store
+      console.warn("No database connection available. Using in-memory session store instead.");
+      const MemoryStore = createMemoryStore(session);
+      this.sessionStore = new MemoryStore({
+        checkPeriod: 86400000, // 24 hours
+      });
+    }
   }
 
   private async initAdminUser() {
