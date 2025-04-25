@@ -77,278 +77,160 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   };
   
   return (
-    <section className="bg-white shadow-sm mb-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        {/* Search input above the filter bar */}
-        <div className="mb-4">
-          <form onSubmit={handleSearchSubmit} className="flex relative">
-            <Input
-              type="text"
-              placeholder="Search toys, categories, or tags..."
-              value={searchValue}
-              onChange={handleSearchChange}
-              className="pr-12 focus-visible:ring-blue-500"
-            />
-            <Button
-              type="submit"
-              size="sm"
-              className="absolute right-1 top-1 bottom-1 px-3 bg-blue-600 hover:bg-blue-700"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </form>
-        </div>
-      
-        {/* Desktop view for filters in a row */}
-        <div className="hidden md:flex items-center space-x-4">
-          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
-            <MapPin className="text-blue-700 h-4 w-4" />
-            <Select 
-              value={filters.location} 
-              onValueChange={(value) => handleFilterChange("location", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-sm font-medium text-blue-800 min-w-36">
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">Any Location</SelectItem>
-                {LOCATIONS.map(location => (
-                  <SelectItem key={location} value={location}>{location}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
-            <Baby className="text-blue-700 h-4 w-4" />
-            <Select 
-              value={filters.ageRange} 
-              onValueChange={(value) => handleFilterChange("ageRange", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-sm font-medium text-blue-800 min-w-32">
-                <SelectValue placeholder="All Ages" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">All Ages</SelectItem>
-                {AGE_RANGES.map(ageRange => (
-                  <SelectItem key={ageRange} value={ageRange}>{ageRange}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
-            <Grid className="text-blue-700 h-4 w-4" />
-            <Select 
-              value={filters.category} 
-              onValueChange={(value) => handleFilterChange("category", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-sm font-medium text-blue-800 min-w-36">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">All Categories</SelectItem>
-                {CATEGORIES.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
-            <Star className="text-blue-700 h-4 w-4" />
-            <Select 
-              value={filters.condition} 
-              onValueChange={(value) => handleFilterChange("condition", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-sm font-medium text-blue-800 min-w-36">
-                <SelectValue placeholder="Any Condition" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">Any Condition</SelectItem>
-                {CONDITIONS.map(condition => (
-                  <SelectItem key={condition} value={condition}>{condition}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
-            <Tag className="text-blue-700 h-4 w-4" />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="link" 
-                  className="text-blue-800 font-medium text-sm pl-0"
-                >
-                  Tags
-                  {filters.tags.length > 0 && (
-                    <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800">
-                      {filters.tags.length}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0" align="start">
-                <div className="p-4">
-                  <h4 className="text-sm font-medium mb-2">Filter by tags</h4>
-                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-                    {COMMON_TAGS.map(tag => (
-                      <Badge
-                        key={tag}
-                        variant={filters.tags.includes(tag) ? "default" : "outline"}
-                        className={`cursor-pointer ${
-                          filters.tags.includes(tag) 
-                            ? 'bg-primary hover:bg-primary/80' 
-                            : 'hover:bg-muted/80'
-                        }`}
-                        onClick={() => toggleTag(tag)}
-                      >
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                  {filters.tags.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full mt-2"
-                      onClick={() => handleFilterChange('tags', [])}
-                    >
-                      Clear all tags
-                    </Button>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-
-        {/* Mobile view for filters in a grid */}
-        <div className="md:hidden grid grid-cols-2 gap-2 w-full max-w-full overflow-hidden">
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
-            <MapPin className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
-            <Select 
-              value={filters.location} 
-              onValueChange={(value) => handleFilterChange("location", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">Any Location</SelectItem>
-                {LOCATIONS.map(location => (
-                  <SelectItem key={location} value={location}>{location}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
-            <Baby className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
-            <Select 
-              value={filters.ageRange} 
-              onValueChange={(value) => handleFilterChange("ageRange", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
-                <SelectValue placeholder="Age" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">All Ages</SelectItem>
-                {AGE_RANGES.map(ageRange => (
-                  <SelectItem key={ageRange} value={ageRange}>{ageRange}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
-            <Grid className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
-            <Select 
-              value={filters.category} 
-              onValueChange={(value) => handleFilterChange("category", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">All Categories</SelectItem>
-                {CATEGORIES.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
-            <Star className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
-            <Select 
-              value={filters.condition} 
-              onValueChange={(value) => handleFilterChange("condition", value)}
-            >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
-                <SelectValue placeholder="Condition" />
-              </SelectTrigger>
-              <SelectContent className="border-blue-200">
-                <SelectItem value="any">Any Condition</SelectItem>
-                {CONDITIONS.map(condition => (
-                  <SelectItem key={condition} value={condition}>{condition}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm col-span-2 overflow-hidden">
-            <Tag className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="link" 
-                  className="text-blue-800 font-medium text-xs p-0 pl-0 h-auto truncate"
-                >
-                  Tags
-                  {filters.tags.length > 0 && (
-                    <Badge variant="secondary" className="ml-1.5 bg-blue-100 text-blue-800 text-[10px] px-1.5 py-px h-4">
-                      {filters.tags.length}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72 p-0" align="start">
-                <div className="p-4">
-                  <h4 className="text-sm font-medium mb-2">Filter by tags</h4>
-                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-                    {COMMON_TAGS.map(tag => (
-                      <Badge
-                        key={tag}
-                        variant={filters.tags.includes(tag) ? "default" : "outline"}
-                        className={`cursor-pointer ${
-                          filters.tags.includes(tag) 
-                            ? 'bg-primary hover:bg-primary/80' 
-                            : 'hover:bg-muted/80'
-                        }`}
-                        onClick={() => toggleTag(tag)}
-                      >
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                  {filters.tags.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full mt-2"
-                      onClick={() => handleFilterChange('tags', [])}
-                    >
-                      Clear all tags
-                    </Button>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
+    <div>
+      {/* Category Filters */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Categories</h3>
+        <div className="space-y-2 mt-3">
+          {CATEGORIES.map(category => (
+            <label key={category} className="flex items-center">
+              <input 
+                type="checkbox" 
+                checked={filters.category.includes(category)}
+                onChange={(e) => {
+                  const newCategories = e.target.checked
+                    ? [...filters.category, category]
+                    : filters.category.filter(c => c !== category);
+                  handleFilterChange("category", newCategories);
+                }}
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-blue-800">{category}</span>
+            </label>
+          ))}
         </div>
       </div>
-    </section>
+      
+      {/* Age Range Filters */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Age Range</h3>
+        <div className="space-y-2 mt-3">
+          {AGE_RANGES.map(age => (
+            <label key={age} className="flex items-center">
+              <input 
+                type="checkbox" 
+                checked={filters.ageRange.includes(age)}
+                onChange={(e) => {
+                  const newAgeRanges = e.target.checked
+                    ? [...filters.ageRange, age]
+                    : filters.ageRange.filter(a => a !== age);
+                  handleFilterChange("ageRange", newAgeRanges);
+                }}
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-blue-800">{age}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      
+      {/* Location Filters */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Location</h3>
+        <div className="space-y-2 mt-3">
+          {LOCATIONS.map(location => (
+            <label key={location} className="flex items-center">
+              <input 
+                type="checkbox" 
+                checked={filters.location.includes(location)}
+                onChange={(e) => {
+                  const newLocations = e.target.checked
+                    ? [...filters.location, location]
+                    : filters.location.filter(l => l !== location);
+                  handleFilterChange("location", newLocations);
+                }}
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-blue-800">{location}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      
+      {/* Condition Filters */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Condition</h3>
+        <div className="space-y-2 mt-3">
+          {CONDITIONS.map(condition => (
+            <label key={condition} className="flex items-center">
+              <input 
+                type="checkbox" 
+                checked={filters.condition.includes(condition)}
+                onChange={(e) => {
+                  const newConditions = e.target.checked
+                    ? [...filters.condition, condition]
+                    : filters.condition.filter(c => c !== condition);
+                  handleFilterChange("condition", newConditions);
+                }}
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-blue-800">{condition}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      
+      {/* Tags */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Tags</h3>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {COMMON_TAGS.map(tag => (
+            <Badge
+              key={tag}
+              variant={filters.tags.includes(tag) ? "default" : "outline"}
+              className={`cursor-pointer ${
+                filters.tags.includes(tag) 
+                  ? 'bg-primary hover:bg-primary/80' 
+                  : 'hover:bg-muted/80'
+              }`}
+              onClick={() => toggleTag(tag)}
+            >
+              #{tag}
+            </Badge>
+          ))}
+        </div>
+        {filters.tags.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full mt-2"
+            onClick={() => handleFilterChange('tags', [])}
+          >
+            Clear all tags
+          </Button>
+        )}
+      </div>
+
+      {/* Search */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Search</h3>
+        <form onSubmit={handleSearchSubmit} className="mt-3 flex relative">
+          <Input
+            type="text"
+            placeholder="Search toys..."
+            value={searchValue}
+            onChange={handleSearchChange}
+            className="pr-12 focus-visible:ring-blue-500"
+          />
+          <Button
+            type="submit"
+            size="sm"
+            className="absolute right-1 top-1 bottom-1 px-3 bg-blue-600 hover:bg-blue-700"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
+
+      <Button 
+        onClick={() => {
+          // Apply filters button
+          onFilterChange(filters);
+        }}
+        className="w-full bg-blue-700 hover:bg-blue-800 text-white"
+      >
+        Apply Filters
+      </Button>
+    </div>
   );
 }

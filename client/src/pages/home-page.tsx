@@ -15,10 +15,10 @@ export default function HomePage() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const [filters, setFilters] = useState<FilterOptions>({
-    location: "any",
-    ageRange: "any",
-    category: "any",
-    condition: "any",
+    location: [],
+    ageRange: [],
+    category: [],
+    condition: [],
     tags: [],
     search: "",
   });
@@ -35,7 +35,7 @@ export default function HomePage() {
   });
   
   // Query for user's toys to determine if they've already shared toys
-  const { data: userToys = [] } = useQuery({
+  const { data: userToys = [] } = useQuery<any[]>({
     queryKey: ['/api/toys/by-user'],
     enabled: !!user,
     staleTime: 60000, // Cache for 1 minute
@@ -88,38 +88,69 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Toy Listings with Filter Section */}
+      {/* Toy Listings with Filters */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <h2 className="text-2xl font-bold font-heading mb-3">Available Toys</h2>
+        <h2 className="text-2xl font-bold font-heading mb-4">Available Toys</h2>
         
-        <div className="flex mb-5">
-          <div className="mr-8">
-            <h3 className="text-sm text-neutral-600 font-medium mb-2">Sort by:</h3>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input 
-                  type="radio" 
-                  name="sortBy" 
-                  value="newest" 
-                  defaultChecked 
-                  className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-blue-800">Newest First</span>
-              </label>
-              <label className="flex items-center">
-                <input 
-                  type="radio" 
-                  name="sortBy" 
-                  value="closest" 
-                  className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-blue-800">Closest to Me</span>
-              </label>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Filters Sidebar */}
+          <div className="col-span-1 bg-white p-4 rounded-xl shadow-sm">
+            {/* Sort Options */}
+            <div className="mb-6">
+              <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Sort by</h3>
+              <div className="space-y-2 mt-3">
+                <label className="flex items-center">
+                  <input 
+                    type="radio" 
+                    name="sortBy" 
+                    value="newest" 
+                    defaultChecked 
+                    className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-blue-800">Newest First</span>
+                </label>
+                <label className="flex items-center">
+                  <input 
+                    type="radio" 
+                    name="sortBy" 
+                    value="closest" 
+                    className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-blue-800">Closest to Me</span>
+                </label>
+              </div>
             </div>
+            
+            {/* Search */}
+            <div className="mb-6">
+              <form className="flex relative" onSubmit={(e) => {
+                e.preventDefault();
+                handleFilterChange({...filters, search: e.currentTarget.search.value});
+              }}>
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Search toys..."
+                  className="w-full rounded-md border border-blue-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  defaultValue={filters.search}
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1 top-1 bottom-1 px-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
+            
+            <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
+          </div>
+          
+          {/* Toy Listings */}
+          <div className="col-span-1 md:col-span-3">
+            <ToyList filters={filters} />
           </div>
         </div>
-
-        <ToyList filters={filters} />
       </section>
 
       {/* Community Impact */}
@@ -219,7 +250,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {user && userToys.length === 0 && (
+        {user && Array.isArray(userToys) && userToys.length === 0 && (
           <div className="text-center mt-10">
             <Button 
               className="px-6 py-6 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-full shadow-lg hover:shadow-xl transform transition hover:scale-105"
