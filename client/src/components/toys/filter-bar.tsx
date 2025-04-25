@@ -162,7 +162,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     type="checkbox" 
                     checked={filters.ageRange.includes(age)}
                     readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
                   />
                   <span>{age}</span>
                 </div>
@@ -198,7 +198,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     type="checkbox" 
                     checked={filters.location.includes(location)}
                     readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
                   />
                   <span>{location}</span>
                 </div>
@@ -234,7 +234,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     type="checkbox" 
                     checked={filters.condition.includes(condition)}
                     readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
                   />
                   <span>{condition}</span>
                 </div>
@@ -270,7 +270,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     type="checkbox" 
                     checked={filters.tags.includes(tag)}
                     readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
                   />
                   <span>#{tag}</span>
                 </div>
@@ -342,7 +342,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.category.filter(c => c !== category);
                   handleFilterChange("category", newCategories);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
               />
               <span className="ml-2 text-sm text-blue-800">{category}</span>
             </label>
@@ -365,7 +365,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.ageRange.filter(a => a !== age);
                   handleFilterChange("ageRange", newAgeRanges);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
               />
               <span className="ml-2 text-sm text-blue-800">{age}</span>
             </label>
@@ -388,7 +388,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.location.filter(l => l !== location);
                   handleFilterChange("location", newLocations);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
               />
               <span className="ml-2 text-sm text-blue-800">{location}</span>
             </label>
@@ -411,7 +411,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.condition.filter(c => c !== condition);
                   handleFilterChange("condition", newConditions);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
               />
               <span className="ml-2 text-sm text-blue-800">{condition}</span>
             </label>
@@ -427,9 +427,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             <Badge
               key={tag}
               variant={filters.tags.includes(tag) ? "default" : "outline"}
-              className={`cursor-pointer ${
+              className={`cursor-pointer transform transition-all duration-200 hover:scale-110 ${
                 filters.tags.includes(tag) 
-                  ? 'bg-primary hover:bg-primary/80' 
+                  ? 'bg-primary hover:bg-primary/80 animate-pulse-slow' 
                   : 'hover:bg-muted/80'
               }`}
               onClick={() => toggleTag(tag)}
