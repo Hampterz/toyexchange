@@ -10,6 +10,7 @@ import ProfilePage from "@/pages/profile-page";
 import UserProfilePage from "@/pages/user-profile-page";
 import FavoritesPage from "@/pages/favorites-page";
 import MessagesPage from "@/pages/messages-page";
+import ToyPage from "@/pages/toy-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -113,6 +114,11 @@ const Router = () => {
       {/* Public user profile page - accessible to all users */}
       <Route path="/users/:userId">
         {() => <Layout><UserProfilePage /></Layout>}
+      </Route>
+      
+      {/* Public individual toy page - accessible to all users */}
+      <Route path="/toys/:id">
+        {() => <Layout><ToyPage /></Layout>}
       </Route>
       
       {/* Resource Pages */}

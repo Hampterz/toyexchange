@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Heart, MapPin, ChevronLeft, ChevronRight, Calendar, MapPinIcon, Star } from "lucide-react";
+import { Heart, MapPin, ChevronLeft, ChevronRight, Calendar, MapPinIcon, Star, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toy } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,6 +10,7 @@ import { SustainabilityBadge } from "@/components/profile/sustainability-badge";
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { SocialShareButtons } from "@/components/social/social-share-buttons";
 
 interface ToyCardProps {
   toy: Toy;
@@ -136,6 +137,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       year: 'numeric'
     }).format(date);
   };
+  
+  // Get shareable URL for this toy
+  const getShareableUrl = () => {
+    return `${window.location.origin}/toys/${toy.id}`;
+  };
 
   return (
     <>
@@ -156,17 +162,33 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             </div>
           )}
           
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFavoriteClick();
-            }}
-            className="absolute top-2 right-2 sm:top-3 sm:right-3 h-8 w-8 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
-            aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
-            disabled={toggleFavoriteMutation.isPending}
-          >
-            <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-500 hover:text-primary"}`} />
-          </button>
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex space-x-1">
+            {/* Share button */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                // Open dialog to ensure sharing works
+                setIsExpanded(true);
+              }}
+              className="h-8 w-8 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
+              aria-label="Share this toy"
+            >
+              <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-neutral-500 hover:text-primary" />
+            </button>
+            
+            {/* Favorite button */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleFavoriteClick();
+              }}
+              className="h-8 w-8 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
+              aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+              disabled={toggleFavoriteMutation.isPending}
+            >
+              <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-500 hover:text-primary"}`} />
+            </button>
+          </div>
           
           <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-primary text-white text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full">
             {toy.condition}
@@ -416,6 +438,17 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 <Badge variant="outline">{toy.category}</Badge>
               </div>
               
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold mb-2">Share this toy</h3>
+                <div className="flex items-center space-x-2">
+                  <SocialShareButtons
+                    url={getShareableUrl()}
+                    title={`Check out this toy on ToyShare: ${toy.title}`}
+                    description={`${toy.description} - Available for exchange in ${toy.location}`}
+                  />
+                </div>
+              </div>
+
               <div className="mt-6 border-t pt-4">
                 <div className="flex items-center">
                   <div className="flex-1">
