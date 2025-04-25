@@ -1,70 +1,176 @@
-// Define the OAuth client ID
-const GOOGLE_CLIENT_ID = '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com';
+// Define interfaces for Google auth types
+interface GoogleUser {
+  getBasicProfile(): GoogleProfile;
+  getAuthResponse(includeAuthorizationData?: boolean): GoogleAuthResponse;
+  getId(): string;
+  isSignedIn(): boolean;
+  hasGrantedScopes(scopes: string): boolean;
+  disconnect(): void;
+  grantOfflineAccess(options: object): Promise<{code: string}>;
+  signIn(options?: object): Promise<any>;
+}
 
-// This function initiates Google OAuth sign-in by redirecting the user to Google's authorization page
-export const signInWithGoogle = async () => {
-  try {
-    // Google OAuth endpoint
-    const authUrl = "https://accounts.google.com/o/oauth2/v2/auth";
-    
-    // OAuth parameters
-    const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: `${window.location.origin}/auth`,
-      response_type: 'token',
-      scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-      state: Math.random().toString(36).substring(2),
-      prompt: 'select_account',
-    });
-    
-    // Redirect to Google's OAuth sign-in page
-    window.location.href = `${authUrl}?${params.toString()}`;
-    
-    // Return a dummy success since this function redirects and doesn't return
-    return { redirecting: true };
-  } catch (error) {
-    console.error("Error initiating Google sign in:", error);
-    throw error;
-  }
-};
+interface GoogleProfile {
+  getId(): string;
+  getName(): string;
+  getGivenName(): string;
+  getFamilyName(): string;
+  getImageUrl(): string;
+  getEmail(): string;
+}
 
-// This function handles the OAuth callback after Google authorization
-export const handleGoogleCallback = async () => {
-  // Parse the access token from the URL hash
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const accessToken = params.get('access_token');
-  
-  if (!accessToken) {
-    return null;
+interface GoogleAuthResponse {
+  access_token: string;
+  id_token: string;
+  scope: string;
+  expires_in: number;
+  first_issued_at: number;
+  expires_at: number;
+}
+
+interface AuthInstance {
+  isSignedIn: {
+    get(): boolean;
+    listen(listener: (isSignedIn: boolean) => void): void;
+  };
+  currentUser: {
+    get(): GoogleUser;
+    listen(listener: (user: GoogleUser) => void): void;
+  };
+  signIn(options?: object): Promise<GoogleUser>;
+  signOut(): Promise<void>;
+  disconnect(): Promise<void>;
+}
+
+// Declare global gapi object
+declare global {
+  interface Window {
+    gapi: {
+      load(api: string, callback: () => void): void;
+      auth2: {
+        init(params: {client_id: string}): Promise<AuthInstance>;
+        getAuthInstance(): AuthInstance;
+      };
+    };
+    onGoogleSignIn?: (user: any) => void;
   }
-  
-  try {
-    // Use the access token to get user info from Google
-    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
+}
+
+// Will store the auth instance once initialized
+let googleAuth: AuthInstance | null = null;
+
+// Function to initialize Google Auth
+export const initializeGoogleAuth = (): Promise<AuthInstance> => {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || !window.gapi) {
+      reject(new Error('Google API not available'));
+      return;
+    }
+
+    if (googleAuth) {
+      resolve(googleAuth);
+      return;
+    }
+
+    window.gapi.load('auth2', () => {
+      try {
+        window.gapi.auth2
+          .init({
+            client_id: '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com',
+          })
+          .then((auth: AuthInstance) => {
+            googleAuth = auth;
+            resolve(auth);
+          })
+          .catch((error: Error) => {
+            console.error('Error initializing Google Auth:', error);
+            reject(error);
+          });
+      } catch (error) {
+        console.error('Error loading auth2:', error);
+        reject(error);
       }
     });
+  });
+};
+
+// Function to sign in with Google
+export const signInWithGoogle = async (): Promise<any> => {
+  try {
+    const auth = await initializeGoogleAuth();
+    const googleUser = await auth.signIn({
+      scope: 'profile email',
+    });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch user data');
-    }
+    const profile = googleUser.getBasicProfile();
+    const authResponse = googleUser.getAuthResponse();
     
-    const userData = await response.json();
-    
-    // Return the user data
     return {
-      sub: userData.sub, // This is like a user ID
-      email: userData.email,
-      displayName: userData.name,
-      givenName: userData.given_name,
-      familyName: userData.family_name,
-      photoURL: userData.picture,
-      token: accessToken
+      id: profile.getId(),
+      email: profile.getEmail(),
+      name: profile.getName(),
+      givenName: profile.getGivenName(),
+      familyName: profile.getFamilyName(),
+      imageUrl: profile.getImageUrl(),
+      token: authResponse.id_token,
     };
   } catch (error) {
-    console.error("Error processing Google sign-in callback:", error);
+    console.error('Error signing in with Google:', error);
     throw error;
   }
 };
+
+// Function to sign out from Google
+export const signOutFromGoogle = async (): Promise<void> => {
+  try {
+    const auth = await initializeGoogleAuth();
+    await auth.signOut();
+  } catch (error) {
+    console.error('Error signing out from Google:', error);
+    throw error;
+  }
+};
+
+// Function to check if user is signed in
+export const isGoogleSignedIn = async (): Promise<boolean> => {
+  try {
+    const auth = await initializeGoogleAuth();
+    return auth.isSignedIn.get();
+  } catch (error) {
+    console.error('Error checking Google sign-in status:', error);
+    return false;
+  }
+};
+
+// Callback function for Google Sign-In button
+export const onSignIn = (googleUser: any) => {
+  try {
+    const profile = googleUser.getBasicProfile();
+    const id = profile.getId();
+    const name = profile.getName();
+    const imageUrl = profile.getImageUrl();
+    const email = profile.getEmail();
+    
+    const userData = {
+      id,
+      name,
+      imageUrl,
+      email,
+    };
+    
+    console.log('Google user signed in:', userData);
+    
+    // Call the global callback if defined
+    if (window.onGoogleSignIn) {
+      window.onGoogleSignIn(userData);
+    }
+    
+    return userData;
+  } catch (error) {
+    console.error('Error in onSignIn callback:', error);
+    throw error;
+  }
+};
+
+// Set the global callback
+window.onGoogleSignIn = onSignIn;

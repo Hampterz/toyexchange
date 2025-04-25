@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,16 +18,17 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { loginUserSchema, registerUserSchema } from "@/hooks/use-auth";
-import { signInWithGoogle, handleGoogleCallback } from "@/lib/googleAuth";
+import { signInWithGoogle, initializeGoogleAuth } from "@/lib/googleAuth";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [_, navigate] = useLocation();
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  // Check for Google OAuth callback and for logged in users
+  // Initialize Google Auth when component mounts
   useEffect(() => {
     // If user is already logged in, redirect to home page
     if (user) {
@@ -35,27 +36,28 @@ export default function AuthPage() {
       return;
     }
 
-    // Check if this is a callback from Google OAuth
-    if (window.location.hash && window.location.hash.includes('access_token')) {
-      const processGoogleCallback = async () => {
+    // Initialize Google Sign-In button
+    const renderGoogleButton = () => {
+      // Set the global callback for Google Sign-In
+      window.onGoogleSignIn = async (googleUser) => {
         try {
           setIsGoogleSigningIn(true);
-          const googleUserData = await handleGoogleCallback();
+          // Use the Google user data to authenticate with your backend
           
-          if (googleUserData) {
-            // Show success message
-            toast({
-              title: "Google Sign-in Successful",
-              description: `Welcome, ${googleUserData.displayName || 'User'}!`,
-              variant: "default",
-            });
-            
-            // Here you would integrate with your backend to create/login the user
-            // For now, we'll just redirect to home page
-            navigate('/');
-          }
+          // Show a toast notification
+          toast({
+            title: "Google Sign-in Successful",
+            description: `Welcome, ${googleUser.name || 'User'}!`,
+            variant: "default",
+          });
+          
+          // For now, just log and redirect (you'd normally call your backend here)
+          console.log("Google sign-in successful:", googleUser);
+          
+          // Redirect to home page
+          navigate('/');
         } catch (error) {
-          console.error("Error processing Google callback:", error);
+          console.error("Error handling Google sign-in:", error);
           toast({
             title: "Google Sign-in Failed",
             description: "Unable to process Google sign-in. Please try again.",
@@ -66,8 +68,21 @@ export default function AuthPage() {
         }
       };
       
-      processGoogleCallback();
-    }
+      // Initialize Google Auth API if needed
+      if (!window.gapi || !window.gapi.auth2) {
+        initializeGoogleAuth()
+          .catch(error => {
+            console.error("Failed to initialize Google Auth:", error);
+            toast({
+              title: "Google Sign-in Error",
+              description: "Could not initialize Google sign-in. Please try again later.",
+              variant: "destructive",
+            });
+          });
+      }
+    };
+    
+    renderGoogleButton();
   }, [user, navigate, toast]);
 
   // Login form
@@ -104,9 +119,12 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleSigningIn(true);
-      // This function redirects to Google and doesn't return anything meaningful
-      await signInWithGoogle();
-      // The rest of the logic will be handled in the useEffect when Google redirects back
+      const googleUser = await signInWithGoogle();
+      
+      if (googleUser) {
+        // This will eventually be handled by the onGoogleSignIn callback
+        console.log("Google sign-in successful:", googleUser);
+      }
     } catch (error) {
       console.error("Google sign-in error:", error);
       toast({
@@ -190,6 +208,7 @@ export default function AuthPage() {
                         </div>
                       </div>
 
+                      {/* Custom Google Sign-In Button */}
                       <Button 
                         type="button" 
                         variant="outline" 
@@ -218,6 +237,11 @@ export default function AuthPage() {
                         </svg>
                         <span>{isGoogleSigningIn ? "Signing in..." : "Sign in with Google"}</span>
                       </Button>
+                      
+                      {/* Google's native sign-in button (hidden) */}
+                      <div className="hidden mt-2">
+                        <div ref={googleButtonRef} className="g-signin2" data-onsuccess="onSignIn"></div>
+                      </div>
                     </form>
                   </Form>
                 </CardContent>
@@ -352,7 +376,7 @@ export default function AuthPage() {
                           />
                           <path d="M1 1h22v22H1z" fill="none" />
                         </svg>
-                        <span>{isGoogleSigningIn ? "Signing in..." : "Sign up with Google"}</span>
+                        <span>{isGoogleSigningIn ? "Signing in..." : "Sign in with Google"}</span>
                       </Button>
                     </form>
                   </Form>
@@ -360,54 +384,55 @@ export default function AuthPage() {
               </Card>
             </TabsContent>
           </Tabs>
-          
-          <p className="text-xs text-blue-500 text-center mt-6">
-            By signing up, you agree to our <Link href="#" className="text-blue-700 hover:underline">Terms of Service</Link> and <Link href="#" className="text-blue-700 hover:underline">Privacy Policy</Link>
-          </p>
         </div>
         
-        {/* Right Side - Hero Content */}
-        <div className="md:w-1/2 bg-gradient-to-r from-blue-700 to-blue-900 p-6 md:p-10 text-white flex flex-col justify-center relative">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 md:p-8 relative">
-            <h2 className="text-3xl font-bold mb-4">Share Toys, Create Smiles!</h2>
-            <p className="mb-4 text-white/90">
-              Join our community of parents reducing waste and helping each other by sharing outgrown toys.
+        {/* Right Side - Hero Section */}
+        <div className="md:w-1/2 bg-gradient-to-br from-blue-700 to-blue-900 p-8 md:p-12 flex flex-col justify-center text-white">
+          <div className="max-w-md mx-auto">
+            <h2 className="text-3xl font-bold mb-4">Share Toys, Build Community</h2>
+            <p className="mb-6 text-blue-100">
+              Join our growing community of parents exchanging toys, reducing waste, and 
+              creating connections. ToyShare helps you find and give away toys to other
+              families near you.
             </p>
             
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start">
-                <i className="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
-                <span>Free toy exchanges with families near you</span>
-              </li>
-              <li className="flex items-start">
-                <i className="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
-                <span>Safe, trusted community of parents</span>
-              </li>
-              <li className="flex items-start">
-                <i className="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
-                <span>Help reduce waste and environmental impact</span>
-              </li>
-              <li className="flex items-start">
-                <i className="fas fa-check-circle mt-1 mr-2 text-blue-300"></i>
-                <span>Save money on children's toys and games</span>
-              </li>
-            </ul>
-            
-            <div className="flex items-center space-x-4 bg-blue-800/50 p-4 rounded-lg">
-              <div className="h-12 w-12 rounded-full overflow-hidden bg-blue-200 flex items-center justify-center text-blue-700 text-xl font-bold">
-                <span>G</span>
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="bg-blue-600 p-2 rounded-full mt-1">
+                  <i className="fas fa-leaf text-lg"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Sustainable Parenting</h3>
+                  <p className="text-blue-100">
+                    Extend the life of toys by passing them on when your children outgrow them.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">"ToyShare has been amazing for our family!"</p>
-                <p className="text-sm text-white/80">Guest User</p>
+              
+              <div className="flex items-start space-x-4">
+                <div className="bg-blue-600 p-2 rounded-full mt-1">
+                  <i className="fas fa-users text-lg"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Local Connections</h3>
+                  <p className="text-blue-100">
+                    Meet other parents in your neighborhood through toy exchanges.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="bg-blue-600 p-2 rounded-full mt-1">
+                  <i className="fas fa-piggy-bank text-lg"></i>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Save Money</h3>
+                  <p className="text-blue-100">
+                    Access quality toys without the cost of buying new every time.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="absolute bottom-6 right-6 flex space-x-2">
-            <div className="h-2 w-2 rounded-full bg-white/30"></div>
-            <div className="h-2 w-2 rounded-full bg-white"></div>
-            <div className="h-2 w-2 rounded-full bg-white/30"></div>
           </div>
         </div>
       </div>
