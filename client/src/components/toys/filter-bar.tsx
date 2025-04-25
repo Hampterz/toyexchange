@@ -93,7 +93,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.category.filter(c => c !== category);
                   handleFilterChange("category", newCategories);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-blue-800">{category}</span>
             </label>
@@ -116,7 +116,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.ageRange.filter(a => a !== age);
                   handleFilterChange("ageRange", newAgeRanges);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-blue-800">{age}</span>
             </label>
@@ -139,7 +139,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.location.filter(l => l !== location);
                   handleFilterChange("location", newLocations);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-blue-800">{location}</span>
             </label>
@@ -162,7 +162,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     : filters.condition.filter(c => c !== condition);
                   handleFilterChange("condition", newConditions);
                 }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-blue-800">{condition}</span>
             </label>
@@ -201,33 +201,14 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         )}
       </div>
 
-      {/* Search */}
-      <div className="mb-6">
-        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Search</h3>
-        <form onSubmit={handleSearchSubmit} className="mt-3 flex relative">
-          <Input
-            type="text"
-            placeholder="Search toys..."
-            value={searchValue}
-            onChange={handleSearchChange}
-            className="pr-12 focus-visible:ring-blue-500"
-          />
-          <Button
-            type="submit"
-            size="sm"
-            className="absolute right-1 top-1 bottom-1 px-3 bg-blue-600 hover:bg-blue-700"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-      </div>
+
 
       <Button 
         onClick={() => {
           // Apply filters button
           onFilterChange(filters);
         }}
-        className="w-full bg-blue-700 hover:bg-blue-800 text-white"
+        className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4"
       >
         Apply Filters
       </Button>
