@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
 import { COMMON_TAGS } from "@shared/schema";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useMediaQuery } from "../../hooks/use-media-query";
 
 type FilterBarProps = {
   onFilterChange: (filters: FilterOptions) => void;

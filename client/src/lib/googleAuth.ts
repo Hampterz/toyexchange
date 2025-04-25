@@ -74,12 +74,19 @@ export const initializeGoogleAuth = (): Promise<AuthInstance> => {
 
     window.gapi.load('auth2', () => {
       try {
+        // Log the current origin to help with debugging
+        console.log('Current origin:', window.location.origin);
+        
+        // Cast params to any to bypass TypeScript limitations
         window.gapi.auth2
           .init({
             client_id: '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com',
-          })
+            cookie_policy: 'single_host_origin',
+            scope: 'profile email',
+          } as any)
           .then((auth: AuthInstance) => {
             googleAuth = auth;
+            console.log('Google Auth initialized successfully');
             resolve(auth);
           })
           .catch((error: Error) => {
