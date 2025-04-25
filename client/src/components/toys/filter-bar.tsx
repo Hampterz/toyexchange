@@ -99,7 +99,8 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           </form>
         </div>
       
-        <div className="flex items-center overflow-x-auto scrollbar-hide space-x-4">
+        {/* Desktop view for filters in a row */}
+        <div className="hidden md:flex items-center space-x-4">
           <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-full border border-blue-100 shadow-sm">
             <MapPin className="text-blue-700 h-4 w-4" />
             <Select 
@@ -189,6 +190,131 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="start">
+                <div className="p-4">
+                  <h4 className="text-sm font-medium mb-2">Filter by tags</h4>
+                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                    {COMMON_TAGS.map(tag => (
+                      <Badge
+                        key={tag}
+                        variant={filters.tags.includes(tag) ? "default" : "outline"}
+                        className={`cursor-pointer ${
+                          filters.tags.includes(tag) 
+                            ? 'bg-primary hover:bg-primary/80' 
+                            : 'hover:bg-muted/80'
+                        }`}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                  {filters.tags.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() => handleFilterChange('tags', [])}
+                    >
+                      Clear all tags
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Mobile view for filters in a grid */}
+        <div className="md:hidden grid grid-cols-2 gap-2">
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
+            <MapPin className="text-blue-700 h-3.5 w-3.5" />
+            <Select 
+              value={filters.location} 
+              onValueChange={(value) => handleFilterChange("location", value)}
+            >
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+                <SelectValue placeholder="Location" />
+              </SelectTrigger>
+              <SelectContent className="border-blue-200">
+                <SelectItem value="any">Any Location</SelectItem>
+                {LOCATIONS.map(location => (
+                  <SelectItem key={location} value={location}>{location}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
+            <Baby className="text-blue-700 h-3.5 w-3.5" />
+            <Select 
+              value={filters.ageRange} 
+              onValueChange={(value) => handleFilterChange("ageRange", value)}
+            >
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+                <SelectValue placeholder="Age" />
+              </SelectTrigger>
+              <SelectContent className="border-blue-200">
+                <SelectItem value="any">All Ages</SelectItem>
+                {AGE_RANGES.map(ageRange => (
+                  <SelectItem key={ageRange} value={ageRange}>{ageRange}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
+            <Grid className="text-blue-700 h-3.5 w-3.5" />
+            <Select 
+              value={filters.category} 
+              onValueChange={(value) => handleFilterChange("category", value)}
+            >
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent className="border-blue-200">
+                <SelectItem value="any">All Categories</SelectItem>
+                {CATEGORIES.map(category => (
+                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
+            <Star className="text-blue-700 h-3.5 w-3.5" />
+            <Select 
+              value={filters.condition} 
+              onValueChange={(value) => handleFilterChange("condition", value)}
+            >
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+                <SelectValue placeholder="Condition" />
+              </SelectTrigger>
+              <SelectContent className="border-blue-200">
+                <SelectItem value="any">Any Condition</SelectItem>
+                {CONDITIONS.map(condition => (
+                  <SelectItem key={condition} value={condition}>{condition}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm col-span-2">
+            <Tag className="text-blue-700 h-3.5 w-3.5" />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="link" 
+                  className="text-blue-800 font-medium text-xs p-0 pl-0 h-auto"
+                >
+                  Tags
+                  {filters.tags.length > 0 && (
+                    <Badge variant="secondary" className="ml-1.5 bg-blue-100 text-blue-800 text-[10px] px-1.5 py-px h-4">
+                      {filters.tags.length}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 p-0" align="start">
                 <div className="p-4">
                   <h4 className="text-sm font-medium mb-2">Filter by tags</h4>
                   <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
