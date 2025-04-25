@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
 import { COMMON_TAGS } from "@shared/schema";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 type FilterBarProps = {
   onFilterChange: (filters: FilterOptions) => void;
@@ -43,6 +44,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   });
   
   const [searchValue, setSearchValue] = useState(initialFilters?.search || "");
+  
+  // Check if we're on mobile
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Update filters when a selection changes
   const handleFilterChange = (key: keyof FilterOptions, value: string | string[]) => {
@@ -76,98 +80,265 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     handleFilterChange('search', searchValue);
   };
   
+  // Handle multi-select in mobile dropdown
+  const handleMultiSelectChange = (filterType: keyof FilterOptions, value: string) => {
+    const currentValues = filters[filterType] as string[];
+    
+    if (currentValues.includes(value)) {
+      // If already selected, remove it
+      const updatedValues = currentValues.filter(v => v !== value);
+      handleFilterChange(filterType, updatedValues);
+    } else {
+      // Otherwise add it
+      const updatedValues = [...currentValues, value];
+      handleFilterChange(filterType, updatedValues);
+    }
+  };
+
+  // Format selected values for display in a multi-select dropdown
+  const formatSelectedValues = (filterType: keyof FilterOptions): string => {
+    const selectedValues = filters[filterType] as string[];
+    if (selectedValues.length === 0) return "Select...";
+    if (selectedValues.length === 1) return selectedValues[0];
+    return `${selectedValues.length} selected`;
+  };
+
   return (
     <div>
       {/* Category Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Categories</h3>
-        <div className="space-y-2 mt-3">
-          {CATEGORIES.map(category => (
-            <label key={category} className="flex items-center">
-              <input 
-                type="checkbox" 
-                checked={filters.category.includes(category)}
-                onChange={(e) => {
-                  const newCategories = e.target.checked
-                    ? [...filters.category, category]
-                    : filters.category.filter(c => c !== category);
-                  handleFilterChange("category", newCategories);
-                }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-blue-800">{category}</span>
-            </label>
-          ))}
-        </div>
+        {isMobile ? (
+          // Mobile dropdown version
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between text-left font-normal mt-2"
+              >
+                {formatSelectedValues("category")}
+                <Grid className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <div className="max-h-60 overflow-auto p-2">
+                {CATEGORIES.map(category => (
+                  <div 
+                    key={category}
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                    onClick={() => handleMultiSelectChange("category", category)}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={filters.category.includes(category)}
+                      readOnly
+                      className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    />
+                    <span>{category}</span>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          // Desktop checkbox version
+          <div className="space-y-2 mt-3">
+            {CATEGORIES.map(category => (
+              <label key={category} className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  checked={filters.category.includes(category)}
+                  onChange={(e) => {
+                    const newCategories = e.target.checked
+                      ? [...filters.category, category]
+                      : filters.category.filter(c => c !== category);
+                    handleFilterChange("category", newCategories);
+                  }}
+                  className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-blue-800">{category}</span>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Age Range Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Age Range</h3>
-        <div className="space-y-2 mt-3">
-          {AGE_RANGES.map(age => (
-            <label key={age} className="flex items-center">
-              <input 
-                type="checkbox" 
-                checked={filters.ageRange.includes(age)}
-                onChange={(e) => {
-                  const newAgeRanges = e.target.checked
-                    ? [...filters.ageRange, age]
-                    : filters.ageRange.filter(a => a !== age);
-                  handleFilterChange("ageRange", newAgeRanges);
-                }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-blue-800">{age}</span>
-            </label>
-          ))}
-        </div>
+        {isMobile ? (
+          // Mobile dropdown version
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between text-left font-normal mt-2"
+              >
+                {formatSelectedValues("ageRange")}
+                <Baby className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <div className="max-h-60 overflow-auto p-2">
+                {AGE_RANGES.map(age => (
+                  <div 
+                    key={age}
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                    onClick={() => handleMultiSelectChange("ageRange", age)}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={filters.ageRange.includes(age)}
+                      readOnly
+                      className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    />
+                    <span>{age}</span>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          // Desktop checkbox version
+          <div className="space-y-2 mt-3">
+            {AGE_RANGES.map(age => (
+              <label key={age} className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  checked={filters.ageRange.includes(age)}
+                  onChange={(e) => {
+                    const newAgeRanges = e.target.checked
+                      ? [...filters.ageRange, age]
+                      : filters.ageRange.filter(a => a !== age);
+                    handleFilterChange("ageRange", newAgeRanges);
+                  }}
+                  className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-blue-800">{age}</span>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Location Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Location</h3>
-        <div className="space-y-2 mt-3">
-          {LOCATIONS.map(location => (
-            <label key={location} className="flex items-center">
-              <input 
-                type="checkbox" 
-                checked={filters.location.includes(location)}
-                onChange={(e) => {
-                  const newLocations = e.target.checked
-                    ? [...filters.location, location]
-                    : filters.location.filter(l => l !== location);
-                  handleFilterChange("location", newLocations);
-                }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-blue-800">{location}</span>
-            </label>
-          ))}
-        </div>
+        {isMobile ? (
+          // Mobile dropdown version
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between text-left font-normal mt-2"
+              >
+                {formatSelectedValues("location")}
+                <MapPin className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <div className="max-h-60 overflow-auto p-2">
+                {LOCATIONS.map(location => (
+                  <div 
+                    key={location}
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                    onClick={() => handleMultiSelectChange("location", location)}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={filters.location.includes(location)}
+                      readOnly
+                      className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    />
+                    <span>{location}</span>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          // Desktop checkbox version
+          <div className="space-y-2 mt-3">
+            {LOCATIONS.map(location => (
+              <label key={location} className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  checked={filters.location.includes(location)}
+                  onChange={(e) => {
+                    const newLocations = e.target.checked
+                      ? [...filters.location, location]
+                      : filters.location.filter(l => l !== location);
+                    handleFilterChange("location", newLocations);
+                  }}
+                  className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-blue-800">{location}</span>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Condition Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Condition</h3>
-        <div className="space-y-2 mt-3">
-          {CONDITIONS.map(condition => (
-            <label key={condition} className="flex items-center">
-              <input 
-                type="checkbox" 
-                checked={filters.condition.includes(condition)}
-                onChange={(e) => {
-                  const newConditions = e.target.checked
-                    ? [...filters.condition, condition]
-                    : filters.condition.filter(c => c !== condition);
-                  handleFilterChange("condition", newConditions);
-                }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-blue-800">{condition}</span>
-            </label>
-          ))}
-        </div>
+        {isMobile ? (
+          // Mobile dropdown version
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between text-left font-normal mt-2"
+              >
+                {formatSelectedValues("condition")}
+                <Star className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <div className="max-h-60 overflow-auto p-2">
+                {CONDITIONS.map(condition => (
+                  <div 
+                    key={condition}
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                    onClick={() => handleMultiSelectChange("condition", condition)}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={filters.condition.includes(condition)}
+                      readOnly
+                      className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    />
+                    <span>{condition}</span>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          // Desktop checkbox version
+          <div className="space-y-2 mt-3">
+            {CONDITIONS.map(condition => (
+              <label key={condition} className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  checked={filters.condition.includes(condition)}
+                  onChange={(e) => {
+                    const newConditions = e.target.checked
+                      ? [...filters.condition, condition]
+                      : filters.condition.filter(c => c !== condition);
+                    handleFilterChange("condition", newConditions);
+                  }}
+                  className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-blue-800">{condition}</span>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Tags */}
