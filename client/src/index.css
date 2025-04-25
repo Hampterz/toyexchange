@@ -60,7 +60,53 @@
   
   /* Rounded checkboxes */
   [type="checkbox"] {
-    @apply rounded-full cursor-pointer transform transition-transform duration-200 hover:scale-110;
+    @apply rounded-full cursor-pointer transform transition-all duration-200 hover:scale-110;
+    border-radius: 9999px !important; /* Force full rounded corners */
+    appearance: none !important; /* Remove default appearance */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    height: 1rem !important;
+    width: 1rem !important;
+    background-color: white;
+    border: 2px solid #93c5fd; /* Light blue border */
+    position: relative;
+  }
+  
+  /* Checkbox focus state */
+  [type="checkbox"]:focus {
+    @apply outline-none ring-2 ring-blue-400 ring-opacity-50;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+  
+  /* Checkbox hover state */
+  [type="checkbox"]:hover:not(:checked):not(:disabled) {
+    @apply border-blue-500;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Checkbox checked state */
+  [type="checkbox"]:checked {
+    @apply bg-blue-600 border-blue-600;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1);
+  }
+  
+  /* Checkbox checkmark */
+  [type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background-color: white;
+    animation: checkmark-appear 0.2s ease-in-out;
+  }
+  
+  @keyframes checkmark-appear {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
   
   /* Input field animations */
@@ -263,13 +309,23 @@
 
 /* Checkbox animation */
 @keyframes checkboxPop {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% { transform: scale(0.8); opacity: 0.7; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .checkbox-pop:checked {
-  animation: checkboxPop 0.3s ease-out;
+  animation: checkboxPop 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes checkbox-wave {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+[type="checkbox"]:checked:not(:focus) {
+  animation: checkbox-wave 0.75s ease-out;
 }
 
 /* Shake animation for errors */
