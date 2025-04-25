@@ -67,6 +67,17 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
             </div>
           )}
 
+          {/* Mobile sign-in button (only visible when not logged in) */}
+          {!user && (
+            <div className="md:hidden flex items-center mr-1">
+              <Link href="/auth">
+                <Button variant="default" size="sm" className="bg-blue-700 hover:bg-blue-800 font-semibold px-4 py-1 h-8">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
+          )}
+
           <div className="hidden md:flex items-center space-x-1">
             {user ? (
               <>
@@ -359,16 +370,18 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
                     Help Center
                   </Button>
                 </Link>
-                <Link href="/auth">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="w-full mt-2 bg-blue-700 hover:bg-blue-800"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
+                <div className="pt-3 border-t mt-2">
+                  <Link href="/auth">
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full bg-blue-700 hover:bg-blue-800 font-semibold shadow-md"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
