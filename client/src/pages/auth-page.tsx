@@ -166,7 +166,7 @@ export default function AuthPage() {
       // Visual feedback that the Konami code was recognized
       toast({
         title: "Admin Mode Activated!",
-        description: "Welcome, Administrator. Logging you in...",
+        description: "Welcome, ToyShare Admin. Logging you in...",
         variant: "default",
       });
       
@@ -174,11 +174,11 @@ export default function AuthPage() {
       setShowConfetti(true);
       
       try {
-        // Use the login mutation to properly update auth context
+        // Use the login mutation to properly update auth context with the main admin account
         loginMutation.mutate(
           { 
-            username: "admin",
-            password: "toyshare@admin"
+            username: "adminsreyas",
+            password: "Jell1boi!!"
           },
           {
             onSuccess: () => {
