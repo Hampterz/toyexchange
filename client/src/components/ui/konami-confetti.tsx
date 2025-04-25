@@ -9,6 +9,7 @@ interface ConfettiPiece {
   delay: number;
   rotation: number;
   opacity: number;
+  rotationAnimation: number;
 }
 
 export function KonamiConfetti() {
@@ -29,6 +30,7 @@ export function KonamiConfetti() {
         speed: Math.random() * 3 + 2, // Random fall speed (2-5s)
         delay: Math.random() * 1, // Random start delay (0-1s)
         rotation: Math.random() * 360, // Random rotation (0-360deg)
+        rotationAnimation: Math.random() * 720, // Random rotation during fall (0-720deg)
         opacity: Math.random() * 0.6 + 0.4 // Random opacity (0.4-1)
       });
     }
@@ -47,7 +49,7 @@ export function KonamiConfetti() {
   
   return (
     <div className="fixed inset-0 pointer-events-none z-50">
-      {confettiPieces.map((piece) => (
+      {confettiPieces.map((piece, index) => (
         <div
           key={piece.id}
           className="absolute top-0 rounded-sm"
@@ -56,29 +58,28 @@ export function KonamiConfetti() {
             width: `${piece.size}rem`,
             height: `${piece.size * 0.4}rem`,
             backgroundColor: piece.color,
-            animation: `konami-confetti-fall ${piece.speed}s ${piece.delay}s linear forwards`,
-            transform: `rotate(${piece.rotation}deg)`,
+            animation: `konami-confetti-fall-${index} ${piece.speed}s ${piece.delay}s linear forwards`,
             opacity: piece.opacity,
           }}
         />
       ))}
       
       <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes konami-confetti-fall {
+        __html: confettiPieces.map((piece, index) => `
+          @keyframes konami-confetti-fall-${index} {
             0% {
-              transform: translateY(-10px) rotate(${Math.random() * 360}deg);
+              transform: translateY(-10px) rotate(${piece.rotation}deg);
               opacity: 1;
             }
             80% {
               opacity: 0.8;
             }
             100% {
-              transform: translateY(100vh) rotate(${Math.random() * 720}deg);
+              transform: translateY(100vh) rotate(${piece.rotation + piece.rotationAnimation}deg);
               opacity: 0;
             }
           }
-        `
+        `).join('\n')
       }} />
     </div>
   );

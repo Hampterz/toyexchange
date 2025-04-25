@@ -27,6 +27,7 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [_, navigate] = useLocation();
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const registerGoogleButtonRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -169,6 +170,9 @@ export default function AuthPage() {
         variant: "default",
       });
       
+      // Show confetti celebration animation
+      setShowConfetti(true);
+      
       try {
         // Authenticate as admin
         const response = await apiRequest("POST", "/api/login", {
@@ -177,14 +181,16 @@ export default function AuthPage() {
         });
         
         if (response.ok) {
-          // Show celebration and redirect to home
+          // Delay redirect to home to enjoy the confetti
           setTimeout(() => {
             navigate("/");
-          }, 1000);
+          }, 2000);
         } else {
+          setShowConfetti(false);
           throw new Error("Admin login failed");
         }
       } catch (error) {
+        setShowConfetti(false);
         toast({
           title: "Admin Login Failed",
           description: "Unable to login as admin. Please try again later.",
@@ -252,6 +258,9 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 page-transition">
+      {/* Konami Code Confetti */}
+      {showConfetti && <KonamiConfetti />}
+      
       <div className="max-w-6xl w-full flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Left Side - Auth Forms */}
         <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
