@@ -20,6 +20,8 @@ import { Link } from "wouter";
 import { loginUserSchema, registerUserSchema } from "@/hooks/use-auth";
 import { initializeGoogleAuth, renderGoogleButton, signInWithGoogle, handleCredential } from "@/lib/googleAuth";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { KonamiConfetti } from "@/components/ui/konami-confetti";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -119,6 +121,82 @@ export default function AuthPage() {
     // Clean up
     return () => {
       window.removeEventListener('load', setupGoogleAuth);
+    };
+  }, [user, navigate, toast]);
+  
+  // Konami code Easter egg - admin login sequence: ↑ ↑ ↓ ↓ ← → ← → B A
+  useEffect(() => {
+    // Skip if user is already logged in
+    if (user) return;
+    
+    const konamiCode = [
+      'ArrowUp', 'ArrowUp',
+      'ArrowDown', 'ArrowDown',
+      'ArrowLeft', 'ArrowRight',
+      'ArrowLeft', 'ArrowRight',
+      'b', 'a'
+    ];
+    let konamiIndex = 0;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the key pressed matches the next key in the Konami code
+      const requiredKey = konamiCode[konamiIndex].toLowerCase();
+      const pressedKey = e.key.toLowerCase();
+      
+      if (pressedKey === requiredKey) {
+        konamiIndex++;
+        
+        // If all keys have been pressed in the correct sequence
+        if (konamiIndex === konamiCode.length) {
+          adminLogin();
+          konamiIndex = 0; // Reset after successful entry
+        }
+      } else {
+        konamiIndex = 0; // Reset on any wrong key
+        
+        // If the user pressed the first key of the sequence, start over
+        if (pressedKey === konamiCode[0].toLowerCase()) {
+          konamiIndex = 1;
+        }
+      }
+    };
+    
+    const adminLogin = async () => {
+      // Visual feedback that the Konami code was recognized
+      toast({
+        title: "Admin Mode Activated!",
+        description: "Welcome, Administrator. Logging you in...",
+        variant: "default",
+      });
+      
+      try {
+        // Authenticate as admin
+        const response = await apiRequest("POST", "/api/login", {
+          username: "admin",
+          password: "toyshare@admin"
+        });
+        
+        if (response.ok) {
+          // Show celebration and redirect to home
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
+        } else {
+          throw new Error("Admin login failed");
+        }
+      } catch (error) {
+        toast({
+          title: "Admin Login Failed",
+          description: "Unable to login as admin. Please try again later.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [user, navigate, toast]);
 
