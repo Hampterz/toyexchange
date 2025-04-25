@@ -1,183 +1,187 @@
-// Define interfaces for Google auth types
+// Define interfaces for Google Identity Services
+interface CredentialResponse {
+  credential: string;
+  clientId: string;
+  select_by: string;
+}
+
+interface DecodedCredential {
+  iss: string;
+  nbf: number;
+  aud: string;
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  azp: string;
+  name: string;
+  picture: string;
+  given_name: string;
+  family_name: string;
+  iat: number;
+  exp: number;
+  jti: string;
+}
+
 interface GoogleUser {
-  getBasicProfile(): GoogleProfile;
-  getAuthResponse(includeAuthorizationData?: boolean): GoogleAuthResponse;
-  getId(): string;
-  isSignedIn(): boolean;
-  hasGrantedScopes(scopes: string): boolean;
-  disconnect(): void;
-  grantOfflineAccess(options: object): Promise<{code: string}>;
-  signIn(options?: object): Promise<any>;
+  id: string;
+  email: string;
+  name: string;
+  givenName: string;
+  familyName: string;
+  imageUrl: string;
+  token: string;
 }
 
-interface GoogleProfile {
-  getId(): string;
-  getName(): string;
-  getGivenName(): string;
-  getFamilyName(): string;
-  getImageUrl(): string;
-  getEmail(): string;
-}
-
-interface GoogleAuthResponse {
-  access_token: string;
-  id_token: string;
-  scope: string;
-  expires_in: number;
-  first_issued_at: number;
-  expires_at: number;
-}
-
-interface AuthInstance {
-  isSignedIn: {
-    get(): boolean;
-    listen(listener: (isSignedIn: boolean) => void): void;
-  };
-  currentUser: {
-    get(): GoogleUser;
-    listen(listener: (user: GoogleUser) => void): void;
-  };
-  signIn(options?: object): Promise<GoogleUser>;
-  signOut(): Promise<void>;
-  disconnect(): Promise<void>;
-}
-
-// Declare global gapi object
+// Declare global window object with Google Identity Services
 declare global {
   interface Window {
-    gapi: {
-      load(api: string, callback: () => void): void;
-      auth2: {
-        init(params: {client_id: string}): Promise<AuthInstance>;
-        getAuthInstance(): AuthInstance;
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: any) => void;
+          renderButton: (parent: HTMLElement, options: any) => void;
+          prompt: (notification?: any) => void;
+          disableAutoSelect: () => void;
+        };
       };
     };
-    onGoogleSignIn?: (user: any) => void;
+    handleGoogleCredential?: (response: CredentialResponse) => void;
   }
 }
 
-// Will store the auth instance once initialized
-let googleAuth: AuthInstance | null = null;
+// Client ID for the application
+const CLIENT_ID = '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com';
 
-// Function to initialize Google Auth
-export const initializeGoogleAuth = (): Promise<AuthInstance> => {
+// Function to decode JWT token
+function decodeJWT(token: string): DecodedCredential | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+}
+
+// Function to initialize Google Sign-In
+export const initializeGoogleAuth = (): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined' || !window.gapi) {
-      reject(new Error('Google API not available'));
+    if (typeof window === 'undefined' || !window.google) {
+      console.log('Current origin:', window.location.origin);
+      console.error('Google Identity Services not available');
+      reject(new Error('Google Identity Services not available'));
       return;
     }
 
-    if (googleAuth) {
-      resolve(googleAuth);
-      return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: (response: CredentialResponse) => {
+          if (window.handleGoogleCredential) {
+            window.handleGoogleCredential(response);
+          }
+        },
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      
+      console.log('Google Identity Services initialized successfully');
+      resolve();
+    } catch (error) {
+      console.error('Error initializing Google Identity Services:', error);
+      reject(error);
     }
-
-    window.gapi.load('auth2', () => {
-      try {
-        // Log the current origin to help with debugging
-        console.log('Current origin:', window.location.origin);
-        
-        // Cast params to any to bypass TypeScript limitations
-        window.gapi.auth2
-          .init({
-            client_id: '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com',
-            cookie_policy: 'single_host_origin',
-            scope: 'profile email',
-          } as any)
-          .then((auth: AuthInstance) => {
-            googleAuth = auth;
-            console.log('Google Auth initialized successfully');
-            resolve(auth);
-          })
-          .catch((error: Error) => {
-            console.error('Error initializing Google Auth:', error);
-            reject(error);
-          });
-      } catch (error) {
-        console.error('Error loading auth2:', error);
-        reject(error);
-      }
-    });
   });
 };
 
-// Function to sign in with Google
-export const signInWithGoogle = async (): Promise<any> => {
+// Function to render Google Sign-In button
+export const renderGoogleButton = (element: HTMLElement): void => {
+  if (!window.google) {
+    console.error('Google Identity Services not loaded');
+    return;
+  }
+
   try {
-    const auth = await initializeGoogleAuth();
-    const googleUser = await auth.signIn({
-      scope: 'profile email',
+    window.google.accounts.id.renderButton(element, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'rectangular',
+      logo_alignment: 'left',
+      width: element.offsetWidth,
     });
-    
-    const profile = googleUser.getBasicProfile();
-    const authResponse = googleUser.getAuthResponse();
-    
-    return {
-      id: profile.getId(),
-      email: profile.getEmail(),
-      name: profile.getName(),
-      givenName: profile.getGivenName(),
-      familyName: profile.getFamilyName(),
-      imageUrl: profile.getImageUrl(),
-      token: authResponse.id_token,
-    };
+    console.log('Google Sign-In button rendered');
   } catch (error) {
-    console.error('Error signing in with Google:', error);
-    throw error;
+    console.error('Error rendering Google Sign-In button:', error);
+  }
+};
+
+// Function to sign in with Google (prompt user to select account)
+export const signInWithGoogle = (): void => {
+  if (!window.google) {
+    console.error('Google Identity Services not loaded');
+    return;
+  }
+  
+  try {
+    window.google.accounts.id.prompt();
+    console.log('Google Sign-In prompt displayed');
+  } catch (error) {
+    console.error('Error showing Google Sign-In prompt:', error);
   }
 };
 
 // Function to sign out from Google
-export const signOutFromGoogle = async (): Promise<void> => {
+export const signOutFromGoogle = (): void => {
+  if (!window.google) {
+    console.error('Google Identity Services not loaded');
+    return;
+  }
+  
   try {
-    const auth = await initializeGoogleAuth();
-    await auth.signOut();
+    window.google.accounts.id.disableAutoSelect();
+    console.log('Google Sign-Out successful');
   } catch (error) {
     console.error('Error signing out from Google:', error);
-    throw error;
   }
 };
 
-// Function to check if user is signed in
-export const isGoogleSignedIn = async (): Promise<boolean> => {
+// Function to handle credential response
+export const handleCredential = (response: CredentialResponse): GoogleUser | null => {
   try {
-    const auth = await initializeGoogleAuth();
-    return auth.isSignedIn.get();
-  } catch (error) {
-    console.error('Error checking Google sign-in status:', error);
-    return false;
-  }
-};
-
-// Callback function for Google Sign-In button
-export const onSignIn = (googleUser: any) => {
-  try {
-    const profile = googleUser.getBasicProfile();
-    const id = profile.getId();
-    const name = profile.getName();
-    const imageUrl = profile.getImageUrl();
-    const email = profile.getEmail();
+    const decodedCredential = decodeJWT(response.credential);
     
-    const userData = {
-      id,
-      name,
-      imageUrl,
-      email,
-    };
-    
-    console.log('Google user signed in:', userData);
-    
-    // Call the global callback if defined
-    if (window.onGoogleSignIn) {
-      window.onGoogleSignIn(userData);
+    if (!decodedCredential) {
+      throw new Error('Failed to decode credential');
     }
     
+    const userData: GoogleUser = {
+      id: decodedCredential.sub,
+      email: decodedCredential.email,
+      name: decodedCredential.name,
+      givenName: decodedCredential.given_name,
+      familyName: decodedCredential.family_name,
+      imageUrl: decodedCredential.picture,
+      token: response.credential,
+    };
+    
+    console.log('Google sign-in successful:', userData);
     return userData;
   } catch (error) {
-    console.error('Error in onSignIn callback:', error);
-    throw error;
+    console.error('Error handling Google credential:', error);
+    return null;
   }
 };
 
 // Set the global callback
-window.onGoogleSignIn = onSignIn;
+window.handleGoogleCredential = handleCredential;

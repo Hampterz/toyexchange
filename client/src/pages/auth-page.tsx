@@ -18,7 +18,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { loginUserSchema, registerUserSchema } from "@/hooks/use-auth";
-import { signInWithGoogle, initializeGoogleAuth } from "@/lib/googleAuth";
+import { initializeGoogleAuth, renderGoogleButton, signInWithGoogle, handleCredential } from "@/lib/googleAuth";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
@@ -26,6 +26,7 @@ export default function AuthPage() {
   const [_, navigate] = useLocation();
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
+  const customGoogleButtonRef = useRef<HTMLButtonElement>(null);
   const { toast } = useToast();
   
   // Initialize Google Auth when component mounts
@@ -36,53 +37,80 @@ export default function AuthPage() {
       return;
     }
 
-    // Initialize Google Sign-In button
-    const renderGoogleButton = () => {
-      // Set the global callback for Google Sign-In
-      window.onGoogleSignIn = async (googleUser) => {
-        try {
-          setIsGoogleSigningIn(true);
-          // Use the Google user data to authenticate with your backend
-          
-          // Show a toast notification
-          toast({
-            title: "Google Sign-in Successful",
-            description: `Welcome, ${googleUser.name || 'User'}!`,
-            variant: "default",
-          });
-          
-          // For now, just log and redirect (you'd normally call your backend here)
-          console.log("Google sign-in successful:", googleUser);
-          
-          // Redirect to home page
-          navigate('/');
-        } catch (error) {
-          console.error("Error handling Google sign-in:", error);
-          toast({
-            title: "Google Sign-in Failed",
-            description: "Unable to process Google sign-in. Please try again.",
-            variant: "destructive",
-          });
-        } finally {
-          setIsGoogleSigningIn(false);
-        }
-      };
-      
-      // Initialize Google Auth API if needed
-      if (!window.gapi || !window.gapi.auth2) {
-        initializeGoogleAuth()
-          .catch(error => {
-            console.error("Failed to initialize Google Auth:", error);
+    // Setup Google Identity Services
+    const setupGoogleAuth = async () => {
+      try {
+        // Set the global callback for Google Sign-In
+        window.handleGoogleCredential = (response) => {
+          try {
+            setIsGoogleSigningIn(true);
+            const googleUser = handleCredential(response);
+            
+            if (googleUser) {
+              // Show a toast notification
+              toast({
+                title: "Google Sign-in Successful",
+                description: `Welcome, ${googleUser.name || 'User'}!`,
+                variant: "default",
+              });
+              
+              // For now, just log and redirect (you'd normally call your backend here)
+              console.log("Google sign-in successful:", googleUser);
+              
+              // Redirect to home page
+              navigate('/');
+            } else {
+              throw new Error("Could not process Google credentials");
+            }
+          } catch (error) {
+            console.error("Error handling Google sign-in:", error);
             toast({
-              title: "Google Sign-in Error",
-              description: "Could not initialize Google sign-in. Please try again later.",
+              title: "Google Sign-in Failed",
+              description: "Unable to process Google sign-in. Please try again.",
               variant: "destructive",
             });
-          });
+          } finally {
+            setIsGoogleSigningIn(false);
+          }
+        };
+        
+        // Wait for Google Identity Services to load
+        if (window.google && window.google.accounts) {
+          await initializeGoogleAuth();
+          
+          // Render the Google button in our container if it exists
+          if (googleButtonRef.current) {
+            renderGoogleButton(googleButtonRef.current);
+          }
+        } else {
+          console.error("Google Identity Services not loaded");
+          throw new Error("Google Identity Services not loaded");
+        }
+      } catch (error) {
+        console.error("Failed to initialize Google Auth:", error);
+        toast({
+          title: "Google Sign-in Error",
+          description: "Could not initialize Google sign-in. Please try again later.",
+          variant: "destructive",
+        });
       }
     };
     
-    renderGoogleButton();
+    // Call the setup function
+    setupGoogleAuth();
+    
+    // Add an event listener to retry initialization after the script loads
+    const handleGoogleLoad = () => {
+      if (window.google && window.google.accounts) {
+        setupGoogleAuth();
+      }
+    };
+    
+    window.addEventListener('load', handleGoogleLoad);
+    
+    return () => {
+      window.removeEventListener('load', handleGoogleLoad);
+    };
   }, [user, navigate, toast]);
 
   // Login form
@@ -116,15 +144,14 @@ export default function AuthPage() {
   };
   
   // Handle Google Sign-in
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     try {
       setIsGoogleSigningIn(true);
-      const googleUser = await signInWithGoogle();
       
-      if (googleUser) {
-        // This will eventually be handled by the onGoogleSignIn callback
-        console.log("Google sign-in successful:", googleUser);
-      }
+      // Show Google Sign-In prompt
+      signInWithGoogle();
+      
+      // Note: The actual sign-in will be handled by the callback registered in useEffect
     } catch (error) {
       console.error("Google sign-in error:", error);
       toast({
@@ -242,9 +269,9 @@ export default function AuthPage() {
                         Google sign-in requires domain registration in Google Cloud Console.
                       </p>
                       
-                      {/* Google's native sign-in button (hidden) */}
-                      <div className="hidden mt-2">
-                        <div ref={googleButtonRef} className="g-signin2" data-onsuccess="onSignIn"></div>
+                      {/* Container for Google's Identity Services button (will be rendered by script) */}
+                      <div className="w-full mt-3">
+                        <div ref={googleButtonRef} id="google-signin-button" className="w-full"></div>
                       </div>
                     </form>
                   </Form>

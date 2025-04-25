@@ -6,15 +6,13 @@
     <title>ToyShare - Give & Receive Children's Toys</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- Google Sign-In -->
-    <meta name="google-signin-client_id" content="107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com">
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <!-- Add Google Sign-In callback handler -->
+    <!-- Google Sign-In with Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-      function onGoogleSignIn(googleUser) {
-        // This function will be available globally
-        if (window.onGoogleSignIn) {
-          window.onGoogleSignIn(googleUser);
+      // Global callback function for Google Identity Services
+      function handleCredentialResponse(response) {
+        if (window.handleGoogleCredential) {
+          window.handleGoogleCredential(response);
         }
       }
     </script>
