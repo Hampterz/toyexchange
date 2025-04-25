@@ -88,29 +88,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
-        </div>
-      </section>
-
-      {/* Toy Listings */}
+      {/* Toy Listings with Filter Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <h2 className="text-2xl font-bold font-heading mb-3">Available Toys</h2>
         
-        <div className="flex items-center mb-5">
-          <span className="text-sm text-neutral-600 font-medium mr-3">Sort by:</span>
-          <div className="relative">
-            <select className="pl-3 pr-8 py-1.5 rounded-md border border-blue-200 bg-blue-50 focus:ring-1 focus:ring-blue-400 focus:border-blue-400 text-sm font-medium shadow-sm text-blue-800 cursor-pointer appearance-none">
-              <option>Newest First</option>
-              <option>Recently Added</option>
-              <option>Closest to Me</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-800">
-              <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clipRule="evenodd" />
-              </svg>
+        <div className="flex mb-5">
+          <div className="mr-8">
+            <h3 className="text-sm text-neutral-600 font-medium mb-2">Sort by:</h3>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input 
+                  type="radio" 
+                  name="sortBy" 
+                  value="newest" 
+                  defaultChecked 
+                  className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-blue-800">Newest First</span>
+              </label>
+              <label className="flex items-center">
+                <input 
+                  type="radio" 
+                  name="sortBy" 
+                  value="closest" 
+                  className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-blue-800">Closest to Me</span>
+              </label>
             </div>
           </div>
         </div>

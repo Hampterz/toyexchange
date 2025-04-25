@@ -24,20 +24,20 @@ type FilterBarProps = {
 };
 
 export type FilterOptions = {
-  location: string;
-  ageRange: string;
-  category: string;
-  condition: string;
+  location: string[];
+  ageRange: string[];
+  category: string[];
+  condition: string[];
   tags: string[];
   search?: string;
 };
 
 export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   const [filters, setFilters] = useState<FilterOptions>({
-    location: initialFilters?.location || "any",
-    ageRange: initialFilters?.ageRange || "any",
-    category: initialFilters?.category || "any",
-    condition: initialFilters?.condition || "any",
+    location: initialFilters?.location || [],
+    ageRange: initialFilters?.ageRange || [],
+    category: initialFilters?.category || [],
+    condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
   });
