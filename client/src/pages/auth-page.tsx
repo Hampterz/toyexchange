@@ -204,10 +204,44 @@ export default function AuthPage() {
                           <span className="w-full border-t border-blue-200"></span>
                         </div>
                         <div className="relative flex justify-center text-xs text-blue-500">
-                          <span className="px-2 bg-white">Or continue with</span>
+                          <span className="px-2 bg-white">Or try demo account</span>
                         </div>
                       </div>
 
+                      {/* Demo Account Button (For testing without Google Sign-in) */}
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full mb-2 flex items-center justify-center space-x-2 border-blue-200 hover:bg-blue-50"
+                        onClick={() => {
+                          loginForm.setValue("username", "demo");
+                          loginForm.setValue("password", "demo123");
+                          setTimeout(() => {
+                            loginForm.handleSubmit(onLoginSubmit)();
+                          }, 250);
+                        }}
+                      >
+                        <i className="fas fa-user-circle mr-2"></i>
+                        <span>Use Demo Account</span>
+                      </Button>
+
+                      {/* Admin Account Button */}
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full mb-2 flex items-center justify-center space-x-2 border-blue-200 hover:bg-blue-50"
+                        onClick={() => {
+                          loginForm.setValue("username", "adminsreyas");
+                          loginForm.setValue("password", "Jell1boi!!");
+                          setTimeout(() => {
+                            loginForm.handleSubmit(onLoginSubmit)();
+                          }, 250);
+                        }}
+                      >
+                        <i className="fas fa-user-shield mr-2"></i>
+                        <span>Use Admin Account</span>
+                      </Button>
+                      
                       {/* Custom Google Sign-In Button */}
                       <Button 
                         type="button" 
@@ -237,6 +271,10 @@ export default function AuthPage() {
                         </svg>
                         <span>{isGoogleSigningIn ? "Signing in..." : "Sign in with Google"}</span>
                       </Button>
+                      
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Google sign-in requires domain registration in Google Cloud Console.
+                      </p>
                       
                       {/* Google's native sign-in button (hidden) */}
                       <div className="hidden mt-2">
