@@ -225,14 +225,14 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         </div>
 
         {/* Mobile view for filters in a grid */}
-        <div className="md:hidden grid grid-cols-2 gap-2">
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
-            <MapPin className="text-blue-700 h-3.5 w-3.5" />
+        <div className="md:hidden grid grid-cols-2 gap-2 w-full max-w-full overflow-hidden">
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
+            <MapPin className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
             <Select 
               value={filters.location} 
               onValueChange={(value) => handleFilterChange("location", value)}
             >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
                 <SelectValue placeholder="Location" />
               </SelectTrigger>
               <SelectContent className="border-blue-200">
@@ -244,13 +244,13 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             </Select>
           </div>
 
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
-            <Baby className="text-blue-700 h-3.5 w-3.5" />
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
+            <Baby className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
             <Select 
               value={filters.ageRange} 
               onValueChange={(value) => handleFilterChange("ageRange", value)}
             >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
                 <SelectValue placeholder="Age" />
               </SelectTrigger>
               <SelectContent className="border-blue-200">
@@ -262,13 +262,13 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             </Select>
           </div>
 
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
-            <Grid className="text-blue-700 h-3.5 w-3.5" />
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
+            <Grid className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
             <Select 
               value={filters.category} 
               onValueChange={(value) => handleFilterChange("category", value)}
             >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="border-blue-200">
@@ -280,13 +280,13 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             </Select>
           </div>
 
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm">
-            <Star className="text-blue-700 h-3.5 w-3.5" />
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm overflow-hidden">
+            <Star className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
             <Select 
               value={filters.condition} 
               onValueChange={(value) => handleFilterChange("condition", value)}
             >
-              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-1">
+              <SelectTrigger className="bg-transparent border-none focus:ring-0 text-xs font-medium text-blue-800 h-7 py-0 px-0 min-w-0 truncate overflow-hidden">
                 <SelectValue placeholder="Condition" />
               </SelectTrigger>
               <SelectContent className="border-blue-200">
@@ -298,13 +298,13 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             </Select>
           </div>
           
-          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm col-span-2">
-            <Tag className="text-blue-700 h-3.5 w-3.5" />
+          <div className="flex items-center space-x-2 bg-blue-50 px-2 py-1.5 rounded-full border border-blue-100 shadow-sm col-span-2 overflow-hidden">
+            <Tag className="text-blue-700 h-3.5 w-3.5 flex-shrink-0" />
             <Popover>
               <PopoverTrigger asChild>
                 <Button 
                   variant="link" 
-                  className="text-blue-800 font-medium text-xs p-0 pl-0 h-auto"
+                  className="text-blue-800 font-medium text-xs p-0 pl-0 h-auto truncate"
                 >
                   Tags
                   {filters.tags.length > 0 && (
