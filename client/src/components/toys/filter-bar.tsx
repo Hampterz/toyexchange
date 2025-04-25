@@ -305,7 +305,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 tags: []
               });
             }}
-            className="w-full mb-3"
+            className="w-full mb-3 transform transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
           >
             Clear All Filters
           </Button>
@@ -316,7 +316,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             // Apply filters button
             onFilterChange(filters);
           }}
-          className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4"
+          className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4 transform transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
         >
           Apply Filters
         </Button>
@@ -442,7 +442,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full mt-2"
+            className="w-full mt-2 transform transition-all duration-200 hover:scale-105 active:scale-95"
             onClick={() => handleFilterChange('tags', [])}
           >
             Clear all tags
@@ -476,7 +476,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               tags: []
             });
           }}
-          className="w-full mb-3"
+          className="w-full mb-3 transform transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
         >
           Clear All Filters
         </Button>
@@ -487,7 +487,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           // Apply filters button
           onFilterChange(filters);
         }}
-        className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4"
+        className="w-full bg-blue-700 hover:bg-blue-800 text-white mt-4 transform transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
       >
         Apply Filters
       </Button>
