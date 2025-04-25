@@ -105,10 +105,10 @@ export class DatabaseStorage implements IStorage {
 
   private async initAdminUser() {
     try {
-      // Check if admin exists
-      const admin = await this.getUserByUsername("adminsreyas");
+      // Check if regular admin exists
+      const adminSreyas = await this.getUserByUsername("adminsreyas");
       
-      if (!admin) {
+      if (!adminSreyas) {
         console.log('Creating admin user: adminsreyas');
         
         // Hash password
@@ -132,7 +132,37 @@ export class DatabaseStorage implements IStorage {
           currentBadge: BADGES.PLANET_PROTECTOR.name
         });
         
-        console.log('Admin user created successfully');
+        console.log('Admin user (adminsreyas) created successfully');
+      }
+      
+      // Check if konami code admin exists
+      const konamiAdmin = await this.getUserByUsername("admin");
+      
+      if (!konamiAdmin) {
+        console.log('Creating Konami code admin user: admin');
+        
+        // Hash password for Konami code admin
+        const hashedPassword = await hashPassword("toyshare@admin");
+        
+        // Create Konami code admin user
+        const adminUser = await this.createUser({
+          username: "admin",
+          password: hashedPassword,
+          email: "konami@toyshare.com",
+          name: "ToyShare Secret Admin",
+          location: "Easter Egg Headquarters",
+          profilePicture: null
+        });
+        
+        // Update Konami admin with sustainability data
+        await this.updateUser(adminUser.id, {
+          toysShared: 100,
+          successfulExchanges: 50,
+          sustainabilityScore: 200,
+          currentBadge: BADGES.PLANET_PROTECTOR.name
+        });
+        
+        console.log('Konami code admin user created successfully');
       }
     } catch (error) {
       console.error('Error creating admin user:', error);
