@@ -126,7 +126,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     type="checkbox" 
                     checked={filters.category.includes(category)}
                     readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500"
+                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
                   />
                   <span>{category}</span>
                 </div>
