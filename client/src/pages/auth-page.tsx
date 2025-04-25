@@ -26,7 +26,7 @@ export default function AuthPage() {
   const [_, navigate] = useLocation();
   const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
-  const customGoogleButtonRef = useRef<HTMLButtonElement>(null);
+  const registerGoogleButtonRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
   // Initialize Google Auth when component mounts
@@ -37,54 +37,33 @@ export default function AuthPage() {
       return;
     }
 
+    let googleAuthInitialized = false;
+
     // Setup Google Identity Services
     const setupGoogleAuth = async () => {
+      if (googleAuthInitialized) return;
+      
       try {
-        // Set the global callback for Google Sign-In
-        window.handleGoogleCredential = (response) => {
-          try {
-            setIsGoogleSigningIn(true);
-            const googleUser = handleCredential(response);
-            
-            if (googleUser) {
-              // Show a toast notification
-              toast({
-                title: "Google Sign-in Successful",
-                description: `Welcome, ${googleUser.name || 'User'}!`,
-                variant: "default",
-              });
-              
-              // For now, just log and redirect (you'd normally call your backend here)
-              console.log("Google sign-in successful:", googleUser);
-              
-              // Redirect to home page
-              navigate('/');
-            } else {
-              throw new Error("Could not process Google credentials");
-            }
-          } catch (error) {
-            console.error("Error handling Google sign-in:", error);
-            toast({
-              title: "Google Sign-in Failed",
-              description: "Unable to process Google sign-in. Please try again.",
-              variant: "destructive",
-            });
-          } finally {
-            setIsGoogleSigningIn(false);
-          }
+        // Set the global credential handler
+        window.handleCredentialResponse = (response) => {
+          processGoogleCredential(response);
         };
         
-        // Wait for Google Identity Services to load
-        if (window.google && window.google.accounts) {
-          await initializeGoogleAuth();
-          
-          // Render the Google button in our container if it exists
-          if (googleButtonRef.current) {
-            renderGoogleButton(googleButtonRef.current);
-          }
-        } else {
-          console.error("Google Identity Services not loaded");
-          throw new Error("Google Identity Services not loaded");
+        window.handleGoogleCredential = (response) => {
+          processGoogleCredential(response);
+        };
+        
+        // Wait for Google Identity Services to load and initialize
+        await initializeGoogleAuth();
+        googleAuthInitialized = true;
+        
+        // Render Google buttons in containers
+        if (googleButtonRef.current) {
+          renderGoogleButton(googleButtonRef.current);
+        }
+        
+        if (registerGoogleButtonRef.current) {
+          renderGoogleButton(registerGoogleButtonRef.current);
         }
       } catch (error) {
         console.error("Failed to initialize Google Auth:", error);
@@ -96,20 +75,50 @@ export default function AuthPage() {
       }
     };
     
-    // Call the setup function
-    setupGoogleAuth();
-    
-    // Add an event listener to retry initialization after the script loads
-    const handleGoogleLoad = () => {
-      if (window.google && window.google.accounts) {
-        setupGoogleAuth();
+    // Process Google credential response
+    const processGoogleCredential = (response: any) => {
+      try {
+        setIsGoogleSigningIn(true);
+        const googleUser = handleCredential(response);
+        
+        if (googleUser) {
+          // Show a toast notification
+          toast({
+            title: "Google Sign-in Successful",
+            description: `Welcome, ${googleUser.name || 'User'}!`,
+            variant: "default",
+          });
+          
+          // For now, just log and redirect (you'd normally call your backend here)
+          console.log("Google sign-in successful:", googleUser);
+          
+          // Redirect to home page
+          navigate('/');
+        } else {
+          throw new Error("Could not process Google credentials");
+        }
+      } catch (error) {
+        console.error("Error handling Google sign-in:", error);
+        toast({
+          title: "Google Sign-in Failed",
+          description: "Unable to process Google sign-in. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsGoogleSigningIn(false);
       }
     };
     
-    window.addEventListener('load', handleGoogleLoad);
+    // Try to initialize Google Auth
+    if (document.readyState === 'complete') {
+      setupGoogleAuth();
+    } else {
+      window.addEventListener('load', setupGoogleAuth);
+    }
     
+    // Clean up
     return () => {
-      window.removeEventListener('load', handleGoogleLoad);
+      window.removeEventListener('load', setupGoogleAuth);
     };
   }, [user, navigate, toast]);
 

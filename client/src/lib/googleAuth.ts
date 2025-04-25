@@ -1,4 +1,4 @@
-// Define interfaces for Google Identity Services
+// Type definitions for Google Identity Services
 interface CredentialResponse {
   credential: string;
   clientId: string;
@@ -42,10 +42,12 @@ declare global {
           renderButton: (parent: HTMLElement, options: any) => void;
           prompt: (notification?: any) => void;
           disableAutoSelect: () => void;
+          revoke: (hint: string, callback: () => void) => void;
         };
       };
     };
     handleGoogleCredential?: (response: CredentialResponse) => void;
+    handleCredentialResponse?: (response: CredentialResponse) => void;
   }
 }
 
@@ -72,41 +74,67 @@ function decodeJWT(token: string): DecodedCredential | null {
   }
 }
 
-// Function to initialize Google Sign-In
-export const initializeGoogleAuth = (): Promise<void> => {
+// Wait for Google Identity Services to load
+const waitForGoogleLibrary = (timeout = 10000): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined' || !window.google) {
-      console.log('Current origin:', window.location.origin);
-      console.error('Google Identity Services not available');
-      reject(new Error('Google Identity Services not available'));
-      return;
-    }
+    const startTime = Date.now();
 
-    try {
-      window.google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: (response: CredentialResponse) => {
-          if (window.handleGoogleCredential) {
-            window.handleGoogleCredential(response);
-          }
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      
-      console.log('Google Identity Services initialized successfully');
-      resolve();
-    } catch (error) {
-      console.error('Error initializing Google Identity Services:', error);
-      reject(error);
-    }
+    const checkLibrary = () => {
+      if (window.google && window.google.accounts) {
+        console.log(`Google Identity Services loaded after ${Date.now() - startTime}ms`);
+        resolve();
+        return;
+      }
+
+      if (Date.now() - startTime > timeout) {
+        reject(new Error(`Google Identity Services not loaded after ${timeout}ms`));
+        return;
+      }
+
+      setTimeout(checkLibrary, 100);
+    };
+
+    checkLibrary();
   });
+};
+
+// Function to initialize Google Sign-In
+export const initializeGoogleAuth = async (): Promise<void> => {
+  try {
+    console.log('Current origin:', window.location.origin);
+    
+    // Wait for Google Identity Services to load
+    await waitForGoogleLibrary();
+
+    // Initialize Google Identity Services
+    window.google!.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      callback: (response: CredentialResponse) => {
+        // This sets handleCredentialResponse as the official callback
+        if (window.handleCredentialResponse) {
+          window.handleCredentialResponse(response);
+        }
+        
+        // Also support our custom callback
+        if (window.handleGoogleCredential) {
+          window.handleGoogleCredential(response);
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    });
+    
+    console.log('Google Identity Services initialized successfully');
+  } catch (error) {
+    console.error('Error initializing Google Identity Services:', error);
+    throw error;
+  }
 };
 
 // Function to render Google Sign-In button
 export const renderGoogleButton = (element: HTMLElement): void => {
-  if (!window.google) {
-    console.error('Google Identity Services not loaded');
+  if (!window.google || !window.google.accounts) {
+    console.error('Google Identity Services not loaded when trying to render button');
     return;
   }
 
@@ -118,7 +146,7 @@ export const renderGoogleButton = (element: HTMLElement): void => {
       text: 'signin_with',
       shape: 'rectangular',
       logo_alignment: 'left',
-      width: element.offsetWidth,
+      width: element.offsetWidth || 240,
     });
     console.log('Google Sign-In button rendered');
   } catch (error) {
@@ -128,37 +156,55 @@ export const renderGoogleButton = (element: HTMLElement): void => {
 
 // Function to sign in with Google (prompt user to select account)
 export const signInWithGoogle = (): void => {
-  if (!window.google) {
-    console.error('Google Identity Services not loaded');
+  if (!window.google || !window.google.accounts) {
+    console.error('Google Identity Services not loaded when trying to sign in');
     return;
   }
   
   try {
-    window.google.accounts.id.prompt();
-    console.log('Google Sign-In prompt displayed');
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        console.error('Google Sign-In prompt not displayed:', notification.getNotDisplayedReason() || notification.getSkippedReason());
+      } else {
+        console.log('Google Sign-In prompt displayed');
+      }
+    });
   } catch (error) {
     console.error('Error showing Google Sign-In prompt:', error);
   }
 };
 
 // Function to sign out from Google
-export const signOutFromGoogle = (): void => {
-  if (!window.google) {
-    console.error('Google Identity Services not loaded');
-    return;
-  }
-  
-  try {
-    window.google.accounts.id.disableAutoSelect();
-    console.log('Google Sign-Out successful');
-  } catch (error) {
-    console.error('Error signing out from Google:', error);
-  }
+export const signOutFromGoogle = (email: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!window.google || !window.google.accounts) {
+      console.error('Google Identity Services not loaded when trying to sign out');
+      reject(new Error('Google Identity Services not loaded'));
+      return;
+    }
+    
+    try {
+      window.google.accounts.id.disableAutoSelect();
+      
+      window.google.accounts.id.revoke(email, () => {
+        console.log('Google Sign-Out successful');
+        resolve();
+      });
+    } catch (error) {
+      console.error('Error signing out from Google:', error);
+      reject(error);
+    }
+  });
 };
 
 // Function to handle credential response
 export const handleCredential = (response: CredentialResponse): GoogleUser | null => {
   try {
+    if (!response || !response.credential) {
+      console.error('Invalid credential response');
+      return null;
+    }
+    
     const decodedCredential = decodeJWT(response.credential);
     
     if (!decodedCredential) {
@@ -185,3 +231,4 @@ export const handleCredential = (response: CredentialResponse): GoogleUser | nul
 
 // Set the global callback
 window.handleGoogleCredential = handleCredential;
+window.handleCredentialResponse = handleCredential;

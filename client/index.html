@@ -7,14 +7,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Google Sign-In with Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
     <script>
       // Global callback function for Google Identity Services
       function handleCredentialResponse(response) {
         if (window.handleGoogleCredential) {
           window.handleGoogleCredential(response);
+        } else {
+          console.error('No credential handler defined');
         }
       }
+      
+      // For debugging
+      window.addEventListener('load', function() {
+        console.log('Window loaded, Google Identity Services script should be loading');
+        if (window.google && window.google.accounts) {
+          console.log('Google Identity Services loaded successfully on window load');
+        } else {
+          console.log('Google Identity Services not loaded yet on window load');
+          // Try to wait a bit longer
+          setTimeout(function() {
+            if (window.google && window.google.accounts) {
+              console.log('Google Identity Services loaded after delay');
+            } else {
+              console.error('Google Identity Services failed to load after delay');
+            }
+          }, 2000);
+        }
+      });
     </script>
   </head>
   <body>
