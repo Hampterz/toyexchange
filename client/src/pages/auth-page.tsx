@@ -174,21 +174,29 @@ export default function AuthPage() {
       setShowConfetti(true);
       
       try {
-        // Authenticate as admin
-        const response = await apiRequest("POST", "/api/login", {
-          username: "admin",
-          password: "toyshare@admin"
-        });
-        
-        if (response.ok) {
-          // Delay redirect to home to enjoy the confetti
-          setTimeout(() => {
-            navigate("/");
-          }, 2000);
-        } else {
-          setShowConfetti(false);
-          throw new Error("Admin login failed");
-        }
+        // Use the login mutation to properly update auth context
+        loginMutation.mutate(
+          { 
+            username: "admin",
+            password: "toyshare@admin"
+          },
+          {
+            onSuccess: () => {
+              // Keep showing confetti for a moment before redirecting
+              setTimeout(() => {
+                navigate("/");
+              }, 2000);
+            },
+            onError: () => {
+              setShowConfetti(false);
+              toast({
+                title: "Admin Login Failed",
+                description: "Unable to login as admin. Please try again later.",
+                variant: "destructive",
+              });
+            }
+          }
+        );
       } catch (error) {
         setShowConfetti(false);
         toast({
@@ -204,7 +212,7 @@ export default function AuthPage() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [user, navigate, toast]);
+  }, [user, navigate, toast, loginMutation]);
 
   // Login form
   const loginForm = useForm<z.infer<typeof loginUserSchema>>({
