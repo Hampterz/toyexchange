@@ -423,6 +423,11 @@ export default function AuthPage() {
                       <p className="text-xs text-gray-500 mt-2 text-center">
                         Google sign-in requires domain registration in Google Cloud Console.
                       </p>
+                      
+                      {/* Container for Google's Identity Services button (register tab) */}
+                      <div className="w-full mt-3">
+                        <div ref={registerGoogleButtonRef} id="google-register-button" className="w-full"></div>
+                      </div>
                     </form>
                   </Form>
                 </CardContent>
