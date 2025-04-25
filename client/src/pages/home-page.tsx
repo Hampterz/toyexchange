@@ -113,44 +113,44 @@ export default function HomePage() {
       </section>
 
       {/* Community Impact */}
-      <section className="bg-blue-100 py-12 mb-12 rounded-xl shadow-md">
+      <section className="bg-blue-100 py-8 sm:py-12 mb-8 sm:mb-12 rounded-xl shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold font-heading mb-4 text-blue-800">Making a Difference Together</h2>
-            <p className="text-blue-900 max-w-2xl mx-auto">
+          <div className="text-center mb-6 sm:mb-10">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-heading mb-3 sm:mb-4 text-blue-800">Making a Difference Together</h2>
+            <p className="text-blue-900 max-w-2xl mx-auto text-sm sm:text-base">
               Together we're creating a more playful world while reducing waste and making quality toys accessible to all families.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow-md text-center transform hover:scale-105 transition duration-300">
-              <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Gift className="h-7 w-7 text-blue-700" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
+            <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md text-center transform transition duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <Gift className="h-5 w-5 sm:h-7 sm:w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">
+              <h3 className="text-xl sm:text-2xl font-bold font-heading mb-1 sm:mb-2 text-blue-700">
                 {communityMetrics?.toysSaved || 0}
               </h3>
-              <p className="text-blue-800">Toys saved from landfill</p>
+              <p className="text-blue-800 text-sm sm:text-base">Toys saved from landfill</p>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-md text-center transform hover:scale-105 transition duration-300">
-              <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="h-7 w-7 text-blue-700" />
+            <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md text-center transform transition duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <MessageSquare className="h-5 w-5 sm:h-7 sm:w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">
+              <h3 className="text-xl sm:text-2xl font-bold font-heading mb-1 sm:mb-2 text-blue-700">
                 {communityMetrics?.familiesConnected || 0}
               </h3>
-              <p className="text-blue-800">Families connected</p>
+              <p className="text-blue-800 text-sm sm:text-base">Families connected</p>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-md text-center transform hover:scale-105 transition duration-300">
-              <div className="h-16 w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-7 w-7 text-blue-700" />
+            <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md text-center transform transition duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <Shield className="h-5 w-5 sm:h-7 sm:w-7 text-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold font-heading mb-2 text-blue-700">
+              <h3 className="text-xl sm:text-2xl font-bold font-heading mb-1 sm:mb-2 text-blue-700">
                 {communityMetrics?.wasteReduced || 0}
               </h3>
-              <p className="text-blue-800">Kg of waste saved</p>
+              <p className="text-blue-800 text-sm sm:text-base">Kg of waste saved</p>
             </div>
           </div>
         </div>
@@ -169,41 +169,41 @@ export default function HomePage() {
       </section>
       
       {/* How It Works */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold font-heading mb-4 text-blue-800">How ToyShare Works</h2>
-          <p className="text-blue-800 max-w-2xl mx-auto">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
+        <div className="text-center mb-6 sm:mb-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-heading mb-3 sm:mb-4 text-blue-800">How ToyShare Works</h2>
+          <p className="text-blue-800 max-w-2xl mx-auto text-sm sm:text-base">
             Our fun and simple process makes sharing toys easy, safe, and rewarding for everyone!
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
-            <div className="h-20 w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-blue-300">
-              <i className="fas fa-camera text-blue-700 text-3xl"></i>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+          <div className="text-center bg-white p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition transform hover:-translate-y-1">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 border-3 sm:border-4 border-blue-300">
+              <i className="fas fa-camera text-blue-700 text-xl sm:text-2xl md:text-3xl"></i>
             </div>
-            <h3 className="text-xl font-bold font-heading mb-3 text-blue-800">1. Share Your Toys</h3>
-            <p className="text-blue-800">
+            <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">1. Share Your Toys</h3>
+            <p className="text-blue-800 text-sm sm:text-base">
               Take photos of toys your children no longer use and create a listing with details about condition and age range.
             </p>
           </div>
 
-          <div className="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
-            <div className="h-20 w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-blue-300">
-              <i className="fas fa-comments text-blue-700 text-3xl"></i>
+          <div className="text-center bg-white p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition transform hover:-translate-y-1">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 border-3 sm:border-4 border-blue-300">
+              <i className="fas fa-comments text-blue-700 text-xl sm:text-2xl md:text-3xl"></i>
             </div>
-            <h3 className="text-xl font-bold font-heading mb-3 text-blue-800">2. Connect With Families</h3>
-            <p className="text-blue-800">
+            <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">2. Connect With Families</h3>
+            <p className="text-blue-800 text-sm sm:text-base">
               Receive requests and chat with interested families through our secure messaging system.
             </p>
           </div>
 
-          <div className="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1">
-            <div className="h-20 w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-blue-300">
-              <i className="fas fa-handshake text-blue-700 text-3xl"></i>
+          <div className="text-center bg-white p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition transform hover:-translate-y-1">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 border-3 sm:border-4 border-blue-300">
+              <i className="fas fa-handshake text-blue-700 text-xl sm:text-2xl md:text-3xl"></i>
             </div>
-            <h3 className="text-xl font-bold font-heading mb-3 text-blue-800">3. Arrange a Handoff</h3>
-            <p className="text-blue-800">
+            <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">3. Arrange a Handoff</h3>
+            <p className="text-blue-800 text-sm sm:text-base">
               Meet at a safe public location to exchange the toy and spread joy to another family.
             </p>
           </div>
@@ -236,37 +236,37 @@ export default function HomePage() {
       </section>
 
       {/* Resource Links */}
-      <section className="bg-blue-50 py-10 mb-12 rounded-xl">
+      <section className="bg-blue-50 py-6 sm:py-10 mb-8 sm:mb-12 rounded-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
-              <BookOpen className="h-8 w-8 text-blue-700 mx-auto mb-3" />
-              <h3 className="font-bold text-blue-800 mb-2">Exchange Guide</h3>
-              <p className="text-blue-600 mb-3 text-sm">Learn the best practices for successful toy exchanges</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-center">
+            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-blue-700 mx-auto mb-2 sm:mb-3" />
+              <h3 className="font-bold text-blue-800 mb-1 sm:mb-2 text-base sm:text-lg">Exchange Guide</h3>
+              <p className="text-blue-600 mb-2 sm:mb-3 text-xs sm:text-sm">Learn the best practices for successful toy exchanges</p>
               <Link href="/resources/exchange-guide">
-                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 h-8 text-xs sm:text-sm">
                   Read Guide
                 </Button>
               </Link>
             </div>
             
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
-              <Shield className="h-8 w-8 text-blue-700 mx-auto mb-3" />
-              <h3 className="font-bold text-blue-800 mb-2">Safety Center</h3>
-              <p className="text-blue-600 mb-3 text-sm">Everything you need to know to stay safe while sharing</p>
+            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-blue-700 mx-auto mb-2 sm:mb-3" />
+              <h3 className="font-bold text-blue-800 mb-1 sm:mb-2 text-base sm:text-lg">Safety Center</h3>
+              <p className="text-blue-600 mb-2 sm:mb-3 text-xs sm:text-sm">Everything you need to know to stay safe while sharing</p>
               <Link href="/safety-center">
-                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 h-8 text-xs sm:text-sm">
                   Visit Safety Center
                 </Button>
               </Link>
             </div>
             
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
-              <MessageSquare className="h-8 w-8 text-blue-700 mx-auto mb-3" />
-              <h3 className="font-bold text-blue-800 mb-2">Get Support</h3>
-              <p className="text-blue-600 mb-3 text-sm">Have questions? Our support team is ready to help</p>
+            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+              <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-blue-700 mx-auto mb-2 sm:mb-3" />
+              <h3 className="font-bold text-blue-800 mb-1 sm:mb-2 text-base sm:text-lg">Get Support</h3>
+              <p className="text-blue-600 mb-2 sm:mb-3 text-xs sm:text-sm">Have questions? Our support team is ready to help</p>
               <Link href="/resources/contact-support">
-                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 h-8 text-xs sm:text-sm">
                   Contact Us
                 </Button>
               </Link>

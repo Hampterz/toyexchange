@@ -140,7 +140,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   return (
     <>
       <div 
-        className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition card-animated cursor-pointer"
+        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition card-animated cursor-pointer"
         onClick={() => setIsExpanded(true)}
       >
         <div className="relative pb-[75%] bg-neutral-100">
@@ -161,43 +161,43 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               e.stopPropagation();
               handleFavoriteClick();
             }}
-            className="absolute top-3 right-3 h-9 w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale"
+            className="absolute top-2 right-2 sm:top-3 sm:right-3 h-8 w-8 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
             aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
             disabled={toggleFavoriteMutation.isPending}
           >
-            <Heart className={`text-lg ${isFavorited ? "fill-primary text-primary" : "text-neutral-500 hover:text-primary"}`} />
+            <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-500 hover:text-primary"}`} />
           </button>
           
-          <div className="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-primary text-white text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full">
             {toy.condition}
           </div>
         </div>
         
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-bold font-heading text-base truncate">
+        <div className="p-3 sm:p-4">
+          <div className="flex items-center justify-between mb-1 sm:mb-2">
+            <h3 className="font-bold font-heading text-sm sm:text-base truncate max-w-[70%]">
               {toy.title}
             </h3>
-            <span className="text-xs bg-neutral-100 px-2 py-1 rounded-full text-neutral-700">
+            <span className="text-[10px] sm:text-xs bg-neutral-100 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-neutral-700 whitespace-nowrap">
               Ages {toy.ageRange}
             </span>
           </div>
           
-          <p className="text-neutral-600 text-sm mb-3 line-clamp-2">
+          <p className="text-neutral-600 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
             {toy.description}
           </p>
           
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1 sm:gap-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <MapPin className="text-neutral-500 mr-1 h-3 w-3" />
-                <span className="text-neutral-500 text-xs">{toy.location}</span>
+                <MapPin className="text-neutral-500 mr-1 h-3 w-3 flex-shrink-0" />
+                <span className="text-neutral-500 text-xs truncate max-w-[150px]">{toy.location}</span>
               </div>
               
               {!isOwner && (
                 <Button 
                   variant="link" 
-                  className="text-primary font-medium text-sm p-0 h-auto hover:underline click-scale"
+                  className="text-primary font-medium text-xs sm:text-sm p-0 h-auto hover:underline click-scale"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRequestClick(toy);
@@ -217,27 +217,27 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               <div className="flex items-center justify-between">
                 <HoverCard>
                   <HoverCardTrigger>
-                    <div className="flex items-center gap-1.5 text-xs text-neutral-600 cursor-pointer">
-                      <span>Shared by:</span>
-                      <span className="font-medium">{toyOwner.name}</span>
+                    <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-neutral-600 cursor-pointer">
+                      <span className="text-[10px] sm:text-xs">Shared by:</span>
+                      <span className="font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[150px]">{toyOwner.name}</span>
                     </div>
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-80 p-4">
+                  <HoverCardContent className="w-72 sm:w-80 p-3 sm:p-4">
                     <div className="flex justify-between">
                       <div>
-                        <h4 className="font-bold">{toyOwner.name}</h4>
-                        <div className="flex items-center text-sm text-neutral-500 mt-1">
-                          <Calendar className="h-3 w-3 mr-1" />
+                        <h4 className="font-bold text-sm sm:text-base">{toyOwner.name}</h4>
+                        <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
+                          <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
                           <span>Joined {formatDate(toyOwner.createdAt)}</span>
                         </div>
-                        <div className="flex items-center text-sm text-neutral-500 mt-1">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          <span>{toyOwner.location}</span>
+                        <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
+                          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">{toyOwner.location}</span>
                         </div>
                       </div>
                       <div className="flex flex-col items-center">
-                        <span className="text-lg font-bold text-blue-600">{toyOwner.successfulExchanges || 0}</span>
-                        <span className="text-xs text-neutral-500">Exchanges</span>
+                        <span className="text-base sm:text-lg font-bold text-blue-600">{toyOwner.successfulExchanges || 0}</span>
+                        <span className="text-[10px] sm:text-xs text-neutral-500">Exchanges</span>
                       </div>
                     </div>
                   </HoverCardContent>
@@ -245,7 +245,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 {toyOwner.currentBadge && (
                   <SustainabilityBadge 
                     user={toyOwner} 
-                    className="text-xs py-0.5 scale-90 origin-right"
+                    className="text-[10px] sm:text-xs py-0.5 scale-90 origin-right"
                   />
                 )}
               </div>
