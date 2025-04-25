@@ -56,28 +56,28 @@ export default function HomePage() {
   return (
     <div className="page-transition">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-700 to-blue-900 py-14 mb-6 rounded-b-3xl shadow-lg">
+      <section className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-14 mb-4 md:mb-6 rounded-b-3xl shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-center text-center">
-            <h1 className="text-3xl md:text-5xl font-bold font-heading text-white mb-4 drop-shadow-md">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold font-heading text-white mb-3 md:mb-4 drop-shadow-md">
               Share Joy, Create Smiles!
             </h1>
-            <p className="text-white text-opacity-90 mb-8 text-lg leading-relaxed max-w-2xl">
+            <p className="text-white text-opacity-90 mb-6 md:mb-8 text-base md:text-lg leading-relaxed max-w-2xl px-2">
               Give your children's unused toys a second life by sharing them with other families in your community. Join our playful exchange today!
             </p>
-            <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-              <Button variant="secondary" className="px-6 py-6 bg-white text-blue-800 font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none px-4 sm:px-0">
+              <Button variant="secondary" className="w-full sm:w-auto px-4 py-3 md:px-6 md:py-4 bg-white text-blue-800 font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105">
                 Browse Toys
               </Button>
               <Button 
-                className="px-6 py-6 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105"
+                className="w-full sm:w-auto px-4 py-3 md:px-6 md:py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105"
                 onClick={handleShareToyClick}
               >
                 <Plus className="mr-2 h-4 w-4" /> Share a Toy
               </Button>
               {!user && (
                 <Button 
-                  className="px-6 py-6 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105"
+                  className="w-full sm:w-auto px-4 py-3 md:px-6 md:py-4 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-full shadow-md hover:shadow-lg transform transition hover:scale-105"
                   onClick={() => navigate('/auth')}
                 >
                   Join Now

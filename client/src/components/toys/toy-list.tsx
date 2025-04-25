@@ -68,15 +68,19 @@ export function ToyList({ filters = {} }: ToyListProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {displayedToys.map((toy) => (
           <ToyCard key={toy.id} toy={toy} onRequestClick={handleRequestClick} />
         ))}
       </div>
 
       {hasMoreToLoad && (
-        <div className="flex justify-center mt-8">
-          <Button onClick={handleLoadMore} variant="outline" className="border-primary text-primary font-bold rounded-full px-6 py-3 hover:bg-primary hover:text-white">
+        <div className="flex justify-center mt-6 md:mt-8">
+          <Button 
+            onClick={handleLoadMore} 
+            variant="outline" 
+            className="w-full sm:w-auto mx-4 sm:mx-0 border-primary text-primary font-bold rounded-full px-4 py-2 md:px-6 md:py-3 hover:bg-primary hover:text-white"
+          >
             Load More Toys
           </Button>
         </div>
