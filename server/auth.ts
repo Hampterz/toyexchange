@@ -119,33 +119,47 @@ export function setupAuth(app: Express) {
   // Handle Google sign-in
   app.post("/api/google-auth", async (req, res, next) => {
     try {
-      const { email, name, id } = req.body;
+      const { email, name, id, picture } = req.body;
       
       if (!email || !name || !id) {
         return res.status(400).json({ message: "Missing required Google account information" });
       }
       
-      // Check if user with this email already exists
-      let user = await storage.getUserByEmail(email);
+      // First check if user with this Google ID already exists
+      let user = await storage.getUserByGoogleId(id);
       
+      // If no user found by Google ID, check by email
       if (!user) {
-        // If no user exists, create a new one
-        // Use email as username (without the @gmail.com part)
-        const username = email.split('@')[0];
+        user = await storage.getUserByEmail(email);
         
-        // Generate a random password (user won't need to know it since they'll use Google to login)
-        const randomPassword = randomBytes(16).toString('hex');
-        
-        // Create the user
-        user = await storage.createUser({
-          username,
-          email,
-          name,
-          password: await hashPassword(randomPassword),
-          googleId: id,
-          location: req.body.location || 'Unknown location',
-          profilePicture: req.body.picture || '',
-        });
+        // If a user with this email exists, update their Google ID
+        if (user) {
+          console.log(`Updating existing user ${user.email} with Google ID: ${id}`);
+          user = await storage.updateUser(user.id, { 
+            googleId: id,
+            // Update profile picture if available
+            profilePicture: picture || user.profilePicture
+          });
+        } else {
+          // If no user exists at all, create a new one
+          // Use email as username (without the @gmail.com part)
+          const username = email.split('@')[0];
+          
+          // Generate a random password (user won't need to know it since they'll use Google to login)
+          const randomPassword = randomBytes(16).toString('hex');
+          
+          console.log(`Creating new user for Google account: ${email}`);
+          // Create the user
+          user = await storage.createUser({
+            username,
+            email,
+            name,
+            password: await hashPassword(randomPassword),
+            googleId: id,
+            location: req.body.location || 'Unknown location',
+            profilePicture: picture || '',
+          });
+        }
       }
       
       // Log the user in
