@@ -202,10 +202,21 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 <AddressAutocomplete
                   placeholder="Search for a location..."
                   className="w-full border-blue-200 focus-visible:ring-blue-700"
-                  onAddressSelect={(address) => {
+                  onAddressSelect={(address, coordinates) => {
                     // Add the selected address to the location filters
-                    if (!filters.location.includes(address)) {
+                    if (address && !filters.location.includes(address)) {
                       handleMultiSelectChange("location", address);
+                      
+                      // If we have coordinates, update the latitude and longitude
+                      if (coordinates) {
+                        handleFilterChange("latitude", coordinates.latitude);
+                        handleFilterChange("longitude", coordinates.longitude);
+                        
+                        // If distance isn't set yet, set a default
+                        if (!filters.distance) {
+                          handleFilterChange("distance", 25);
+                        }
+                      }
                     }
                   }}
                 />
@@ -461,11 +472,22 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <AddressAutocomplete
             placeholder="Search for a location..."
             className="w-full border-blue-200 focus-visible:ring-blue-700 mb-2"
-            onAddressSelect={(address) => {
+            onAddressSelect={(address, coordinates) => {
               // Add the selected address to the location filters
-              if (!filters.location.includes(address)) {
+              if (address && !filters.location.includes(address)) {
                 const newLocations = [...filters.location, address];
                 handleFilterChange("location", newLocations);
+                
+                // If we have coordinates, update the latitude and longitude
+                if (coordinates) {
+                  handleFilterChange("latitude", coordinates.latitude);
+                  handleFilterChange("longitude", coordinates.longitude);
+                  
+                  // If distance isn't set yet, set a default
+                  if (!filters.distance) {
+                    handleFilterChange("distance", 25);
+                  }
+                }
               }
             }}
           />

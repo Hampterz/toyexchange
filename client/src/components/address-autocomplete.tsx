@@ -4,7 +4,11 @@ import { cn } from "@/lib/utils";
 
 // Define the props for the AddressAutocomplete component
 interface AddressAutocompleteProps {
-  onAddressSelect: (address: string, placeId?: string) => void;
+  onAddressSelect: (
+    address: string, 
+    coordinates?: { latitude: number; longitude: number }, 
+    placeId?: string
+  ) => void;
   placeholder?: string;
   defaultValue?: string;
   className?: string;
@@ -25,7 +29,16 @@ declare global {
             options?: { types: string[]; fields: string[] }
           ) => {
             addListener: (event: string, callback: () => void) => void;
-            getPlace: () => { formatted_address?: string; place_id?: string };
+            getPlace: () => { 
+              formatted_address?: string; 
+              place_id?: string;
+              geometry?: {
+                location?: {
+                  lat: () => number;
+                  lng: () => number;
+                }
+              }
+            };
           };
         };
       };
@@ -151,7 +164,7 @@ export function AddressAutocomplete({
       // Create the autocomplete instance
       autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
         types: ["address"],
-        fields: ["formatted_address", "place_id"],
+        fields: ["formatted_address", "place_id", "geometry"],
       });
   
       // Add listener for place_changed event
@@ -160,7 +173,17 @@ export function AddressAutocomplete({
         
         if (place && place.formatted_address) {
           setInputValue(place.formatted_address);
-          onAddressSelect(place.formatted_address, place.place_id);
+          
+          // If we have geometry/location data, extract coordinates
+          let coordinates;
+          if (place.geometry && place.geometry.location) {
+            coordinates = {
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng()
+            };
+          }
+          
+          onAddressSelect(place.formatted_address, coordinates, place.place_id);
         }
       });
       
