@@ -359,22 +359,7 @@ export default function AuthPage() {
                         </div>
                       </div>
                       
-                      {/* Container for Google's Identity Services button (will be rendered by script) */}
-                      <div className="w-full mt-4">
-                        <div 
-                          ref={googleButtonRef} 
-                          id="google-signin-button" 
-                          className="w-full flex justify-center items-center min-h-[40px]"
-                        >
-                          {/* If button doesn't render, a fallback will appear */}
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center my-4">
-                        <div className="flex-grow h-px bg-gray-300"></div>
-                        <span className="px-3 text-sm text-gray-500">or</span>
-                        <div className="flex-grow h-px bg-gray-300"></div>
-                      </div>
+
                       
                       <Button 
                         type="button"
@@ -500,17 +485,6 @@ export default function AuthPage() {
                         </div>
                         <div className="relative flex justify-center text-xs text-blue-500">
                           <span className="px-2 bg-white">Or continue with</span>
-                        </div>
-                      </div>
-                      
-                      {/* Container for Google's Identity Services button (register tab) */}
-                      <div className="w-full mt-4 mb-2">
-                        <div 
-                          ref={registerGoogleButtonRef} 
-                          id="google-register-button" 
-                          className="w-full flex justify-center items-center min-h-[40px]"
-                        >
-                          {/* If button doesn't render, a fallback will appear */}
                         </div>
                       </div>
                       
