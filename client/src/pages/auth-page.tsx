@@ -22,6 +22,7 @@ import { initializeGoogleAuth, renderGoogleButton, signInWithGoogle, handleCrede
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { KonamiConfetti } from "@/components/ui/konami-confetti";
+import { AddressAutocomplete } from "@/components/address-autocomplete";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -442,10 +443,13 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-blue-800">Location (Full Address)</FormLabel>
                             <FormControl>
-                              <Input 
-                                placeholder="e.g. 123 Main St, Apt 4, Seattle, WA 98101" 
+                              <AddressAutocomplete 
+                                placeholder="Start typing your address..." 
                                 className="border-blue-200 focus-visible:ring-blue-700" 
-                                {...field} 
+                                defaultValue={field.value}
+                                onAddressSelect={(address) => {
+                                  field.onChange(address);
+                                }}
                               />
                             </FormControl>
                             <FormMessage />
