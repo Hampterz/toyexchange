@@ -478,6 +478,96 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   // Desktop version - checkboxes and badge tags
   return (
     <div>
+      {/* Location Filters - Moved to top */}
+      <div className="mb-6">
+        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Location</h3>
+        
+        {/* Google Maps Address Autocomplete */}
+        <div className="mb-3">
+          <AddressAutocomplete
+            placeholder=""
+            className="w-full border-blue-200 focus-visible:ring-blue-700 mb-2"
+            onAddressSelect={(address, coordinates) => {
+              // Add the selected address to the location filters
+              if (address && !filters.location.includes(address)) {
+                const newLocations = [...filters.location, address];
+                handleFilterChange("location", newLocations);
+                
+                // If we have coordinates, update the latitude and longitude
+                if (coordinates) {
+                  handleFilterChange("latitude", coordinates.latitude);
+                  handleFilterChange("longitude", coordinates.longitude);
+                  
+                  // If distance isn't set yet, set a default
+                  if (!filters.distance) {
+                    handleFilterChange("distance", 25);
+                  }
+                }
+              }
+            }}
+          />
+          
+          {/* Selected custom locations */}
+          {filters.location.length > 0 && (
+            <div className="mt-2">
+              <div className="flex flex-wrap gap-1">
+                {filters.location.map(location => {
+                  // Only show badge for custom locations (not in LOCATIONS array)
+                  if (!LOCATIONS.includes(location)) {
+                    return (
+                      <Badge 
+                        key={location} 
+                        variant="secondary"
+                        className="flex items-center gap-1 py-1 bg-blue-50 mb-1"
+                      >
+                        <span className="text-xs max-w-[200px] truncate">{location}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newLocations = filters.location.filter(l => l !== location);
+                            handleFilterChange("location", newLocations);
+                          }}
+                          className="text-blue-500 hover:text-blue-700 ml-1"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Distance slider */}
+        <div className="mt-4 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-medium text-blue-700">Search radius</h4>
+            <span className="text-sm font-medium text-blue-700">{filters.distance} miles</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Ruler className="h-4 w-4 text-blue-600" />
+            <Slider
+              value={[filters.distance || 25]}
+              min={1}
+              max={100}
+              step={1}
+              className="flex-1"
+              onValueChange={(value) => {
+                handleFilterChange("distance", value[0]);
+              }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>1 mile</span>
+            <span>50 miles</span>
+            <span>100 miles</span>
+          </div>
+        </div>
+      </div>
+      
       {/* Category Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Categories</h3>
@@ -523,8 +613,6 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           ))}
         </div>
       </div>
-      
-      {/* Location Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Location</h3>
         
