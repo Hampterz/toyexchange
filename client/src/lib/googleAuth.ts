@@ -51,8 +51,8 @@ declare global {
   }
 }
 
-// Client ID for the application
-const CLIENT_ID = '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com';
+// Client ID for the application - using environment variable with fallback
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID || '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com';
 
 // Function to decode JWT token
 function decodeJWT(token: string): DecodedCredential | null {
