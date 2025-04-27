@@ -262,24 +262,54 @@ export class DatabaseStorage implements IStorage {
         query = query.where(eq(toys.ageRange, filters.ageRange));
       }
       
-      // Search filter - enhanced to search title, description, and tags
+      // Search filter - enhanced to search title, description, and tags with scoring
       if (filters.search && typeof filters.search === 'string' && filters.search.trim() !== '') {
         const searchTerm = `%${filters.search.trim().toLowerCase()}%`;
         const searchTermExact = filters.search.trim().toLowerCase();
+        const searchWords = searchTermExact.split(/\s+/).filter(word => word.length > 1);
         
         // Improved search that checks the title, description, and if the search term is in any tag
         query = query.where(
           or(
-            // Check title and description with LIKE for partial matches
+            // Check title with LIKE for partial and exact matches
             like(sql`LOWER(${toys.title})`, searchTerm),
+            // Check if title has exact word matches for more accuracy
+            ...searchWords.map(word => like(sql`LOWER(${toys.title})`, `%${word}%`)),
+            
+            // Check description with LIKE for partial matches
             like(sql`LOWER(${toys.description})`, searchTerm),
-            // Check if any tag contains the search term
-            // This uses PostgreSQL JSON functions to check if any tag matches our search term
+            
+            // Check category for matches (often people search by category name)
+            like(sql`LOWER(${toys.category})`, searchTerm),
+            
+            // Check if any tag contains the search term or search words
             sql`EXISTS (
               SELECT 1 FROM jsonb_array_elements_text(${toys.tags}::jsonb) tag 
-              WHERE LOWER(tag) LIKE ${searchTerm}
+              WHERE LOWER(tag) LIKE ${searchTerm} OR ${
+                // Dynamically build an OR condition for each search word
+                sql.raw(searchWords.map(word => `LOWER(tag) LIKE '%${word}%'`).join(' OR '))
+              }
             )`
           )
+        );
+        
+        // Ordering by relevance
+        // This orders the results with exact title matches first, followed by tag matches, then description matches
+        query = query.orderBy(
+          sql`
+            CASE
+              WHEN LOWER(${toys.title}) = ${searchTermExact} THEN 1
+              WHEN LOWER(${toys.title}) LIKE ${`${searchTermExact}%`} THEN 2
+              WHEN EXISTS (
+                SELECT 1 FROM jsonb_array_elements_text(${toys.tags}::jsonb) tag 
+                WHERE LOWER(tag) = ${searchTermExact}
+              ) THEN 3
+              WHEN LOWER(${toys.category}) = ${searchTermExact} THEN 4
+              WHEN LOWER(${toys.description}) LIKE ${`%${searchTermExact}%`} THEN 5
+              ELSE 6
+            END ASC,
+            ${toys.createdAt} DESC
+          `
         );
       }
       

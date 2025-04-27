@@ -121,26 +121,12 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Search */}
+            {/* Enhanced Smart Search */}
             <div className="mb-6">
-              <form className="flex relative" onSubmit={(e) => {
-                e.preventDefault();
-                handleFilterChange({...filters, search: e.currentTarget.search.value});
-              }}>
-                <input
-                  type="text"
-                  name="search"
-                  placeholder="Search toys..."
-                  className="w-full rounded-md border border-blue-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  defaultValue={filters.search}
-                />
-                <button
-                  type="submit"
-                  className="absolute right-1 top-1 bottom-1 px-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
-                >
-                  <Search className="h-4 w-4" />
-                </button>
-              </form>
+              <ToySearch 
+                onSearch={(query) => handleFilterChange({...filters, search: query})} 
+                initialValue={filters.search || ""}
+              />
             </div>
             
             <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
