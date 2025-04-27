@@ -60,29 +60,67 @@ export function AddressAutocomplete({
 
   // Load the Google Maps script on component mount
   useEffect(() => {
+    let scriptElement: HTMLScriptElement | null = null;
+    let scriptAddedToHead = false;
+
     // Check if Google Maps script is already loaded
     if (!window.google || !window.google.maps) {
-      // Define the callback function that will be called when the script loads
-      window.initAutocomplete = () => {
-        if (inputRef.current && window.google) {
-          initializeAutocomplete();
-        }
-      };
+      try {
+        // Define the callback function that will be called when the script loads
+        window.initAutocomplete = () => {
+          if (inputRef.current && window.google) {
+            initializeAutocomplete();
+          }
+        };
 
-      // Create the script element
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initAutocomplete`;
-      script.async = true;
-      script.defer = true;
-      
-      // Add the script to the document
-      document.head.appendChild(script);
-      
-      // Cleanup function to remove the script when the component unmounts
-      return () => {
-        document.head.removeChild(script);
-        window.initAutocomplete = undefined;
-      };
+        // Create the script element
+        scriptElement = document.createElement("script");
+        scriptElement.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initAutocomplete`;
+        scriptElement.async = true;
+        scriptElement.defer = true;
+        
+        // Add error handling to the script
+        scriptElement.onerror = (error) => {
+          console.error("Error loading Google Maps API:", error);
+          // If the API key is invalid or has errors, still allow manual input
+          if (inputRef.current) {
+            // Remove the disabled attribute if present
+            inputRef.current.disabled = false;
+          }
+        };
+        
+        // Add the script to the document
+        document.head.appendChild(scriptElement);
+        scriptAddedToHead = true;
+        
+        // Set a timeout to ensure the input is enabled if the API fails to load
+        const enableInputTimeout = setTimeout(() => {
+          if (inputRef.current && inputRef.current.disabled) {
+            inputRef.current.disabled = false;
+          }
+        }, 5000); // 5 second timeout
+        
+        return () => {
+          // Clean up timeout
+          clearTimeout(enableInputTimeout);
+          
+          // Remove the script from head if it was added
+          if (scriptAddedToHead && scriptElement) {
+            try {
+              document.head.removeChild(scriptElement);
+            } catch (e) {
+              console.error("Error removing script:", e);
+            }
+          }
+          window.initAutocomplete = undefined;
+        };
+      } catch (error) {
+        console.error("Error setting up Google Maps script:", error);
+        // If there's an error, make sure the input is still usable
+        if (inputRef.current) {
+          inputRef.current.disabled = false;
+        }
+      }
     } else {
       // If the script is already loaded, initialize autocomplete directly
       initializeAutocomplete();
@@ -124,18 +162,35 @@ export function AddressAutocomplete({
     }
   };
 
+  // Handle manual form submission if user presses enter
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Call the callback with the current manual input value
+      onAddressSelect(inputValue);
+    }
+  };
+
   return (
-    <Input
-      ref={inputRef}
-      type="text"
-      id={id}
-      placeholder={placeholder}
-      className={cn("address-autocomplete", className)}
-      value={inputValue}
-      onChange={handleInputChange}
-      required={required}
-      autoFocus={autoFocus}
-      disabled={disabled}
-    />
+    <div className="relative">
+      <Input
+        ref={inputRef}
+        type="text"
+        id={id}
+        placeholder={placeholder}
+        className={cn("address-autocomplete", className)}
+        value={inputValue}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        required={required}
+        autoFocus={autoFocus}
+        disabled={disabled}
+      />
+      {apiKey ? null : (
+        <p className="text-xs text-red-500 mt-1">
+          No Google Maps API key available. Manual address entry only.
+        </p>
+      )}
+    </div>
   );
 }
