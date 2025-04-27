@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Baby, Grid, Star, Tag, Search } from "lucide-react";
+import { MapPin, Baby, Grid, Star, Tag, Search, Ruler } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/const
 import { COMMON_TAGS } from "@shared/schema";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
+import { Slider } from "@/components/ui/slider";
 
 type FilterBarProps = {
   onFilterChange: (filters: FilterOptions) => void;
@@ -25,6 +26,9 @@ export type FilterOptions = {
   condition: string[];
   tags: string[];
   search?: string;
+  distance?: number;
+  latitude?: number;
+  longitude?: number;
 };
 
 export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
@@ -35,6 +39,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
+    distance: initialFilters?.distance || 25, // Default to 25 miles
+    latitude: initialFilters?.latitude,
+    longitude: initialFilters?.longitude,
   });
   
   const [searchValue, setSearchValue] = useState(initialFilters?.search || "");
@@ -204,8 +211,30 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 />
               </div>
               
+              {/* Distance slider */}
+              <div className="mt-4 pt-2 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-medium text-gray-500">Distance: {filters.distance} miles</h4>
+                </div>
+                <Slider
+                  value={[filters.distance || 25]}
+                  min={1}
+                  max={100}
+                  step={1}
+                  className="mt-2"
+                  onValueChange={(value) => {
+                    handleFilterChange("distance", value[0]);
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>1 mile</span>
+                  <span>50 miles</span>
+                  <span>100 miles</span>
+                </div>
+              </div>
+              
               {/* Selected Locations */}
-              <div className="mt-2">
+              <div className="mt-4 pt-2 border-t border-gray-100">
                 <h4 className="text-xs font-medium text-gray-500 mb-1">Selected Locations:</h4>
                 {filters.location.length === 0 ? (
                   <p className="text-xs text-gray-400 italic">No locations selected</p>
