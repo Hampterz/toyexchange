@@ -6,11 +6,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { SustainabilityBadge } from "@/components/profile/sustainability-badge";
+import SustainabilityBadge from "@/components/profile/sustainability-badge";
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SocialShareButtons } from "@/components/social/social-share-buttons";
+import ConfettiEffect from "@/components/ui/confetti-effect";
 
 interface ToyCardProps {
   toy: ToyWithDistance;
@@ -27,6 +28,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   
   // Track if we're viewing videos or images
   const [viewingVideos, setViewingVideos] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Query to check if the toy is favorited by the current user
   const { data: favoriteData } = useQuery({
@@ -76,6 +78,46 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       toast({
         title: "Error",
         description: "Failed to update favorite status",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Mutation to mark a toy as sold
+  const markAsSoldMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("PATCH", `/api/toys/${toy.id}`, {
+        status: "sold",
+        isAvailable: false,
+        soldDate: new Date().toISOString()
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      // Show success toast
+      toast({
+        title: "Success!",
+        description: "Toy has been marked as sold",
+        variant: "default",
+      });
+      
+      // Show confetti celebration effect
+      setShowConfetti(true);
+      
+      // Invalidate the toy queries to refresh data
+      queryClient.invalidateQueries({ queryKey: [`/api/toys/${toy.id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/toys"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${user?.id}/toys`] });
+      
+      // Hide the expanded toy view after a short delay to show confetti
+      setTimeout(() => {
+        setIsExpanded(false);
+      }, 500);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to mark toy as sold",
         variant: "destructive",
       });
     },
@@ -145,6 +187,8 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
 
   return (
     <>
+      {/* Confetti effect when marking a toy as sold */}
+      {showConfetti && <ConfettiEffect duration={3000} numberOfPieces={300} />}
       <div 
         className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition card-animated cursor-pointer"
         onClick={() => setIsExpanded(true)}
@@ -237,7 +281,22 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               )}
               
               {isOwner && (
-                <span className="text-xs text-neutral-500 italic">Your listing</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-neutral-500 italic">Your listing</span>
+                  {toy.status !== 'sold' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-2 py-0 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markAsSoldMutation.mutate();
+                      }}
+                    >
+                      Mark as Sold
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
             
