@@ -119,7 +119,17 @@ export function setupAuth(app: Express) {
   // Handle Google sign-in
   app.post("/api/google-auth", async (req, res, next) => {
     try {
-      const { email, name, id, picture } = req.body;
+      const { 
+        email, 
+        name, 
+        id, 
+        picture, 
+        givenName, 
+        familyName, 
+        location, 
+        latitude, 
+        longitude 
+      } = req.body;
       
       if (!email || !name || !id) {
         return res.status(400).json({ message: "Missing required Google account information" });
@@ -135,33 +145,83 @@ export function setupAuth(app: Express) {
         // If a user with this email exists, update their Google ID
         if (user) {
           console.log(`Updating existing user ${user.email} with Google ID: ${id}`);
-          user = await storage.updateUser(user.id, { 
+          
+          // Update user with Google information
+          const updatedUser = await storage.updateUser(user.id, { 
             googleId: id,
             // Update profile picture if available
-            profilePicture: picture || user.profilePicture
+            profilePicture: picture || user.profilePicture,
+            // Update location if provided and user's current location is unknown
+            ...(location && user.location === 'Unknown location' ? { location } : {}),
+            ...(latitude ? { latitude } : {}),
+            ...(longitude ? { longitude } : {})
           });
+          
+          if (updatedUser) {
+            user = updatedUser;
+            console.log(`Updated existing user: ${user.name} (${user.email})`);
+          }
         } else {
           // If no user exists at all, create a new one
-          // Use email as username (without the @gmail.com part)
-          const username = email.split('@')[0];
+          
+          // Generate a unique username based on name and random suffix to avoid conflicts
+          // First try to use first name or email prefix
+          let baseUsername = (givenName || name.split(' ')[0] || email.split('@')[0]).toLowerCase();
+          
+          // Replace spaces and special characters
+          baseUsername = baseUsername.replace(/[^a-z0-9]/g, '');
+          
+          // Generate a timestamp suffix for uniqueness
+          const timestamp = Date.now().toString().slice(-4);
+          const username = `${baseUsername}${timestamp}`;
           
           // Generate a random password (user won't need to know it since they'll use Google to login)
           const randomPassword = randomBytes(16).toString('hex');
           
-          console.log(`Creating new user for Google account: ${email}`);
-          // Create the user
+          console.log(`Creating new user for Google account: ${name} (${email})`);
+          
+          // Create the user with all available information
           user = await storage.createUser({
             username,
             email,
-            name,
+            name,  // Use full name with proper capitalization
             password: await hashPassword(randomPassword),
             googleId: id,
-            location: req.body.location || 'Unknown location',
+            location: location || 'Unknown location',
             profilePicture: picture || '',
+            latitude,
+            longitude
+            // Note: arrays will be initialized with default values in the database
+          });
+          
+          console.log(`Created new user: ${user.name} (${user.email}) with location: ${user.location}`);
+        }
+      } else {
+        // User exists, check if we need to update their info
+        const userNeedsUpdate = 
+          (location && user.location === 'Unknown location') || 
+          (picture && !user.profilePicture) ||
+          (latitude && !user.latitude) ||
+          (longitude && !user.longitude);
+          
+        if (userNeedsUpdate) {
+          console.log(`Updating existing user ${user.email} with additional information`);
+          
+          user = await storage.updateUser(user.id, {
+            // Only update these fields if they're empty
+            ...(location && user.location === 'Unknown location' ? { location } : {}),
+            ...(picture && !user.profilePicture ? { profilePicture: picture } : {}),
+            ...(latitude && !user.latitude ? { latitude } : {}),
+            ...(longitude && !user.longitude ? { longitude } : {})
           });
         }
       }
       
+      // Check if we have a valid user before attempting to log in
+      if (!user) {
+        return res.status(500).json({ message: "Failed to create or retrieve user account" });
+      }
+
       // Log the user in
       req.login(user, (err) => {
         if (err) return next(err);
@@ -171,6 +231,7 @@ export function setupAuth(app: Express) {
         res.status(200).json(userWithoutPassword);
       });
     } catch (error) {
+      console.error("Error in Google auth:", error);
       next(error);
     }
   });

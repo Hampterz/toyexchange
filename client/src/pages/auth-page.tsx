@@ -84,17 +84,28 @@ export default function AuthPage() {
         if (googleUser) {
           console.log("Google user data:", googleUser);
           
+          // Extract the full name details including first and last name
+          const fullName = googleUser.name || `${googleUser.givenName} ${googleUser.familyName}`.trim();
+          
           // Try to get user's location
           let location = "";
+          let latitude = "";
+          let longitude = "";
           
           try {
             if (navigator.geolocation) {
+              // Show toast to let user know we're getting their location
+              toast({
+                title: "Getting your location",
+                description: "This helps us find toys near you. Please wait a moment.",
+              });
+              
               // Create a promise from the geolocation API
               const getPosition = () => new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(
                   position => resolve(position),
                   error => reject(error),
-                  { timeout: 5000, maximumAge: 60000 }
+                  { timeout: 8000, maximumAge: 60000, enableHighAccuracy: true }
                 );
               });
               
@@ -102,6 +113,10 @@ export default function AuthPage() {
               const position = await getPosition() as GeolocationPosition;
               const lat = position.coords.latitude;
               const lng = position.coords.longitude;
+              
+              // Store lat/lng for database
+              latitude = lat.toString();
+              longitude = lng.toString();
               
               // We have coordinates, now try to get a formatted address via reverse geocoding
               const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
@@ -111,18 +126,36 @@ export default function AuthPage() {
                 const geocodeData = await geocodeResponse.json();
                 
                 if (geocodeData.results && geocodeData.results.length > 0) {
-                  location = geocodeData.results[0].formatted_address;
+                  // Get city from results - typically in address_components
+                  const addressComponents = geocodeData.results[0].address_components;
+                  const city = addressComponents.find(
+                    (component: any) => component.types.includes("locality")
+                  )?.long_name;
+                  
+                  const state = addressComponents.find(
+                    (component: any) => component.types.includes("administrative_area_level_1")
+                  )?.short_name;
+                  
+                  // Set location to city, state format if available
+                  if (city && state) {
+                    location = `${city}, ${state}`;
+                  } else {
+                    // Fallback to formatted address but keep it short
+                    location = geocodeData.results[0].formatted_address.split(',').slice(0, 2).join(',');
+                  }
+                  
                   console.log("Got user location:", location);
                 }
               } catch (geocodeError) {
                 console.error("Error during reverse geocoding:", geocodeError);
                 // Just use coordinates as a fallback
-                location = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+                location = `${lat.toFixed(3)}° N, ${lng.toFixed(3)}° W`;
               }
             }
           } catch (geoError) {
             console.error("Error getting user location:", geoError);
-            // Continue with no location - we'll prompt them for it later
+            // Set a default location
+            location = "Please update your location";
           }
           
           try {
@@ -130,9 +163,13 @@ export default function AuthPage() {
             const res = await apiRequest('POST', '/api/google-auth', {
               id: googleUser.id,
               email: googleUser.email,
-              name: googleUser.name,
+              name: fullName,
+              givenName: googleUser.givenName,
+              familyName: googleUser.familyName,
               picture: googleUser.imageUrl,
-              location: location, // Add location if we have it
+              location: location || "Please update your location",
+              latitude, 
+              longitude
             });
             
             if (!res.ok) {
@@ -142,15 +179,21 @@ export default function AuthPage() {
             // Get the authenticated user from response
             const userData = await res.json();
             
+            // Show confetti to celebrate the sign-in
+            setShowConfetti(true);
+            
             // Show success notification
             toast({
-              title: "Google Sign-in Successful",
-              description: `Welcome, ${userData.name || 'User'}!`,
+              title: "Welcome to ToyShare! 🎉",
+              description: `Hi ${userData.name.split(' ')[0]}, you've successfully signed in with Google.`,
               variant: "default",
             });
             
-            // Redirect to home page
-            navigate('/');
+            // Redirect to home page after a short delay so they can see the confetti
+            setTimeout(() => {
+              setShowConfetti(false);
+              navigate('/');
+            }, 2000);
           } catch (apiError) {
             console.error("API error during Google auth:", apiError);
             throw new Error("Failed to authenticate with server");
