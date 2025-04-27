@@ -50,7 +50,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Update filters when a selection changes
-  const handleFilterChange = (key: keyof FilterOptions, value: string | string[]) => {
+  const handleFilterChange = (key: keyof FilterOptions, value: string | string[] | number) => {
     const updatedFilters = { ...filters, [key]: value };
     setFilters(updatedFilters);
     onFilterChange(updatedFilters);
@@ -502,6 +502,32 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               </div>
             </div>
           )}
+        </div>
+        
+        {/* Distance slider */}
+        <div className="mt-4 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-medium text-blue-700">Search radius</h4>
+            <span className="text-sm font-medium text-blue-700">{filters.distance} miles</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Ruler className="h-4 w-4 text-blue-600" />
+            <Slider
+              value={[filters.distance || 25]}
+              min={1}
+              max={100}
+              step={1}
+              className="flex-1"
+              onValueChange={(value) => {
+                handleFilterChange("distance", value[0]);
+              }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>1 mile</span>
+            <span>50 miles</span>
+            <span>100 miles</span>
+          </div>
         </div>
         
         {/* Divider */}
