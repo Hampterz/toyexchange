@@ -14,11 +14,32 @@ interface AddressAutocompleteProps {
   disabled?: boolean;
 }
 
-// Extend the window interface to include the google object
+// Extend the window interface to include the google object and initialization function
 declare global {
   interface Window {
-    google: any;
-    initAutocomplete: () => void;
+    google?: {
+      maps?: {
+        places?: {
+          Autocomplete: new (
+            input: HTMLInputElement,
+            options?: { types: string[]; fields: string[] }
+          ) => {
+            addListener: (event: string, callback: () => void) => void;
+            getPlace: () => { formatted_address?: string; place_id?: string };
+          };
+        };
+      };
+      accounts?: {
+        id: {
+          initialize: (config: any) => void;
+          renderButton: (parent: HTMLElement, options: any) => void;
+          prompt: (notification?: any) => void;
+          disableAutoSelect: () => void;
+          revoke: (hint: string, callback: () => void) => void;
+        };
+      };
+    };
+    initAutocomplete?: () => void;
   }
 }
 
@@ -60,7 +81,7 @@ export function AddressAutocomplete({
       // Cleanup function to remove the script when the component unmounts
       return () => {
         document.head.removeChild(script);
-        delete window.initAutocomplete;
+        window.initAutocomplete = undefined;
       };
     } else {
       // If the script is already loaded, initialize autocomplete directly
@@ -70,23 +91,27 @@ export function AddressAutocomplete({
 
   // Initialize the autocomplete functionality
   const initializeAutocomplete = () => {
-    if (!inputRef.current || !window.google) return;
+    if (!inputRef.current || !window.google || !window.google.maps || !window.google.maps.places) return;
     
-    // Create the autocomplete instance
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ["address"],
-      fields: ["formatted_address", "place_id"],
-    });
-
-    // Add listener for place_changed event
-    autocompleteRef.current.addListener("place_changed", () => {
-      const place = autocompleteRef.current.getPlace();
-      
-      if (place && place.formatted_address) {
-        setInputValue(place.formatted_address);
-        onAddressSelect(place.formatted_address, place.place_id);
-      }
-    });
+    try {
+      // Create the autocomplete instance
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ["address"],
+        fields: ["formatted_address", "place_id"],
+      });
+  
+      // Add listener for place_changed event
+      autocompleteRef.current.addListener("place_changed", () => {
+        const place = autocompleteRef.current.getPlace();
+        
+        if (place && place.formatted_address) {
+          setInputValue(place.formatted_address);
+          onAddressSelect(place.formatted_address, place.place_id);
+        }
+      });
+    } catch (error) {
+      console.error("Error initializing Google Maps Autocomplete:", error);
+    }
   };
 
   // Handle manual input changes

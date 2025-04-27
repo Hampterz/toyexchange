@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { MapPin, Baby, Grid, Star, Tag, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -10,6 +11,7 @@ import {
 import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
 import { COMMON_TAGS } from "@shared/schema";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { AddressAutocomplete } from "@/components/address-autocomplete";
 
 type FilterBarProps = {
   onFilterChange: (filters: FilterOptions) => void;
@@ -188,21 +190,69 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
             <div className="max-h-60 overflow-auto p-2">
-              {LOCATIONS.map(location => (
-                <div 
-                  key={location}
-                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                  onClick={() => handleMultiSelectChange("location", location)}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={filters.location.includes(location)}
-                    readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
-                  />
-                  <span>{location}</span>
-                </div>
-              ))}
+              {/* Google Maps Address Autocomplete */}
+              <div className="mb-2">
+                <AddressAutocomplete
+                  placeholder="Search for a location..."
+                  className="w-full border-blue-200 focus-visible:ring-blue-700"
+                  onAddressSelect={(address) => {
+                    // Add the selected address to the location filters
+                    if (!filters.location.includes(address)) {
+                      handleMultiSelectChange("location", address);
+                    }
+                  }}
+                />
+              </div>
+              
+              {/* Selected Locations */}
+              <div className="mt-2">
+                <h4 className="text-xs font-medium text-gray-500 mb-1">Selected Locations:</h4>
+                {filters.location.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic">No locations selected</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {filters.location.map(location => (
+                      <Badge 
+                        key={location} 
+                        variant="secondary"
+                        className="flex items-center gap-1 py-1 bg-blue-50"
+                      >
+                        <span className="text-xs max-w-[150px] truncate">{location}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newLocations = filters.location.filter(l => l !== location);
+                            handleFilterChange("location", newLocations);
+                          }}
+                          className="text-blue-500 hover:text-blue-700 ml-1"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Pre-defined locations for backwards compatibility */}
+              <div className="mt-3 pt-2 border-t border-gray-100">
+                <h4 className="text-xs font-medium text-gray-500 mb-1">Common Locations:</h4>
+                {LOCATIONS.map(location => (
+                  <div 
+                    key={location}
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                    onClick={() => handleMultiSelectChange("location", location)}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={filters.location.includes(location)}
+                      readOnly
+                      className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
+                    />
+                    <span>{location}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -376,7 +426,62 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       {/* Location Filters */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Location</h3>
-        <div className="space-y-2 mt-3">
+        
+        {/* Google Maps Address Autocomplete */}
+        <div className="mb-3">
+          <AddressAutocomplete
+            placeholder="Search for a location..."
+            className="w-full border-blue-200 focus-visible:ring-blue-700 mb-2"
+            onAddressSelect={(address) => {
+              // Add the selected address to the location filters
+              if (!filters.location.includes(address)) {
+                const newLocations = [...filters.location, address];
+                handleFilterChange("location", newLocations);
+              }
+            }}
+          />
+          
+          {/* Selected custom locations */}
+          {filters.location.length > 0 && (
+            <div className="mt-2">
+              <div className="flex flex-wrap gap-1">
+                {filters.location.map(location => {
+                  // Only show badge for custom locations (not in LOCATIONS array)
+                  if (!LOCATIONS.includes(location)) {
+                    return (
+                      <Badge 
+                        key={location} 
+                        variant="secondary"
+                        className="flex items-center gap-1 py-1 bg-blue-50 mb-1"
+                      >
+                        <span className="text-xs max-w-[200px] truncate">{location}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newLocations = filters.location.filter(l => l !== location);
+                            handleFilterChange("location", newLocations);
+                          }}
+                          className="text-blue-500 hover:text-blue-700 ml-1"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Divider */}
+        <div className="border-t border-gray-100 my-3 pt-2">
+          <h4 className="text-xs font-medium text-gray-500 mb-2">Common Locations:</h4>
+        </div>
+        
+        {/* Pre-defined locations */}
+        <div className="space-y-2">
           {LOCATIONS.map(location => (
             <label key={location} className="flex items-center">
               <input 

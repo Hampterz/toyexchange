@@ -36,7 +36,18 @@ interface GoogleUser {
 declare global {
   interface Window {
     google?: {
-      accounts: {
+      maps?: {
+        places?: {
+          Autocomplete: new (
+            input: HTMLInputElement,
+            options?: { types: string[]; fields: string[] }
+          ) => {
+            addListener: (event: string, callback: () => void) => void;
+            getPlace: () => { formatted_address?: string; place_id?: string };
+          };
+        };
+      };
+      accounts?: {
         id: {
           initialize: (config: any) => void;
           renderButton: (parent: HTMLElement, options: any) => void;
@@ -48,6 +59,7 @@ declare global {
     };
     handleGoogleCredential?: (response: CredentialResponse) => void;
     handleCredentialResponse?: (response: CredentialResponse) => void;
+    initAutocomplete?: () => void;
   }
 }
 
@@ -107,7 +119,11 @@ export const initializeGoogleAuth = async (): Promise<void> => {
     await waitForGoogleLibrary();
 
     // Initialize Google Identity Services
-    window.google!.accounts.id.initialize({
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+      throw new Error('Google Identity Services not loaded or properly initialized');
+    }
+    
+    window.google.accounts.id.initialize({
       client_id: CLIENT_ID,
       callback: (response: CredentialResponse) => {
         // This sets handleCredentialResponse as the official callback
