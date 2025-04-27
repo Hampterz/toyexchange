@@ -116,6 +116,51 @@ export function setupAuth(app: Express) {
     });
   });
 
+  // Handle Google sign-in
+  app.post("/api/google-auth", async (req, res, next) => {
+    try {
+      const { email, name, id } = req.body;
+      
+      if (!email || !name || !id) {
+        return res.status(400).json({ message: "Missing required Google account information" });
+      }
+      
+      // Check if user with this email already exists
+      let user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        // If no user exists, create a new one
+        // Use email as username (without the @gmail.com part)
+        const username = email.split('@')[0];
+        
+        // Generate a random password (user won't need to know it since they'll use Google to login)
+        const randomPassword = randomBytes(16).toString('hex');
+        
+        // Create the user
+        user = await storage.createUser({
+          username,
+          email,
+          name,
+          password: await hashPassword(randomPassword),
+          googleId: id,
+          location: req.body.location || 'Unknown location',
+          profilePicture: req.body.picture || '',
+        });
+      }
+      
+      // Log the user in
+      req.login(user, (err) => {
+        if (err) return next(err);
+        
+        // Don't return password in response
+        const { password, ...userWithoutPassword } = user;
+        res.status(200).json(userWithoutPassword);
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     

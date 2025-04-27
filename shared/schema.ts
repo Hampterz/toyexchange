@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   location: text("location").notNull(),
   profilePicture: text("profile_picture"),
+  googleId: text("google_id").unique(),
   
   // Sustainability metrics
   toysShared: integer("toys_shared").default(0),
