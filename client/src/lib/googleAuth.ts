@@ -1,5 +1,12 @@
 // Import global type definitions from global.d.ts
 
+// Re-declare CredentialResponse for local use
+interface CredentialResponse {
+  credential: string;
+  clientId: string;
+  select_by: string;
+}
+
 interface DecodedCredential {
   iss: string;
   nbf: number;

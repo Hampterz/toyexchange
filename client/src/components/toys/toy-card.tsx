@@ -213,7 +213,14 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <MapPin className="text-neutral-500 mr-1 h-3 w-3 flex-shrink-0" />
-                <span className="text-neutral-500 text-xs truncate max-w-[150px]">{toy.location}</span>
+                <span className="text-neutral-500 text-xs truncate max-w-[150px]">
+                  {toy.location}
+                  {toy.distance && (
+                    <span className="ml-1 text-blue-600 font-medium">
+                      ({Math.round(toy.distance * 10) / 10} miles)
+                    </span>
+                  )}
+                </span>
               </div>
               
               {!isOwner && (
@@ -416,7 +423,14 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 <h3 className="text-sm font-semibold mb-1">Pickup Location</h3>
                 <div className="flex items-center text-neutral-700 text-sm">
                   <MapPin className="h-4 w-4 mr-1 text-neutral-500" />
-                  {toy.location}
+                  <span>
+                    {toy.location}
+                    {toy.distance && (
+                      <span className="ml-1 text-blue-600 font-medium">
+                        ({Math.round(toy.distance * 10) / 10} miles away)
+                      </span>
+                    )}
+                  </span>
                 </div>
               </div>
               
