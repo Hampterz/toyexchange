@@ -136,14 +136,14 @@ export const renderGoogleButton = (element: HTMLElement): void => {
   try {
     window.google.accounts.id.renderButton(element, {
       type: 'standard',
-      theme: 'outline',
+      theme: 'filled_blue', // More prominent blue button
       size: 'large',
-      text: 'signin_with',
+      text: 'continue_with', // Changed from 'signin_with' to match request
       shape: 'rectangular',
-      logo_alignment: 'left',
-      width: element.offsetWidth || 240,
+      logo_alignment: 'center',
+      width: element.offsetWidth, // Full width of container
     });
-    console.log('Google Sign-In button rendered');
+    console.log('Google Sign-In button rendered with account selector');
   } catch (error) {
     console.error('Error rendering Google Sign-In button:', error);
   }
