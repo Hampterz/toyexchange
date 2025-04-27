@@ -51,6 +51,7 @@ import HelpCenter from "@/pages/help-center";
 // Admin Pages
 import AdminDashboard from "@/pages/admin/dashboard";
 import ReportsManagement from "@/pages/admin/reports-management";
+import ContactMessages from "@/pages/admin/contact-messages";
 import SafetyTipsManagement from "@/pages/admin/safety-tips-management";
 import MeetupLocationVerification from "@/pages/admin/meetup-location-verification";
 
@@ -199,10 +200,17 @@ const Router = () => {
           </Layout>
         )}
       </Route>
-      <Route path="/admin/reports">
+      <Route path="/admin/reports-management">
         {() => (
           <Layout>
-            <ProtectedRoute path="/admin/reports" component={ReportsManagement} />
+            <ProtectedRoute path="/admin/reports-management" component={ReportsManagement} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/admin/contact-messages">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/admin/contact-messages" component={ContactMessages} />
           </Layout>
         )}
       </Route>

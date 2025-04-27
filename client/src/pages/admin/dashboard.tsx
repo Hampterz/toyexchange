@@ -305,29 +305,45 @@ export default function AdminDashboard() {
                   
                   <div className="mt-6 pt-6 border-t border-blue-100">
                     <h4 className="font-medium text-blue-800 mb-2">Badge Distribution</h4>
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-blue-700">Bronze</span>
-                      <span className="font-medium text-blue-800">65%</span>
-                    </div>
-                    <div className="w-full bg-blue-100 rounded-full h-2 mb-3">
-                      <div className="bg-amber-500 h-2 rounded-full" style={{ width: "65%" }}></div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-blue-700">Silver</span>
-                      <span className="font-medium text-blue-800">25%</span>
-                    </div>
-                    <div className="w-full bg-blue-100 rounded-full h-2 mb-3">
-                      <div className="bg-slate-400 h-2 rounded-full" style={{ width: "25%" }}></div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-blue-700">Gold</span>
-                      <span className="font-medium text-blue-800">10%</span>
-                    </div>
-                    <div className="w-full bg-blue-100 rounded-full h-2 mb-3">
-                      <div className="bg-yellow-500 h-2 rounded-full" style={{ width: "10%" }}></div>
-                    </div>
+                    {users.length === 0 ? (
+                      <div className="text-center py-4">
+                        <p className="text-blue-600">No users with badges yet.</p>
+                        <p className="text-sm text-blue-500 mt-1">Users earn badges by sharing toys and completing exchanges.</p>
+                      </div>
+                    ) : (
+                      <>
+                        {Object.entries(
+                          users.reduce((acc, user) => {
+                            const badge = user.currentBadge || "Newcomer";
+                            acc[badge] = (acc[badge] || 0) + 1;
+                            return acc;
+                          }, {} as Record<string, number>)
+                        ).map(([badge, count]) => {
+                          const percentage = Math.round((count / users.length) * 100);
+                          let color = "bg-gray-400";
+                          
+                          switch(badge) {
+                            case "Newcomer": color = "bg-gray-400"; break;
+                            case "Eco Friend": color = "bg-green-500"; break;
+                            case "Sustainability Hero": color = "bg-blue-500"; break;
+                            case "Earth Guardian": color = "bg-indigo-500"; break;
+                            case "Planet Protector": color = "bg-purple-500"; break;
+                          }
+                          
+                          return (
+                            <div key={badge}>
+                              <div className="flex items-center justify-between text-sm mb-2">
+                                <span className="text-blue-700">{badge}</span>
+                                <span className="font-medium text-blue-800">{percentage}%</span>
+                              </div>
+                              <div className="w-full bg-blue-100 rounded-full h-2 mb-3">
+                                <div className={`${color} h-2 rounded-full`} style={{ width: `${percentage}%` }}></div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -355,7 +371,12 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" className="w-full mt-2 text-blue-700 border-blue-200">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-2 text-blue-700 border-blue-200"
+                    onClick={() => navigate("/admin/contact-messages")}
+                  >
                     View All Messages
                   </Button>
                 </CardContent>
@@ -379,7 +400,12 @@ export default function AdminDashboard() {
                       <p className="text-xs text-blue-500 mt-1">Reported by: {report.reportedBy.name}</p>
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" className="w-full mt-2 text-blue-700 border-blue-200">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-2 text-blue-700 border-blue-200"
+                    onClick={() => navigate("/admin/reports-management")}
+                  >
                     View All Reports
                   </Button>
                 </CardContent>
