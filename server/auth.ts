@@ -207,13 +207,17 @@ export function setupAuth(app: Express) {
         if (userNeedsUpdate) {
           console.log(`Updating existing user ${user.email} with additional information`);
           
-          user = await storage.updateUser(user.id, {
+          const updatedUser = await storage.updateUser(user.id, {
             // Only update these fields if they're empty
             ...(location && user.location === 'Unknown location' ? { location } : {}),
             ...(picture && !user.profilePicture ? { profilePicture: picture } : {}),
             ...(latitude && !user.latitude ? { latitude } : {}),
             ...(longitude && !user.longitude ? { longitude } : {})
           });
+
+          if (updatedUser) {
+            user = updatedUser;
+          }
         }
       }
       
