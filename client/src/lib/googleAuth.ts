@@ -136,9 +136,9 @@ export const renderGoogleButton = (element: HTMLElement): void => {
   try {
     window.google.accounts.id.renderButton(element, {
       type: 'standard',
-      theme: 'filled_blue', // More prominent blue button
+      theme: 'outline', // White button with border
       size: 'large',
-      text: 'continue_with', // Changed from 'signin_with' to match request
+      text: 'continue_with', // "Continue with Google"
       shape: 'rectangular',
       logo_alignment: 'center',
       width: element.offsetWidth, // Full width of container
