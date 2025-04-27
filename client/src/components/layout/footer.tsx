@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Shield, CheckCircle, Globe, Award } from "lucide-react";
 
 export function Footer() {
   return (
@@ -67,12 +68,47 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-neutral-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-neutral-400 text-sm">&copy; {new Date().getFullYear()} ToyShare. All rights reserved.</p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/help-center" className="text-neutral-400 hover:text-white text-sm">Help Center</Link>
-            <Link href="/safety-center" className="text-neutral-400 hover:text-white text-sm">Safety Center</Link>
-            <Link href="/resources/community-standards" className="text-neutral-400 hover:text-white text-sm">Community Standards</Link>
+        {/* Trust badges section */}
+        <div className="border-t border-neutral-700 mt-8 pt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
+              <Shield className="h-8 w-8 text-blue-400 mb-2" />
+              <h5 className="font-medium text-sm mb-1">Trusted Platform</h5>
+              <p className="text-neutral-400 text-xs">Verified user accounts &amp; secure communication</p>
+            </div>
+            
+            <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
+              <CheckCircle className="h-8 w-8 text-green-400 mb-2" />
+              <h5 className="font-medium text-sm mb-1">Safety Verified</h5>
+              <p className="text-neutral-400 text-xs">All toy listings reviewed for safety standards</p>
+            </div>
+            
+            <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
+              <Globe className="h-8 w-8 text-blue-400 mb-2" />
+              <h5 className="font-medium text-sm mb-1">Community Driven</h5>
+              <p className="text-neutral-400 text-xs">Built by parents, for families worldwide</p>
+            </div>
+            
+            <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
+              <Award className="h-8 w-8 text-yellow-400 mb-2" />
+              <h5 className="font-medium text-sm mb-1">Eco-Friendly</h5>
+              <p className="text-neutral-400 text-xs">Promoting sustainability through reuse</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+              <p className="text-neutral-400 text-sm">&copy; {new Date().getFullYear()} ToyShare. All rights reserved.</p>
+              <div className="h-4 w-px bg-neutral-700"></div>
+              <p className="text-neutral-500 text-xs">Made with ❤️ for families</p>
+            </div>
+            
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+              <Link href="/help-center" className="text-neutral-400 hover:text-white text-sm">Help Center</Link>
+              <Link href="/safety-center" className="text-neutral-400 hover:text-white text-sm">Safety Center</Link>
+              <Link href="/community/toy-map" className="text-neutral-400 hover:text-white text-sm">Toy Map</Link>
+              <Link href="/resources/community-standards" className="text-neutral-400 hover:text-white text-sm">Community Standards</Link>
+            </div>
           </div>
         </div>
       </div>

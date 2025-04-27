@@ -17,6 +17,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { CookieConsent } from "@/components/ui/cookie-consent";
 
 // Resources Pages
 import CommunityGuidelines from "@/pages/resources/community-guidelines";
@@ -249,6 +250,7 @@ function App() {
         <AuthProvider>
           <Router />
           <Toaster />
+          <CookieConsent />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
