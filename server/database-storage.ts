@@ -262,13 +262,23 @@ export class DatabaseStorage implements IStorage {
         query = query.where(eq(toys.ageRange, filters.ageRange));
       }
       
-      // Search filter
+      // Search filter - enhanced to search title, description, and tags
       if (filters.search && typeof filters.search === 'string' && filters.search.trim() !== '') {
         const searchTerm = `%${filters.search.trim().toLowerCase()}%`;
+        const searchTermExact = filters.search.trim().toLowerCase();
+        
+        // Improved search that checks the title, description, and if the search term is in any tag
         query = query.where(
           or(
+            // Check title and description with LIKE for partial matches
             like(sql`LOWER(${toys.title})`, searchTerm),
-            like(sql`LOWER(${toys.description})`, searchTerm)
+            like(sql`LOWER(${toys.description})`, searchTerm),
+            // Check if any tag contains the search term
+            // This uses PostgreSQL JSON functions to check if any tag matches our search term
+            sql`EXISTS (
+              SELECT 1 FROM jsonb_array_elements_text(${toys.tags}::jsonb) tag 
+              WHERE LOWER(tag) LIKE ${searchTerm}
+            )`
           )
         );
       }

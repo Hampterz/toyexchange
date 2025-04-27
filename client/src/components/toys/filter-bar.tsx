@@ -552,30 +552,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           </div>
         </div>
         
-        {/* Divider */}
-        <div className="border-t border-gray-100 my-3 pt-2">
-          <h4 className="text-xs font-medium text-gray-500 mb-2">Common Locations:</h4>
-        </div>
-        
-        {/* Pre-defined locations */}
-        <div className="space-y-2">
-          {LOCATIONS.map(location => (
-            <label key={location} className="flex items-center">
-              <input 
-                type="checkbox" 
-                checked={filters.location.includes(location)}
-                onChange={(e) => {
-                  const newLocations = e.target.checked
-                    ? [...filters.location, location]
-                    : filters.location.filter(l => l !== location);
-                  handleFilterChange("location", newLocations);
-                }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
-              />
-              <span className="ml-2 text-sm text-blue-800">{location}</span>
-            </label>
-          ))}
-        </div>
+        {/* Location section now relies only on the Map and autocomplete */}
       </div>
       
       {/* Condition Filters */}
