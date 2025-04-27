@@ -61,14 +61,8 @@ export default function AuthPage() {
         await initializeGoogleAuth();
         googleAuthInitialized = true;
         
-        // Render Google buttons in containers
-        if (googleButtonRef.current) {
-          renderGoogleButton(googleButtonRef.current);
-        }
-        
-        if (registerGoogleButtonRef.current) {
-          renderGoogleButton(registerGoogleButtonRef.current);
-        }
+        // We're not using the Google native buttons anymore, just our custom ones
+        // Keeping this comment for reference in case we need to revert
       } catch (error) {
         console.error("Failed to initialize Google Auth:", error);
         toast({
@@ -88,6 +82,47 @@ export default function AuthPage() {
         if (googleUser) {
           console.log("Google user data:", googleUser);
           
+          // Try to get user's location
+          let location = "";
+          
+          try {
+            if (navigator.geolocation) {
+              // Create a promise from the geolocation API
+              const getPosition = () => new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                  position => resolve(position),
+                  error => reject(error),
+                  { timeout: 5000, maximumAge: 60000 }
+                );
+              });
+              
+              // Try to get location
+              const position = await getPosition() as GeolocationPosition;
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+              
+              // We have coordinates, now try to get a formatted address via reverse geocoding
+              const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+              
+              try {
+                const geocodeResponse = await fetch(geocodingUrl);
+                const geocodeData = await geocodeResponse.json();
+                
+                if (geocodeData.results && geocodeData.results.length > 0) {
+                  location = geocodeData.results[0].formatted_address;
+                  console.log("Got user location:", location);
+                }
+              } catch (geocodeError) {
+                console.error("Error during reverse geocoding:", geocodeError);
+                // Just use coordinates as a fallback
+                location = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+              }
+            }
+          } catch (geoError) {
+            console.error("Error getting user location:", geoError);
+            // Continue with no location - we'll prompt them for it later
+          }
+          
           try {
             // Call our backend API to create/login the user with Google credentials
             const res = await apiRequest('POST', '/api/google-auth', {
@@ -95,6 +130,7 @@ export default function AuthPage() {
               email: googleUser.email,
               name: googleUser.name,
               picture: googleUser.imageUrl,
+              location: location, // Add location if we have it
             });
             
             if (!res.ok) {
