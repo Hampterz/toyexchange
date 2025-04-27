@@ -34,8 +34,16 @@ interface GoogleUser {
   token: string;
 }
 
-// Client ID for the application - using environment variable with fallback
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID || '107759557190-0j8kms29569g55to0sv10i9ilig10qbv.apps.googleusercontent.com';
+// Client ID for the application from environment variable
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
+
+// Log Client ID availability for debugging (will show only if it exists, not the actual value)
+console.log(`Google OAuth Client ID is ${CLIENT_ID ? 'configured' : 'missing'}`);
+
+// Verify Client ID is available
+if (!CLIENT_ID) {
+  console.error('Missing Google OAuth Client ID. Set VITE_GOOGLE_OAUTH_CLIENT_ID environment variable.');
+}
 
 // Function to decode JWT token
 function decodeJWT(token: string): DecodedCredential | null {
