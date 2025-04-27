@@ -18,43 +18,7 @@ interface AddressAutocompleteProps {
   disabled?: boolean;
 }
 
-// Extend the window interface to include the google object and initialization function
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          Autocomplete: new (
-            input: HTMLInputElement,
-            options?: { types: string[]; fields: string[] }
-          ) => {
-            addListener: (event: string, callback: () => void) => void;
-            getPlace: () => { 
-              formatted_address?: string; 
-              place_id?: string;
-              geometry?: {
-                location?: {
-                  lat: () => number;
-                  lng: () => number;
-                }
-              }
-            };
-          };
-        };
-      };
-      accounts?: {
-        id: {
-          initialize: (config: any) => void;
-          renderButton: (parent: HTMLElement, options: any) => void;
-          prompt: (notification?: any) => void;
-          disableAutoSelect: () => void;
-          revoke: (hint: string, callback: () => void) => void;
-        };
-      };
-    };
-    initAutocomplete?: () => void;
-  }
-}
+// The window interface is extended in global.d.ts
 
 export function AddressAutocomplete({
   onAddressSelect,

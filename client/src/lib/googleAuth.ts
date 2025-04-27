@@ -1,9 +1,4 @@
-// Type definitions for Google Identity Services
-interface CredentialResponse {
-  credential: string;
-  clientId: string;
-  select_by: string;
-}
+// Import global type definitions from global.d.ts
 
 interface DecodedCredential {
   iss: string;
@@ -30,37 +25,6 @@ interface GoogleUser {
   familyName: string;
   imageUrl: string;
   token: string;
-}
-
-// Declare global window object with Google Identity Services
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          Autocomplete: new (
-            input: HTMLInputElement,
-            options?: { types: string[]; fields: string[] }
-          ) => {
-            addListener: (event: string, callback: () => void) => void;
-            getPlace: () => { formatted_address?: string; place_id?: string };
-          };
-        };
-      };
-      accounts?: {
-        id: {
-          initialize: (config: any) => void;
-          renderButton: (parent: HTMLElement, options: any) => void;
-          prompt: (notification?: any) => void;
-          disableAutoSelect: () => void;
-          revoke: (hint: string, callback: () => void) => void;
-        };
-      };
-    };
-    handleGoogleCredential?: (response: CredentialResponse) => void;
-    handleCredentialResponse?: (response: CredentialResponse) => void;
-    initAutocomplete?: () => void;
-  }
 }
 
 // Client ID for the application - using environment variable with fallback
