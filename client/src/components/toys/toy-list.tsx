@@ -19,8 +19,30 @@ export function ToyList({ filters = {} }: ToyListProps) {
   
   // Build query parameters
   const queryParams = Object.entries(combinedFilters)
-    .filter(([_, value]) => value !== "" && value !== "All Categories" && value !== "All Ages" && value !== "Any Condition")
-    .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+    .filter(([key, value]) => {
+      // Skip empty values and default/all options
+      if (value === "" || 
+          value === "All Categories" || 
+          value === "All Ages" || 
+          value === "Any Condition") {
+        return false;
+      }
+      
+      // For arrays, only include if they have items
+      if (Array.isArray(value) && value.length === 0) {
+        return false;
+      }
+
+      return true;
+    })
+    .map(([key, value]) => {
+      // Handle array values by creating multiple parameters with same key
+      if (Array.isArray(value)) {
+        return value.map(v => `${key}[]=${encodeURIComponent(String(v))}`).join('&');
+      }
+      // Handle single values
+      return `${key}=${encodeURIComponent(String(value))}`;
+    })
     .join("&");
   
   // Query toys from API

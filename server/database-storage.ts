@@ -17,7 +17,7 @@ import {
 import session from "express-session";
 import { IStorage, CommunityMetrics, MemStorage } from "./storage";
 import { db, pool, initDatabase } from "./db";
-import { eq, and, desc, sql, asc } from "drizzle-orm";
+import { eq, and, desc, sql, asc, or, inArray, like } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import { hashPassword } from "./auth";
 import createMemoryStore from "memorystore";
@@ -224,31 +224,115 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(toys).orderBy(desc(toys.createdAt));
     
     if (filters) {
-      if (filters.location && filters.location !== "any") {
+      // Location filter with array support
+      if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
+        // If there are multiple locations, we use the "in" operator
+        query = query.where(
+          inArray(toys.location, filters.location)
+        );
+      } else if (filters.location && typeof filters.location === 'string' && filters.location !== "any") {
+        // For backwards compatibility with single string values
         query = query.where(eq(toys.location, filters.location));
       }
       
-      if (filters.category && filters.category !== "all") {
+      // Category filter with array support
+      if (filters.category && Array.isArray(filters.category) && filters.category.length > 0) {
+        query = query.where(
+          inArray(toys.category, filters.category)
+        );
+      } else if (filters.category && typeof filters.category === 'string' && filters.category !== "all") {
         query = query.where(eq(toys.category, filters.category));
       }
       
-      if (filters.condition && filters.condition !== "all") {
+      // Condition filter with array support
+      if (filters.condition && Array.isArray(filters.condition) && filters.condition.length > 0) {
+        query = query.where(
+          inArray(toys.condition, filters.condition)
+        );
+      } else if (filters.condition && typeof filters.condition === 'string' && filters.condition !== "all") {
         query = query.where(eq(toys.condition, filters.condition));
       }
       
-      if (filters.ageRange && filters.ageRange !== "all") {
+      // Age range filter with array support
+      if (filters.ageRange && Array.isArray(filters.ageRange) && filters.ageRange.length > 0) {
+        query = query.where(
+          inArray(toys.ageRange, filters.ageRange)
+        );
+      } else if (filters.ageRange && typeof filters.ageRange === 'string' && filters.ageRange !== "all") {
         query = query.where(eq(toys.ageRange, filters.ageRange));
       }
       
-      if (filters.tags && filters.tags.length > 0) {
-        // This is a simplification - for proper tag filtering you'd need a more sophisticated approach
-        // Ideally with a JOIN if tags were in a separate table
-        // For now, we're simulating an "OR" query across tags
-        // Note: This won't work properly as-is and would need to be adjusted based on your schema
+      // Search filter
+      if (filters.search && typeof filters.search === 'string' && filters.search.trim() !== '') {
+        const searchTerm = `%${filters.search.trim().toLowerCase()}%`;
+        query = query.where(
+          or(
+            like(sql`LOWER(${toys.title})`, searchTerm),
+            like(sql`LOWER(${toys.description})`, searchTerm)
+          )
+        );
       }
+      
+      // Tags filter - we use OR logic for tags (any toy matching ANY of the tags)
+      if (filters.tags && Array.isArray(filters.tags) && filters.tags.length > 0) {
+        const tagConditions = filters.tags.map(tag => 
+          sql`${toys.tags}::jsonb @> ${JSON.stringify([tag])}::jsonb`
+        );
+        
+        if (tagConditions.length > 0) {
+          query = query.where(or(...tagConditions));
+        }
+      }
+
+      // Distance filter - we'll need to do post-processing for this
+      // since it requires calculating distances between points
     }
     
-    return query;
+    let result = await query;
+    
+    // If we need to filter by distance
+    if (filters && 
+        filters.distance && 
+        filters.latitude && 
+        filters.longitude && 
+        typeof filters.distance === 'number' && 
+        filters.distance > 0) {
+      // Filter toys by distance
+      result = result.filter(toy => {
+        if (!toy.latitude || !toy.longitude) return false;
+        
+        // Calculate the distance between the two points using the Haversine formula
+        const distance = this.calculateDistance(
+          parseFloat(filters.latitude), 
+          parseFloat(filters.longitude),
+          parseFloat(toy.latitude), 
+          parseFloat(toy.longitude)
+        );
+        
+        // Filter by miles (convert km to miles)
+        return distance <= filters.distance;
+      });
+    }
+    
+    return result;
+  }
+  
+  // Helper function to calculate distance between two points using the Haversine formula
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 3963.0; // Radius of the Earth in miles
+    const dLat = this.deg2rad(lat2 - lat1);
+    const dLon = this.deg2rad(lon2 - lon1);
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c; // Distance in miles
+    return distance;
+  }
+  
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI/180);
   }
 
   async getToysByUser(userId: number): Promise<Toy[]> {

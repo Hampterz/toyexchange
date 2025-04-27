@@ -412,3 +412,26 @@ export const insertSafetyTipSchema = createInsertSchema(safetyTips).pick({
 
 export type InsertSafetyTip = z.infer<typeof insertSafetyTipSchema>;
 export type SafetyTip = typeof safetyTips.$inferSelect;
+
+// Community metrics type
+export type CommunityMetrics = {
+  toysSaved: number;
+  familiesConnected: number;
+  sustainabilityImpact: number;
+  totalToys: number;
+  activeUsers: number;
+  successfulExchanges: number;
+};
+
+// Filter options for toy search
+export type FilterOptions = {
+  location: string[];
+  ageRange: string[];
+  category: string[];
+  condition: string[];
+  tags: string[];
+  search?: string;
+  distance?: number;
+  latitude?: number;
+  longitude?: number;
+};
