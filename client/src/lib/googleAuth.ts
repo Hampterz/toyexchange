@@ -92,7 +92,7 @@ const waitForGoogleLibrary = (timeout = 10000): Promise<void> => {
     const startTime = Date.now();
 
     const checkLibrary = () => {
-      if (window.google && window.google.accounts) {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
         console.log(`Google Identity Services loaded after ${Date.now() - startTime}ms`);
         resolve();
         return;
@@ -149,7 +149,7 @@ export const initializeGoogleAuth = async (): Promise<void> => {
 
 // Function to render Google Sign-In button
 export const renderGoogleButton = (element: HTMLElement): void => {
-  if (!window.google || !window.google.accounts) {
+  if (!window.google || !window.google.accounts || !window.google.accounts.id) {
     console.error('Google Identity Services not loaded when trying to render button');
     return;
   }
@@ -172,13 +172,13 @@ export const renderGoogleButton = (element: HTMLElement): void => {
 
 // Function to sign in with Google (prompt user to select account)
 export const signInWithGoogle = (): void => {
-  if (!window.google || !window.google.accounts) {
+  if (!window.google || !window.google.accounts || !window.google.accounts.id) {
     console.error('Google Identity Services not loaded when trying to sign in');
     return;
   }
   
   try {
-    window.google.accounts.id.prompt((notification) => {
+    window.google.accounts.id.prompt((notification: any) => {
       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
         console.error('Google Sign-In prompt not displayed:', notification.getNotDisplayedReason() || notification.getSkippedReason());
       } else {
@@ -193,7 +193,7 @@ export const signInWithGoogle = (): void => {
 // Function to sign out from Google
 export const signOutFromGoogle = (email: string): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (!window.google || !window.google.accounts) {
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
       console.error('Google Identity Services not loaded when trying to sign out');
       reject(new Error('Google Identity Services not loaded'));
       return;
