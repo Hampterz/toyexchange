@@ -108,7 +108,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     // Mobile version - compact dropdowns
     return (
       <div className="space-y-3 mb-4">
-        {/* Categories Dropdown */}
+        {/* Location Dropdown - Moved to top */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -117,29 +117,90 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               className="w-full justify-between text-left font-normal"
             >
               <div className="flex items-center">
-                <Grid className="mr-2 h-4 w-4 shrink-0" />
-                <span>Categories ({filters.category.length || 0})</span>
+                <MapPin className="mr-2 h-4 w-4 shrink-0" />
+                <span>Location ({filters.location.length || 0})</span>
               </div>
-              <span className="opacity-70">{filters.category.length > 0 ? `${filters.category.length} selected` : ""}</span>
+              <span className="opacity-70">{filters.location.length > 0 ? `${filters.location.length} selected` : ""}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
             <div className="max-h-60 overflow-auto p-2">
-              {CATEGORIES.map(category => (
-                <div 
-                  key={category}
-                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                  onClick={() => handleMultiSelectChange("category", category)}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={filters.category.includes(category)}
-                    readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
-                  />
-                  <span>{category}</span>
+              {/* Google Maps Address Autocomplete */}
+              <div className="mb-2">
+                <AddressAutocomplete
+                  placeholder=""
+                  className="w-full border-blue-200 focus-visible:ring-blue-700"
+                  onAddressSelect={(address, coordinates) => {
+                    // Add the selected address to the location filters
+                    if (address && !filters.location.includes(address)) {
+                      handleMultiSelectChange("location", address);
+                      
+                      // If we have coordinates, update the latitude and longitude
+                      if (coordinates) {
+                        handleFilterChange("latitude", coordinates.latitude);
+                        handleFilterChange("longitude", coordinates.longitude);
+                        
+                        // If distance isn't set yet, set a default
+                        if (!filters.distance) {
+                          handleFilterChange("distance", 25);
+                        }
+                      }
+                    }
+                  }}
+                />
+              </div>
+              
+              {/* Distance slider */}
+              <div className="mt-4 pt-2 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-medium text-gray-500">Distance: {filters.distance} miles</h4>
                 </div>
-              ))}
+                <Slider
+                  value={[filters.distance || 25]}
+                  min={1}
+                  max={100}
+                  step={1}
+                  className="mt-2"
+                  onValueChange={(value) => {
+                    handleFilterChange("distance", value[0]);
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>1 mile</span>
+                  <span>50 miles</span>
+                  <span>100 miles</span>
+                </div>
+              </div>
+              
+              {/* Selected Locations */}
+              <div className="mt-4 pt-2 border-t border-gray-100">
+                <h4 className="text-xs font-medium text-gray-500 mb-1">Selected Locations:</h4>
+                {filters.location.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic">No locations selected</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {filters.location.map(location => (
+                      <Badge 
+                        key={location} 
+                        variant="secondary"
+                        className="flex items-center gap-1 py-1 bg-blue-50"
+                      >
+                        <span className="text-xs max-w-[150px] truncate">{location}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newLocations = filters.location.filter(l => l !== location);
+                            handleFilterChange("location", newLocations);
+                          }}
+                          className="text-blue-500 hover:text-blue-700 ml-1"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -200,7 +261,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               {/* Google Maps Address Autocomplete */}
               <div className="mb-2">
                 <AddressAutocomplete
-                  placeholder="Search for a location..."
+                  placeholder=""
                   className="w-full border-blue-200 focus-visible:ring-blue-700"
                   onAddressSelect={(address, coordinates) => {
                     // Add the selected address to the location filters

@@ -22,7 +22,7 @@ interface AddressAutocompleteProps {
 
 export function AddressAutocomplete({
   onAddressSelect,
-  placeholder = "Enter your address",
+  placeholder = "",
   defaultValue = "",
   className,
   id,
