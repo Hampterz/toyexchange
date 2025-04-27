@@ -54,9 +54,19 @@ export function AddressAutocomplete({
   disabled
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = useState(defaultValue);
+  const [showFallbackMessage, setShowFallbackMessage] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+  // Use an effect to show the fallback message after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowFallbackMessage(!autocompleteRef.current);
+    }, 2000); // Show fallback message after 2 seconds if autocomplete not initialized
+    
+    return () => clearTimeout(timer);
+  }, [autocompleteRef.current]);
 
   // Load the Google Maps script on component mount
   useEffect(() => {
@@ -154,11 +164,18 @@ export function AddressAutocomplete({
 
   // Handle manual input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
     
-    // If the field is cleared or manually edited, call the callback with the current value
-    if (e.target.value === "") {
+    // If the field is cleared, call the callback with empty string
+    if (newValue === "") {
       onAddressSelect("");
+    } else {
+      // If Google Maps autocomplete isn't working, still update with manual input
+      // This ensures manual entry works even without API access
+      if (!autocompleteRef.current) {
+        onAddressSelect(newValue);
+      }
     }
   };
 
@@ -186,9 +203,9 @@ export function AddressAutocomplete({
         autoFocus={autoFocus}
         disabled={disabled}
       />
-      {apiKey ? null : (
-        <p className="text-xs text-red-500 mt-1">
-          No Google Maps API key available. Manual address entry only.
+      {!autocompleteRef.current && (
+        <p className="text-xs text-amber-500 mt-1">
+          Address autocomplete unavailable. You can still type addresses manually.
         </p>
       )}
     </div>
