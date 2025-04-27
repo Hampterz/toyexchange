@@ -79,24 +79,43 @@ export default function AuthPage() {
     };
     
     // Process Google credential response
-    const processGoogleCredential = (response: any) => {
+    const processGoogleCredential = async (response: any) => {
       try {
         setIsGoogleSigningIn(true);
         const googleUser = handleCredential(response);
         
         if (googleUser) {
-          // Show a toast notification
-          toast({
-            title: "Google Sign-in Successful",
-            description: `Welcome, ${googleUser.name || 'User'}!`,
-            variant: "default",
-          });
+          console.log("Google user data:", googleUser);
           
-          // For now, just log and redirect (you'd normally call your backend here)
-          console.log("Google sign-in successful:", googleUser);
-          
-          // Redirect to home page
-          navigate('/');
+          try {
+            // Call our backend API to create/login the user with Google credentials
+            const res = await apiRequest('POST', '/api/google-auth', {
+              id: googleUser.id,
+              email: googleUser.email,
+              name: googleUser.name,
+              picture: googleUser.imageUrl,
+            });
+            
+            if (!res.ok) {
+              throw new Error(`Server error: ${res.status}`);
+            }
+            
+            // Get the authenticated user from response
+            const userData = await res.json();
+            
+            // Show success notification
+            toast({
+              title: "Google Sign-in Successful",
+              description: `Welcome, ${userData.name || 'User'}!`,
+              variant: "default",
+            });
+            
+            // Redirect to home page
+            navigate('/');
+          } catch (apiError) {
+            console.error("API error during Google auth:", apiError);
+            throw new Error("Failed to authenticate with server");
+          }
         } else {
           throw new Error("Could not process Google credentials");
         }

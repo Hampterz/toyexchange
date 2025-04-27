@@ -45,6 +45,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
   location: true,
   profilePicture: true,
+  googleId: true,
   latitude: true,
   longitude: true,
   preferredMeetupLocations: true,
