@@ -139,7 +139,13 @@ export function AddressAutocomplete({
 
   // Initialize the autocomplete functionality
   const initializeAutocomplete = () => {
-    if (!inputRef.current || !window.google || !window.google.maps || !window.google.maps.places) return;
+    if (!inputRef.current || !window.google || !window.google.maps || !window.google.maps.places) {
+      // If Google Maps Places isn't available, make sure the input works manually
+      if (inputRef.current) {
+        inputRef.current.disabled = false;
+      }
+      return;
+    }
     
     try {
       // Create the autocomplete instance
@@ -157,8 +163,14 @@ export function AddressAutocomplete({
           onAddressSelect(place.formatted_address, place.place_id);
         }
       });
+      
+      // Successfully initialized - hide the fallback message
+      setShowFallbackMessage(false);
     } catch (error) {
       console.error("Error initializing Google Maps Autocomplete:", error);
+      if (inputRef.current) {
+        inputRef.current.disabled = false;
+      }
     }
   };
 
@@ -203,7 +215,7 @@ export function AddressAutocomplete({
         autoFocus={autoFocus}
         disabled={disabled}
       />
-      {!autocompleteRef.current && (
+      {showFallbackMessage && (
         <p className="text-xs text-amber-500 mt-1">
           Address autocomplete unavailable. You can still type addresses manually.
         </p>
