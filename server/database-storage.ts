@@ -297,9 +297,12 @@ export class DatabaseStorage implements IStorage {
         filters.longitude && 
         typeof filters.distance === 'number' && 
         filters.distance > 0) {
-      // Filter toys by distance
-      result = result.filter(toy => {
-        if (!toy.latitude || !toy.longitude) return false;
+      
+      // Add distance property to each toy and filter by distance
+      const toysWithDistance = result.map(toy => {
+        if (!toy.latitude || !toy.longitude) {
+          return { ...toy, distance: null };
+        }
         
         // Calculate the distance between the two points using the Haversine formula
         const distance = this.calculateDistance(
@@ -309,8 +312,14 @@ export class DatabaseStorage implements IStorage {
           parseFloat(toy.longitude)
         );
         
-        // Filter by miles (convert km to miles)
-        return distance <= filters.distance;
+        // Add the distance to the toy object
+        return { ...toy, distance };
+      });
+      
+      // Filter by distance
+      result = toysWithDistance.filter(toy => {
+        if (toy.distance === null) return false;
+        return toy.distance <= filters.distance;
       });
     }
     

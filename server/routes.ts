@@ -44,9 +44,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.query.search) filters.search = req.query.search as string;
       if (req.query.isAvailable) filters.isAvailable = req.query.isAvailable === "true";
       
+      // Handle location-based distance filtering
+      if (req.query.latitude && req.query.longitude) {
+        filters.latitude = parseFloat(req.query.latitude as string);
+        filters.longitude = parseFloat(req.query.longitude as string);
+        
+        // Default distance is 25 miles if not specified
+        filters.distance = req.query.distance ? 
+          parseFloat(req.query.distance as string) : 
+          25;
+      }
+      
       const toys = await storage.getToys(filters);
       res.json(toys);
     } catch (error) {
+      console.error("Error fetching toys:", error);
       res.status(500).json({ message: "Failed to fetch toys" });
     }
   });

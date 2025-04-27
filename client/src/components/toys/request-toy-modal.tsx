@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Toy } from "@shared/schema";
+import { Toy, ToyWithDistance } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,7 @@ import { insertToyRequestSchema } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 
 interface RequestToyModalProps {
-  toy: Toy;
+  toy: ToyWithDistance;
   isOpen: boolean;
   onClose: () => void;
 }

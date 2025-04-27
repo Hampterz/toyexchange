@@ -46,11 +46,11 @@ export function ToyList({ filters = {} }: ToyListProps) {
     .join("&");
   
   // Query toys from API
-  const { data: toys, isLoading, error } = useQuery<Toy[]>({
+  const { data: toys, isLoading, error } = useQuery<ToyWithDistance[]>({
     queryKey: [`/api/toys?${queryParams}`],
   });
 
-  const handleRequestClick = (toy: Toy) => {
+  const handleRequestClick = (toy: ToyWithDistance) => {
     setSelectedToy(toy);
     setIsRequestModalOpen(true);
   };
