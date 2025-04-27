@@ -249,42 +249,38 @@ export default function AdminDashboard() {
                   <CardDescription>Latest platform interactions</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Event</TableHead>
-                        <TableHead>User</TableHead>
-                        <TableHead>Time</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium">New Toy Listed</TableCell>
-                        <TableCell>Emma Wilson</TableCell>
-                        <TableCell>2 hours ago</TableCell>
-                      </TableRow>
-                      <TableCell className="font-medium">Exchange Completed</TableCell>
-                        <TableCell>Michael Brown</TableCell>
-                        <TableCell>3 hours ago</TableCell>
-                      <TableRow>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">New User Registered</TableCell>
-                        <TableCell>James Miller</TableCell>
-                        <TableCell>5 hours ago</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Toy Requested</TableCell>
-                        <TableCell>Sophia Williams</TableCell>
-                        <TableCell>6 hours ago</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">New Report Filed</TableCell>
-                        <TableCell>Alex Johnson</TableCell>
-                        <TableCell>8 hours ago</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                  {users.length === 0 && toys.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-blue-600">No activity recorded yet.</p>
+                      <p className="text-sm text-blue-500 mt-2">Activity will appear here as users interact with the platform.</p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Event</TableHead>
+                          <TableHead>User</TableHead>
+                          <TableHead>Time</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {users.slice(0, 3).map((user, index) => (
+                          <TableRow key={`user-${user.id}`}>
+                            <TableCell className="font-medium">New User Registered</TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                          </TableRow>
+                        ))}
+                        {toys.slice(0, 3).map((toy, index) => (
+                          <TableRow key={`toy-${toy.id}`}>
+                            <TableCell className="font-medium">New Toy Listed</TableCell>
+                            <TableCell>{users.find(u => u.id === toy.userId)?.name || 'Unknown User'}</TableCell>
+                            <TableCell>{new Date(toy.createdAt).toLocaleString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
               
