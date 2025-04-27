@@ -137,7 +137,8 @@ export const toys = pgTable("toys", {
   longitude: text("longitude"),
   tags: jsonb("tags").notNull().$type<string[]>().default([]),
   isAvailable: boolean("is_available").default(true),
-  status: text("status").notNull().default("active"), // active, traded, deleted
+  status: text("status").notNull().default("active"), // active, traded, sold, deleted
+  soldDate: timestamp("sold_date"), // Date when the toy was marked as sold
   recommendedAges: jsonb("recommended_ages").$type<number[]>(),
   safetyNotes: text("safety_notes"),
   videos: jsonb("videos").default([]).$type<string[]>(),
@@ -158,6 +159,7 @@ export const insertToySchema = createInsertSchema(toys).pick({
   tags: true,
   isAvailable: true,
   status: true,
+  soldDate: true,
   recommendedAges: true,
   safetyNotes: true,
   videos: true,
@@ -440,3 +442,62 @@ export type FilterOptions = {
   latitude?: number;
   longitude?: number;
 };
+
+// Community Challenge Board
+export const challenges = pgTable("challenges", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  targetCount: integer("target_count").notNull(), // Number of toys needed
+  currentCount: integer("current_count").default(0), // Current progress
+  category: text("category").notNull(), // e.g., "Summer toys", "Educational toys", "Baby toys"
+  ageRange: text("age_range").notNull(), // Target age range for the toys
+  beneficiary: text("beneficiary").notNull(), // Who will receive the toys
+  startDate: timestamp("start_date").notNull().defaultNow(),
+  endDate: timestamp("end_date").notNull(),
+  status: text("status").notNull().default("active"), // active, completed, canceled
+  imageUrl: text("image_url"), // Optional image for the challenge
+  createdBy: integer("created_by").notNull(), // Admin/moderator who created the challenge
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const insertChallengeSchema = createInsertSchema(challenges).pick({
+  title: true,
+  description: true,
+  targetCount: true,
+  currentCount: true,
+  category: true,
+  ageRange: true,
+  beneficiary: true,
+  startDate: true,
+  endDate: true,
+  status: true,
+  imageUrl: true,
+  createdBy: true,
+});
+
+export type InsertChallenge = z.infer<typeof insertChallengeSchema>;
+export type Challenge = typeof challenges.$inferSelect;
+
+// Challenge Participants - Users who've contributed to a challenge
+export const challengeParticipants = pgTable("challenge_participants", {
+  id: serial("id").primaryKey(),
+  challengeId: integer("challenge_id").notNull(),
+  userId: integer("user_id").notNull(),
+  toyId: integer("toy_id").notNull(), // The toy that was donated
+  dateJoined: timestamp("date_joined").defaultNow(),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  contributionNotes: text("contribution_notes"), // Optional notes about the contribution
+});
+
+export const insertChallengeParticipantSchema = createInsertSchema(challengeParticipants).pick({
+  challengeId: true,
+  userId: true,
+  toyId: true,
+  status: true,
+  contributionNotes: true,
+});
+
+export type InsertChallengeParticipant = z.infer<typeof insertChallengeParticipantSchema>;
+export type ChallengeParticipant = typeof challengeParticipants.$inferSelect;
