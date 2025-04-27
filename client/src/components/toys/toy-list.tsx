@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Toy } from "@shared/schema";
+import { Toy, ToyWithDistance } from "@shared/schema";
 import { ToyCard } from "./toy-card";
 import { RequestToyModal } from "./request-toy-modal";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ interface ToyListProps {
 }
 
 export function ToyList({ filters = {} }: ToyListProps) {
-  const [selectedToy, setSelectedToy] = useState<Toy | null>(null);
+  const [selectedToy, setSelectedToy] = useState<ToyWithDistance | null>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [visibleToys, setVisibleToys] = useState(8); // Initial number of toys to show
   

@@ -226,6 +226,11 @@ export type User = typeof users.$inferSelect;
 export type InsertToy = z.infer<typeof insertToySchema>;
 export type Toy = typeof toys.$inferSelect;
 
+// Extended Toy type with additional runtime properties
+export interface ToyWithDistance extends Toy {
+  distance?: number; // Distance in miles from the user's selected location
+}
+
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
 

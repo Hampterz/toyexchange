@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Heart, MapPin, ChevronLeft, ChevronRight, Calendar, MapPinIcon, Star, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Toy } from "@shared/schema";
+import { Toy, ToyWithDistance } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -13,8 +13,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SocialShareButtons } from "@/components/social/social-share-buttons";
 
 interface ToyCardProps {
-  toy: Toy;
-  onRequestClick: (toy: Toy) => void;
+  toy: ToyWithDistance;
+  onRequestClick: (toy: ToyWithDistance) => void;
 }
 
 export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
