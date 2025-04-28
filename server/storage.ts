@@ -12,6 +12,8 @@ import {
   meetupLocations, type MeetupLocation, type InsertMeetupLocation,
   toyHistories, type ToyHistory, type InsertToyHistory,
   safetyTips, type SafetyTip, type InsertSafetyTip,
+  wishes, type Wish, type InsertWish,
+  wishOffers, type WishOffer, type InsertWishOffer,
   BADGES 
 } from "@shared/schema";
 import session from "express-session";
@@ -171,6 +173,20 @@ export interface IStorage {
   // Community metrics
   getCommunityMetrics(): Promise<CommunityMetrics>;
   updateCommunityMetrics(metrics: Partial<CommunityMetrics>): Promise<CommunityMetrics>;
+
+  // Wishes system
+  getWish(id: number): Promise<Wish | undefined>;
+  getWishes(filters?: Record<string, any>): Promise<Wish[]>;
+  getWishesByUser(userId: number): Promise<Wish[]>;
+  createWish(wish: InsertWish): Promise<Wish>;
+  updateWish(id: number, wish: Partial<Wish>): Promise<Wish | undefined>;
+  deleteWish(id: number): Promise<boolean>;
+
+  // Wish offers system
+  getWishOffer(id: number): Promise<WishOffer | undefined>;
+  getWishOffersByWish(wishId: number): Promise<WishOffer[]>;
+  createWishOffer(offer: InsertWishOffer): Promise<WishOffer>;
+  updateWishOfferStatus(id: number, status: string): Promise<WishOffer | undefined>;
 
   // Session store
   sessionStore: session.SessionStore;

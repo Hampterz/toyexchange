@@ -14,7 +14,9 @@ import {
   insertReportSchema,
   insertMeetupLocationSchema,
   insertToyHistorySchema,
-  insertSafetyTipSchema
+  insertSafetyTipSchema,
+  insertWishSchema,
+  insertWishOfferSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1256,6 +1258,224 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedTip);
     } catch (error) {
       res.status(500).json({ message: "Failed to update safety tip" });
+    }
+  });
+
+  // WISHES ROUTES
+  // Get all wishes with optional filters
+  app.get("/api/wishes", async (req, res) => {
+    try {
+      const filters: Record<string, any> = {};
+      
+      // Parse query parameters
+      if (req.query.location) filters.location = req.query.location as string;
+      if (req.query.ageRange) filters.ageRange = req.query.ageRange as string;
+      if (req.query.category) filters.category = req.query.category as string;
+      if (req.query.search) filters.search = req.query.search as string;
+      
+      // Handle location-based distance filtering
+      if (req.query.latitude && req.query.longitude) {
+        filters.latitude = parseFloat(req.query.latitude as string);
+        filters.longitude = parseFloat(req.query.longitude as string);
+        
+        // Default distance is 10 miles if not specified
+        filters.distance = req.query.distance ? 
+          parseFloat(req.query.distance as string) : 
+          10;
+      }
+      
+      const wishes = await storage.getWishes(filters);
+      res.json(wishes);
+    } catch (error) {
+      console.error("Error fetching wishes:", error);
+      res.status(500).json({ message: "Failed to fetch wishes" });
+    }
+  });
+
+  // Get a specific wish
+  app.get("/api/wishes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const wish = await storage.getWish(id);
+      
+      if (!wish) {
+        return res.status(404).json({ message: "Wish not found" });
+      }
+      
+      res.json(wish);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch wish" });
+    }
+  });
+
+  // Create a new wish
+  app.post("/api/wishes", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const wishData = { ...req.body, userId };
+
+      const validatedData = insertWishSchema.parse(wishData);
+      const newWish = await storage.createWish(validatedData);
+      
+      res.status(201).json(newWish);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid wish data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create wish" });
+    }
+  });
+
+  // Update a wish
+  app.patch("/api/wishes/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const wish = await storage.getWish(id);
+      
+      if (!wish) {
+        return res.status(404).json({ message: "Wish not found" });
+      }
+      
+      if (wish.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to update this wish" });
+      }
+      
+      const updatedWish = await storage.updateWish(id, req.body);
+      res.json(updatedWish);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update wish" });
+    }
+  });
+
+  // Delete a wish
+  app.delete("/api/wishes/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const wish = await storage.getWish(id);
+      
+      if (!wish) {
+        return res.status(404).json({ message: "Wish not found" });
+      }
+      
+      if (wish.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to delete this wish" });
+      }
+      
+      await storage.deleteWish(id);
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete wish" });
+    }
+  });
+
+  // Get wishes by user
+  app.get("/api/users/:userId/wishes", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const wishes = await storage.getWishesByUser(userId);
+      res.json(wishes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user's wishes" });
+    }
+  });
+
+  // WISH OFFERS ROUTES
+  // Get offers for a wish
+  app.get("/api/wishes/:wishId/offers", ensureAuthenticated, async (req, res) => {
+    try {
+      const wishId = parseInt(req.params.wishId);
+      const wish = await storage.getWish(wishId);
+      
+      if (!wish) {
+        return res.status(404).json({ message: "Wish not found" });
+      }
+      
+      // Only allow wish creator to see all offers
+      if (wish.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to view these offers" });
+      }
+      
+      const offers = await storage.getWishOffersByWish(wishId);
+      res.json(offers);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch wish offers" });
+    }
+  });
+
+  // Create a wish offer
+  app.post("/api/wishes/:wishId/offer", ensureAuthenticated, async (req, res) => {
+    try {
+      const wishId = parseInt(req.params.wishId);
+      const offererId = req.user!.id;
+      
+      const wish = await storage.getWish(wishId);
+      if (!wish) {
+        return res.status(404).json({ message: "Wish not found" });
+      }
+      
+      if (wish.userId === offererId) {
+        return res.status(400).json({ message: "You cannot offer to your own wish" });
+      }
+      
+      // Check if a pending offer already exists
+      const existingOffers = await storage.getWishOffersByWish(wishId);
+      const alreadyOffered = existingOffers.some(
+        offer => offer.offererId === offererId && offer.status === "pending"
+      );
+      
+      if (alreadyOffered) {
+        return res.status(400).json({ message: "You already have a pending offer for this wish" });
+      }
+      
+      const offerData = {
+        ...req.body,
+        wishId,
+        offererId,
+        status: "pending"
+      };
+
+      const validatedData = insertWishOfferSchema.parse(offerData);
+      const newOffer = await storage.createWishOffer(validatedData);
+      
+      res.status(201).json(newOffer);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid offer data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create offer" });
+    }
+  });
+
+  // Update a wish offer status
+  app.patch("/api/wish-offers/:id/status", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || !["accepted", "rejected", "completed"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      
+      const offer = await storage.getWishOffer(id);
+      if (!offer) {
+        return res.status(404).json({ message: "Offer not found" });
+      }
+      
+      const wish = await storage.getWish(offer.wishId);
+      if (!wish || wish.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to update this offer" });
+      }
+      
+      const updatedOffer = await storage.updateWishOfferStatus(id, status);
+      
+      // If accepted, update wish status to fulfilled
+      if (status === "accepted") {
+        await storage.updateWish(offer.wishId, { status: "fulfilled" });
+      }
+      
+      res.json(updatedOffer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update offer status" });
     }
   });
 
