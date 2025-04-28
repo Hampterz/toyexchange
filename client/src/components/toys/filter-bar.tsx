@@ -108,102 +108,83 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     // Mobile version - compact dropdowns
     return (
       <div className="space-y-3 mb-4">
-        {/* Location Dropdown - Moved to top */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              className="w-full justify-between text-left font-normal"
-            >
-              <div className="flex items-center">
-                <MapPin className="mr-2 h-4 w-4 shrink-0" />
-                <span>Location ({filters.location.length || 0})</span>
-              </div>
-              <span className="opacity-70">{filters.location.length > 0 ? `${filters.location.length} selected` : ""}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
-            <div className="max-h-60 overflow-auto p-2">
-              {/* Google Maps Address Autocomplete */}
-              <div className="mb-2">
-                <AddressAutocomplete
-                  placeholder="Enter a location..."
-                  className="w-full border-blue-200 focus-visible:ring-blue-700"
-                  onAddressSelect={(address, coordinates) => {
-                    // Add the selected address to the location filters
-                    if (address && !filters.location.includes(address)) {
-                      handleMultiSelectChange("location", address);
-                      
-                      // If we have coordinates, update the latitude and longitude
-                      if (coordinates) {
-                        handleFilterChange("latitude", coordinates.latitude);
-                        handleFilterChange("longitude", coordinates.longitude);
-                        
-                        // If distance isn't set yet, set a default
-                        if (!filters.distance) {
-                          handleFilterChange("distance", 25);
-                        }
-                      }
+        {/* Direct Location Search - Moved to top */}
+        <div className="mb-3">
+          <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
+            <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
+            <AddressAutocomplete
+              placeholder="Search for a location..."
+              className="w-full border-none focus-visible:ring-0 p-0"
+              onAddressSelect={(address, coordinates) => {
+                // Add the selected address to the location filters
+                if (address && !filters.location.includes(address)) {
+                  handleMultiSelectChange("location", address);
+                  
+                  // If we have coordinates, update the latitude and longitude
+                  if (coordinates) {
+                    handleFilterChange("latitude", coordinates.latitude);
+                    handleFilterChange("longitude", coordinates.longitude);
+                    
+                    // If distance isn't set yet, set a default
+                    if (!filters.distance) {
+                      handleFilterChange("distance", 25);
                     }
-                  }}
-                />
-              </div>
-              
-              {/* Distance slider */}
-              <div className="mt-4 pt-2 border-t border-gray-100">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-xs font-medium text-gray-500">Distance: {filters.distance} miles</h4>
-                </div>
-                <Slider
-                  value={[filters.distance || 25]}
-                  min={1}
-                  max={100}
-                  step={1}
-                  className="mt-2"
-                  onValueChange={(value) => {
-                    handleFilterChange("distance", value[0]);
-                  }}
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>1 mile</span>
-                  <span>50 miles</span>
-                  <span>100 miles</span>
-                </div>
-              </div>
-              
-              {/* Selected Locations */}
-              <div className="mt-4 pt-2 border-t border-gray-100">
-                <h4 className="text-xs font-medium text-gray-500 mb-1">Selected Locations:</h4>
-                {filters.location.length === 0 ? (
-                  <p className="text-xs text-gray-400 italic">No locations selected</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {filters.location.map(location => (
-                      <Badge 
-                        key={location} 
-                        variant="secondary"
-                        className="flex items-center gap-1 py-1 bg-blue-50"
-                      >
-                        <span className="text-xs max-w-[150px] truncate">{location}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const newLocations = filters.location.filter(l => l !== location);
-                            handleFilterChange("location", newLocations);
-                          }}
-                          className="text-blue-500 hover:text-blue-700 ml-1"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                  }
+                }
+              }}
+            />
+          </div>
+          
+          {/* Distance slider - directly visible */}
+          <div className="mt-3 mb-3 px-1">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xs font-medium text-blue-700">Distance around me</h4>
+              <span className="text-xs font-medium text-blue-700">{filters.distance} miles</span>
+            </div>
+            <Slider
+              value={[filters.distance || 25]}
+              min={1}
+              max={100}
+              step={1}
+              className="mt-1"
+              onValueChange={(value) => {
+                handleFilterChange("distance", value[0]);
+              }}
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>1 mi</span>
+              <span>50 mi</span>
+              <span>100 mi</span>
+            </div>
+          </div>
+          
+          {/* Selected Locations */}
+          {filters.location.length > 0 && (
+            <div className="mt-2">
+              <div className="flex flex-wrap gap-1">
+                {filters.location.map(location => (
+                  <Badge 
+                    key={location} 
+                    variant="secondary"
+                    className="flex items-center gap-1 py-1 bg-blue-50"
+                  >
+                    <span className="text-xs max-w-[150px] truncate">{location}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newLocations = filters.location.filter(l => l !== location);
+                        handleFilterChange("location", newLocations);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 ml-1"
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                ))}
               </div>
             </div>
-          </PopoverContent>
-        </Popover>
+          )}
+        </div>
         
         {/* Age Range Dropdown */}
         <Popover>
