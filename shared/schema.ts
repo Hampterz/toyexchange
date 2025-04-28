@@ -12,12 +12,15 @@ export const users = pgTable("users", {
   location: text("location").notNull(),
   profilePicture: text("profile_picture"),
   googleId: text("google_id").unique(),
+  bio: text("bio"), // Added for profile enhancement
   
   // Sustainability metrics
   toysShared: integer("toys_shared").default(0),
   successfulExchanges: integer("successful_exchanges").default(0),
   sustainabilityScore: integer("sustainability_score").default(0),
   currentBadge: text("current_badge").default("Newcomer"),
+  totalToysPosted: integer("total_toys_posted").default(0), // For profile statistics
+  totalToysTraded: integer("total_toys_traded").default(0), // For profile statistics
   
   // Additional user metrics for gamification
   points: integer("points").default(0),
@@ -34,6 +37,12 @@ export const users = pgTable("users", {
   
   // Notification preferences
   notificationPreferences: jsonb("notification_preferences"),
+  
+  // User blocking
+  blockedUsers: jsonb("blocked_users").$type<number[]>().default([]), // IDs of blocked users
+  
+  // Early supporter badge
+  isEarlySupporter: boolean("is_early_supporter").default(false),
   
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -136,12 +145,14 @@ export const toys = pgTable("toys", {
   latitude: text("latitude"),
   longitude: text("longitude"),
   tags: jsonb("tags").notNull().$type<string[]>().default([]),
+  customTags: jsonb("custom_tags").$type<string[]>().default([]), // Custom user-created tags
   isAvailable: boolean("is_available").default(true),
-  status: text("status").notNull().default("active"), // active, traded, sold, deleted
+  status: text("status").notNull().default("active"), // active, traded, sold, deleted, archived (soft delete)
   soldDate: timestamp("sold_date"), // Date when the toy was marked as sold
   recommendedAges: jsonb("recommended_ages").$type<number[]>(),
   safetyNotes: text("safety_notes"),
   videos: jsonb("videos").default([]).$type<string[]>(),
+  scheduledPublishDate: timestamp("scheduled_publish_date"), // For scheduled listings
   createdAt: timestamp("created_at").defaultNow(),
 });
 
