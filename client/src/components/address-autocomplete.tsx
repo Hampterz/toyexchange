@@ -201,6 +201,11 @@ export function AddressAutocomplete({
         required={required}
         autoFocus={autoFocus}
         disabled={disabled}
+        autoComplete="street-address"
+        spellCheck="false"
+        aria-label="Enter your address"
+        // Make mobile keyboard more suitable for address entry
+        inputMode="text"
       />
       {showFallbackMessage && (
         <p className="text-xs text-amber-500 mt-1">

@@ -562,12 +562,17 @@ export default function AuthPage() {
             </div>
             
             {/* Google account selector button container */}
-            <div 
-              id="google-signin-button" 
-              ref={googleButtonRef}
-              className="w-full h-14 flex justify-center items-center"
-              aria-label="Sign in with Google"
-            ></div>
+            <div className="px-2 sm:px-0">
+              <div 
+                id="google-signin-button" 
+                ref={googleButtonRef}
+                className="w-full h-14 flex justify-center items-center shadow-sm rounded-md hover:shadow-md transition-shadow"
+                aria-label="Sign in with Google"
+              ></div>
+              <p className="text-xs text-center text-blue-500 mt-2">
+                Works on both mobile and desktop devices
+              </p>
+            </div>
           </div>
         </div>
         
