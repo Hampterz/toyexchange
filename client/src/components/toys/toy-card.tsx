@@ -190,8 +190,10 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       {/* Confetti effect when marking a toy as sold */}
       {showConfetti && <ConfettiEffect duration={3000} numberOfPieces={300} />}
       <div 
-        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer touch-manipulation"
         onClick={() => setIsExpanded(true)}
+        role="button"
+        aria-label={`View details for ${toy.title}`}
       >
         <div className="relative pb-[75%] bg-neutral-100">
           {mainImage ? (
@@ -199,6 +201,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               src={mainImage} 
               alt={toy.title} 
               className="absolute h-full w-full object-cover transition group-hover:scale-105" 
+              loading="lazy"
             />
           ) : (
             <div className="absolute h-full w-full flex items-center justify-center text-neutral-400">
@@ -344,10 +347,10 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
 
       {/* Expanded Toy Detail Dialog */}
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+        <DialogContent className="max-w-4xl p-0 overflow-hidden mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto sm:overflow-y-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Image/Video Gallery */}
-            <div className="relative bg-black h-[300px] md:h-full min-h-[300px]">
+            <div className="relative bg-black h-[250px] sm:h-[300px] md:h-full min-h-[250px] sm:min-h-[300px]">
               {!viewingVideos && toy.images && toy.images.length > 0 ? (
                 <div className="w-full h-full relative">
                   <img 

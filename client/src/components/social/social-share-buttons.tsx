@@ -30,8 +30,38 @@ export function SocialShareButtons({ url, title, description = "" }: SocialShare
     });
   };
   
+  // Check if the Web Share API is supported
+  const isWebShareSupported = () => {
+    return navigator.share !== undefined;
+  };
+
+  // Handle sharing with Web Share API (mobile devices)
+  const handleNativeShare = async () => {
+    try {
+      await navigator.share({
+        title: title,
+        text: description,
+        url: url,
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-2">
+      {isWebShareSupported() && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white text-primary hover:bg-primary hover:text-white border-primary"
+          onClick={handleNativeShare}
+        >
+          <span className="mr-1">Share</span>
+          <i className="fas fa-share-alt text-xs"></i>
+        </Button>
+      )}
+      
       <TooltipProvider>
         {/* Facebook */}
         <Tooltip>
