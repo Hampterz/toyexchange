@@ -12,15 +12,12 @@ export const users = pgTable("users", {
   location: text("location").notNull(),
   profilePicture: text("profile_picture"),
   googleId: text("google_id").unique(),
-  bio: text("bio"), // Added for profile enhancement
   
   // Sustainability metrics
   toysShared: integer("toys_shared").default(0),
   successfulExchanges: integer("successful_exchanges").default(0),
   sustainabilityScore: integer("sustainability_score").default(0),
   currentBadge: text("current_badge").default("Newcomer"),
-  totalToysPosted: integer("total_toys_posted").default(0), // For profile statistics
-  totalToysTraded: integer("total_toys_traded").default(0), // For profile statistics
   
   // Additional user metrics for gamification
   points: integer("points").default(0),
@@ -37,12 +34,6 @@ export const users = pgTable("users", {
   
   // Notification preferences
   notificationPreferences: jsonb("notification_preferences"),
-  
-  // User blocking
-  blockedUsers: jsonb("blocked_users").$type<number[]>().default([]), // IDs of blocked users
-  
-  // Early supporter badge
-  isEarlySupporter: boolean("is_early_supporter").default(false),
   
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -145,14 +136,12 @@ export const toys = pgTable("toys", {
   latitude: text("latitude"),
   longitude: text("longitude"),
   tags: jsonb("tags").notNull().$type<string[]>().default([]),
-  customTags: jsonb("custom_tags").$type<string[]>().default([]), // Custom user-created tags
   isAvailable: boolean("is_available").default(true),
   status: text("status").notNull().default("active"), // active, traded, sold, deleted, archived (soft delete)
   soldDate: timestamp("sold_date"), // Date when the toy was marked as sold
   recommendedAges: jsonb("recommended_ages").$type<number[]>(),
   safetyNotes: text("safety_notes"),
   videos: jsonb("videos").default([]).$type<string[]>(),
-  scheduledPublishDate: timestamp("scheduled_publish_date"), // For scheduled listings
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -512,3 +501,42 @@ export const insertChallengeParticipantSchema = createInsertSchema(challengePart
 
 export type InsertChallengeParticipant = z.infer<typeof insertChallengeParticipantSchema>;
 export type ChallengeParticipant = typeof challengeParticipants.$inferSelect;
+
+// Saved Searches - for users to save and get notifications on search criteria
+export const savedSearches = pgTable("saved_searches", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(), // User-friendly name for the search
+  searchParams: jsonb("search_params").notNull().$type<FilterOptions>(), // Store the filter options
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+  lastNotified: timestamp("last_notified"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertSavedSearchSchema = createInsertSchema(savedSearches).pick({
+  userId: true,
+  name: true,
+  searchParams: true,
+  notificationsEnabled: true,
+});
+
+export type InsertSavedSearch = z.infer<typeof insertSavedSearchSchema>;
+export type SavedSearch = typeof savedSearches.$inferSelect;
+
+// User blocking table - to store user blocking relationships
+export const userBlocks = pgTable("user_blocks", {
+  id: serial("id").primaryKey(),
+  blockerId: integer("blocker_id").notNull(), // User who initiated the block
+  blockedId: integer("blocked_id").notNull(), // User who is blocked
+  reason: text("reason"), // Optional reason for the block
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertUserBlockSchema = createInsertSchema(userBlocks).pick({
+  blockerId: true,
+  blockedId: true,
+  reason: true,
+});
+
+export type InsertUserBlock = z.infer<typeof insertUserBlockSchema>;
+export type UserBlock = typeof userBlocks.$inferSelect;
