@@ -140,7 +140,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <div className="mt-3 mb-3 px-1">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-medium text-blue-700">Distance around me</h4>
-              <span className="text-xs font-medium text-blue-700">{filters.distance} miles</span>
+              <span className="text-xs font-medium text-blue-700">{filters.distance || 10} miles</span>
             </div>
             <Slider
               value={[filters.distance || 10]}
@@ -451,7 +451,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mt-4 mb-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-medium text-blue-700">Search radius</h4>
-            <span className="text-sm font-medium text-blue-700">{filters.distance} miles</span>
+            <span className="text-sm font-medium text-blue-700">{filters.distance || 10} miles</span>
           </div>
           <div className="flex items-center gap-2">
             <Ruler className="h-4 w-4 text-blue-600" />
