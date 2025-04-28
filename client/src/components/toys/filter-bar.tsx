@@ -39,7 +39,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
-    distance: initialFilters?.distance || 25, // Default to 25 miles
+    distance: initialFilters?.distance || 10, // Default to 10 miles
     latitude: initialFilters?.latitude,
     longitude: initialFilters?.longitude,
   });
@@ -128,7 +128,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     
                     // If distance isn't set yet, set a default
                     if (!filters.distance) {
-                      handleFilterChange("distance", 25);
+                      handleFilterChange("distance", 10);
                     }
                   }
                 }
@@ -143,7 +143,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               <span className="text-xs font-medium text-blue-700">{filters.distance} miles</span>
             </div>
             <Slider
-              value={[filters.distance || 25]}
+              value={[filters.distance || 10]}
               min={1}
               max={100}
               step={1}
@@ -406,7 +406,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   
                   // If distance isn't set yet, set a default
                   if (!filters.distance) {
-                    handleFilterChange("distance", 25);
+                    handleFilterChange("distance", 10);
                   }
                 }
               }
