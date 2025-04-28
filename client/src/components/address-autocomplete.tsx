@@ -132,10 +132,14 @@ export function AddressAutocomplete({
     
     try {
       // Create the autocomplete instance
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ["address"],
-        fields: ["formatted_address", "place_id", "geometry"],
-      });
+      if (window.google?.maps?.places) {
+        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+          types: ["address"],
+          fields: ["formatted_address", "place_id", "geometry"],
+        });
+      } else {
+        throw new Error("Google Maps Places API not available");
+      }
   
       // Add listener for place_changed event
       autocompleteRef.current.addListener("place_changed", () => {

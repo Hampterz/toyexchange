@@ -304,66 +304,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      
-      {/* Mobile App Promotion */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-10 rounded-xl mb-12 relative overflow-hidden">
-        <div className="absolute right-0 top-0 h-full w-1/2 md:w-2/5 bg-blue-500 bg-opacity-20 rounded-l-full transform -translate-x-1/4"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Download Our App</h2>
-              <p className="text-blue-100 max-w-md mb-6">
-                Get the ToyShare mobile app to manage your toy exchanges on the go. Receive notifications, chat with families, and discover toys near you - all from your phone!
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                <Button className="bg-white text-blue-800 hover:bg-blue-50 flex items-center px-6">
-                  <i className="fab fa-apple text-xl mr-2"></i>
-                  <div className="text-left">
-                    <div className="text-xs">Download on the</div>
-                    <div className="font-bold">App Store</div>
-                  </div>
-                </Button>
-                
-                <Button className="bg-white text-blue-800 hover:bg-blue-50 flex items-center px-6">
-                  <i className="fab fa-google-play text-xl mr-2"></i>
-                  <div className="text-left">
-                    <div className="text-xs">Get it on</div>
-                    <div className="font-bold">Google Play</div>
-                  </div>
-                </Button>
-              </div>
-            </div>
-            
-            <div className="md:w-1/3">
-              <div className="bg-blue-700 p-3 rounded-2xl inline-block transform rotate-3 shadow-xl">
-                <div className="bg-black rounded-xl overflow-hidden h-64 w-48">
-                  <div className="h-10 bg-black flex items-center justify-center">
-                    <div className="w-20 h-5 bg-blue-700 rounded-full"></div>
-                  </div>
-                  <div className="bg-white p-2 h-full">
-                    <div className="bg-blue-100 h-1/4 rounded-lg mb-2"></div>
-                    <div className="bg-blue-50 h-1/6 rounded-lg mb-2"></div>
-                    <div className="flex gap-1 mb-2">
-                      <div className="bg-blue-100 h-8 w-8 rounded-lg"></div>
-                      <div className="bg-blue-50 h-8 flex-1 rounded-lg"></div>
-                    </div>
-                    <div className="flex gap-1 mb-2">
-                      <div className="bg-blue-100 h-8 w-8 rounded-lg"></div>
-                      <div className="bg-blue-50 h-8 flex-1 rounded-lg"></div>
-                    </div>
-                    <div className="flex gap-1">
-                      <div className="bg-blue-100 h-8 w-8 rounded-lg"></div>
-                      <div className="bg-blue-50 h-8 flex-1 rounded-lg"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Newsletter Signup */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">

@@ -46,6 +46,7 @@ declare global {
     handleGoogleCredential?: (response: CredentialResponse) => void;
     handleCredentialResponse?: (response: CredentialResponse) => void;
     initAutocomplete?: () => void;
+    googleMapsScriptLoading?: boolean;
   }
 }
 
