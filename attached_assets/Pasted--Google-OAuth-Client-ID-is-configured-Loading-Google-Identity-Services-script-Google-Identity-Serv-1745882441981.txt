@@ -1,0 +1,51 @@
+ Google OAuth Client ID is configured
+ Loading Google Identity Services script
+ Google Identity Services script loaded successfully
+ Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+oga @ js:1619
+maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+ As of March 1st, 2025, google.maps.places.Autocomplete is not available to new customers. Please use google.maps.places.PlaceAutocompleteElement instead. At this time, google.maps.places.Autocomplete is not scheduled to be discontinued, but google.maps.places.PlaceAutocompleteElement is recommended over google.maps.places.Autocomplete. While google.maps.places.Autocomplete will continue to receive bug fixes for any major regressions, existing bugs in google.maps.places.Autocomplete will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/legacy for additional details and https://developers.google.com/maps/documentation/javascript/places-migration-overview for the migration guide.
+gB @ js:80
+ [Redirect Blocker] Stopping to prevent same tab redirects
+ [Redirect Blocker] Stopping to prevent same tab redirects
+ Window loaded, Google Identity Services script should be loading
+index-CGhL1fdZ.js:538 Google Identity Services loaded successfully on window load
+js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:80 As of March 1st, 2025, google.maps.places.Autocomplete is not available to new customers. Please use google.maps.places.PlaceAutocompleteElement instead. At this time, google.maps.places.Autocomplete is not scheduled to be discontinued, but google.maps.places.PlaceAutocompleteElement is recommended over google.maps.places.Autocomplete. While google.maps.places.Autocomplete will continue to receive bug fixes for any major regressions, existing bugs in google.maps.places.Autocomplete will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/legacy for additional details and https://developers.google.com/maps/documentation/javascript/places-migration-overview for the migration guide.
+gB @ js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:80
+api/toys/by-user:1 
+            
+            
+           Failed to load resource: the server responded with a status of 500 ()
+maps.googleapis.com/maps/gen_204?target=api&ev=api_mapft&cad=host:toyexchange.replit.app,v:60,fv:3.60.10,r:100,key:AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM,Pawa:1,hybrid:0,src:apiv3,token:1skpiksvgi,ts:1p9kh4:1 
+            
+            
+           Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+maps.googleapis.com/maps/gen_204?target=api&ev=api_mapft&cad=host:toyexchange.replit.app,v:60,fv:3.60.10,r:100,key:AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM,Ct4g:1,hybrid:0,src:apiv3,token:1skpiksvgi,ts:1p9oa2:1 
+            
+            
+           Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:80 As of March 1st, 2025, google.maps.places.Autocomplete is not available to new customers. Please use google.maps.places.PlaceAutocompleteElement instead. At this time, google.maps.places.Autocomplete is not scheduled to be discontinued, but google.maps.places.PlaceAutocompleteElement is recommended over google.maps.places.Autocomplete. While google.maps.places.Autocomplete will continue to receive bug fixes for any major regressions, existing bugs in google.maps.places.Autocomplete will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/legacy for additional details and https://developers.google.com/maps/documentation/javascript/places-migration-overview for the migration guide.
+gB @ js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:80
+api/toys/by-user:1 
+            
+            
+           Failed to load resource: the server responded with a status of 500 ()
+index-CGhL1fdZ.js:517 Current origin: https://toyexchange.replit.app
+index-CGhL1fdZ.js:517 Google Identity Services loaded after 0ms
+index-CGhL1fdZ.js:517 Google Identity Services initialized successfully
+index-CGhL1fdZ.js:517 Google Sign-In button rendered with account selector
+js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:80 As of March 1st, 2025, google.maps.places.Autocomplete is not available to new customers. Please use google.maps.places.PlaceAutocompleteElement instead. At this time, google.maps.places.Autocomplete is not scheduled to be discontinued, but google.maps.places.PlaceAutocompleteElement is recommended over google.maps.places.Autocomplete. While google.maps.places.Autocomplete will continue to receive bug fixes for any major regressions, existing bugs in google.maps.places.Autocomplete will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/legacy for additional details and https://developers.google.com/maps/documentation/javascript/places-migration-overview for the migration guide.
+gB @ js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:80
+js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:1505 Google Maps JavaScript API error: ApiNotActivatedMapError
+https://developers.google.com/maps/documentation/javascript/error-messages#api-not-activated-map-error
+_.dj @ js?key=AIzaSyCnVn8EP4dfmyyOYyykJBjUEzJWEq9sJQM&libraries=places&callback=initAutocomplete:1505
+play.google.com/log?format=json&hasfast=true&authuser=0:1 
+            
+            
+           Failed to load resource: net::ERR_BLOCKED_BY_CLIENT
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.

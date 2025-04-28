@@ -122,50 +122,59 @@ export function AddressAutocomplete({
     if (scriptLoaded && !isInitialized && inputRef.current) {
       initializeAutocomplete();
     }
-  }, [scriptLoaded, inputRef.current]);
+  }, [scriptLoaded]);
 
   // Initialize the autocomplete functionality
   const initializeAutocomplete = () => {
     setInitializationAttempted(true);
     
     if (!inputRef.current || !isGoogleMapsLoaded()) {
+      // Enable fallback mode if Google Maps API isn't available
+      setShowFallbackMessage(true);
       return;
     }
     
     try {
       // Create the autocomplete instance
       if (window.google?.maps?.places) {
+        // Ensure any existing autocomplete is cleaned up
+        if (autocompleteRef.current) {
+          // No explicit cleanup method in the API, but we can create a new instance
+          autocompleteRef.current = null;
+        }
+        
+        // Create a new autocomplete instance
         autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
           types: ["address"],
           fields: ["formatted_address", "place_id", "geometry"],
         });
+        
+        // Add listener for place_changed event
+        autocompleteRef.current.addListener("place_changed", () => {
+          const place = autocompleteRef.current.getPlace();
+          
+          if (place && place.formatted_address) {
+            setInputValue(place.formatted_address);
+            
+            // If we have geometry/location data, extract coordinates
+            let coordinates;
+            if (place.geometry && place.geometry.location) {
+              coordinates = {
+                latitude: place.geometry.location.lat(),
+                longitude: place.geometry.location.lng()
+              };
+            }
+            
+            onAddressSelect(place.formatted_address, coordinates, place.place_id);
+          }
+        });
+        
+        // Mark as initialized
+        setIsInitialized(true);
+        setShowFallbackMessage(false);
       } else {
         throw new Error("Google Maps Places API not available");
       }
-  
-      // Add listener for place_changed event
-      autocompleteRef.current.addListener("place_changed", () => {
-        const place = autocompleteRef.current.getPlace();
-        
-        if (place && place.formatted_address) {
-          setInputValue(place.formatted_address);
-          
-          // If we have geometry/location data, extract coordinates
-          let coordinates;
-          if (place.geometry && place.geometry.location) {
-            coordinates = {
-              latitude: place.geometry.location.lat(),
-              longitude: place.geometry.location.lng()
-            };
-          }
-          
-          onAddressSelect(place.formatted_address, coordinates, place.place_id);
-        }
-      });
-      
-      // Mark as initialized
-      setIsInitialized(true);
-      setShowFallbackMessage(false);
     } catch (error) {
       console.error("Error initializing Google Maps Autocomplete:", error);
       setShowFallbackMessage(true);
@@ -177,27 +186,19 @@ export function AddressAutocomplete({
     const newValue = e.target.value;
     setInputValue(newValue);
     
-    // If the field is cleared, call the callback with empty string
-    if (newValue === "") {
-      onAddressSelect("");
-    } else {
-      // If Google Maps autocomplete isn't working, still update with manual input
-      // This ensures manual entry works even without API access
-      if (!isInitialized || showFallbackMessage) {
-        onAddressSelect(newValue);
-      }
-    }
+    // Always pass the current value to parent component
+    // This ensures the form validation doesn't block typing
+    onAddressSelect(newValue);
   };
 
   // Handle manual form submission if user presses enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      // Only call the callback if there's actual text to submit
+      // Call the callback with current value to finalize selection
       if (inputValue.trim()) {
         onAddressSelect(inputValue);
       }
-      // Don't call the callback with empty text, which would trigger error messages
     }
   };
 
@@ -215,7 +216,7 @@ export function AddressAutocomplete({
         required={required}
         autoFocus={autoFocus}
         disabled={disabled}
-        autoComplete="off" // Changed to off to prevent conflicts with Google Autocomplete
+        autoComplete="off" // Prevent browser autocomplete from interfering
         spellCheck="false"
         aria-label="Enter your address"
         // Make mobile keyboard more suitable for address entry
