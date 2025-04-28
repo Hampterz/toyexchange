@@ -206,7 +206,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               <span className="opacity-70">{filters.ageRange.length > 0 ? `${filters.ageRange.length} selected` : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
             <div className="max-h-60 overflow-auto p-2">
               {AGE_RANGES.map(age => (
                 <div 
@@ -242,7 +242,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               <span className="opacity-70">{filters.category.length > 0 ? `${filters.category.length} selected` : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
             <div className="max-h-60 overflow-auto p-2">
               {CATEGORIES.map(category => (
                 <div 
@@ -278,7 +278,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               <span className="opacity-70">{filters.condition.length > 0 ? `${filters.condition.length} selected` : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
             <div className="max-h-60 overflow-auto p-2">
               {CONDITIONS.map(condition => (
                 <div 
@@ -314,7 +314,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               <span className="opacity-70">{filters.tags.length > 0 ? `${filters.tags.length} selected` : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
             <div className="max-h-60 overflow-auto p-2">
               {COMMON_TAGS.map(tag => (
                 <div 
