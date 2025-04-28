@@ -542,3 +542,62 @@ export const insertUserBlockSchema = createInsertSchema(userBlocks).pick({
 
 export type InsertUserBlock = z.infer<typeof insertUserBlockSchema>;
 export type UserBlock = typeof userBlocks.$inferSelect;
+
+// Wish list model for toy requests
+export const wishes = pgTable("wishes", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  ageRange: text("age_range").notNull(),
+  category: text("category").notNull(),
+  images: jsonb("images").$type<string[]>().default([]),
+  location: text("location").notNull(),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
+  tags: jsonb("tags").$type<string[]>().default([]),
+  status: text("status").notNull().default("active"), // active, fulfilled, deleted, archived
+  isPublic: boolean("is_public").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const insertWishSchema = createInsertSchema(wishes).pick({
+  userId: true,
+  title: true,
+  description: true,
+  ageRange: true,
+  category: true,
+  images: true,
+  location: true,
+  latitude: true,
+  longitude: true,
+  tags: true,
+  status: true,
+  isPublic: true,
+});
+
+export type InsertWish = z.infer<typeof insertWishSchema>;
+export type Wish = typeof wishes.$inferSelect;
+
+// WishOffer model for users offering toys to fulfill wishes
+export const wishOffers = pgTable("wish_offers", {
+  id: serial("id").primaryKey(),
+  wishId: integer("wish_id").notNull(),
+  offererId: integer("offerer_id").notNull(), // User offering a toy
+  toyId: integer("toy_id"), // Optional - can link to an existing toy
+  message: text("message").notNull(),
+  status: text("status").notNull().default("pending"), // pending, accepted, rejected, completed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertWishOfferSchema = createInsertSchema(wishOffers).pick({
+  wishId: true,
+  offererId: true,
+  toyId: true,
+  message: true,
+  status: true,
+});
+
+export type InsertWishOffer = z.infer<typeof insertWishOfferSchema>;
+export type WishOffer = typeof wishOffers.$inferSelect;

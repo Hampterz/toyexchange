@@ -193,8 +193,11 @@ export function AddressAutocomplete({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      // Call the callback with the current manual input value
-      onAddressSelect(inputValue);
+      // Only call the callback if there's actual text to submit
+      if (inputValue.trim()) {
+        onAddressSelect(inputValue);
+      }
+      // Don't call the callback with empty text, which would trigger error messages
     }
   };
 
