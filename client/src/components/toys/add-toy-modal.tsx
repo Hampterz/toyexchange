@@ -13,12 +13,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { AGE_RANGES, CATEGORIES, CONDITIONS } from "@/lib/utils/constants";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { insertToySchema, COMMON_TAGS } from "@shared/schema";
+import { insertToySchema, COMMON_TAGS, Toy } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
+import { ToySuccessPage } from "./toy-success-page";
 
 interface AddToyModalProps {
   isOpen: boolean;
@@ -74,6 +75,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [videoUrls, setVideoUrls] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [customTag, setCustomTag] = useState<string>("");
+  const [addedToy, setAddedToy] = useState<Toy | null>(null);
+  const [showSuccessPage, setShowSuccessPage] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -96,20 +100,31 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         : [...prev, tag]
     );
   };
+  
+  // Add a custom tag
+  const addCustomTag = () => {
+    if (customTag.trim() === "" || selectedTags.includes(customTag.trim())) {
+      return;
+    }
+    
+    setSelectedTags(prev => [...prev, customTag.trim()]);
+    setCustomTag("");
+  };
 
   const addToyMutation = useMutation({
     mutationFn: async (toyData: any) => {
       const res = await apiRequest("POST", "/api/toys", toyData);
       return await res.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Toy Added Successfully",
-        description: "Your toy listing has been created",
-      });
+    onSuccess: (data) => {
+      // Instead of closing the modal, show the success page
+      setAddedToy(data);
+      setShowSuccessPage(true);
+      
       queryClient.invalidateQueries({ queryKey: ["/api/toys"] });
+      
+      // Only reset the form, don't close the modal
       reset();
-      onClose();
     },
     onError: (error: any) => {
       toast({
@@ -257,6 +272,24 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       </div>
     );
   };
+
+  // Handle closing the success page and resetting the state
+  const handleCloseSuccess = () => {
+    setShowSuccessPage(false);
+    setAddedToy(null);
+    onClose();
+  };
+  
+  // Show success page if a toy was just added
+  if (showSuccessPage && addedToy) {
+    return (
+      <ToySuccessPage 
+        isOpen={showSuccessPage} 
+        onClose={handleCloseSuccess} 
+        toy={addedToy} 
+      />
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -548,6 +581,49 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                 #{tag}
                               </Badge>
                             ))}
+                          </div>
+                          
+                          <div className="mt-3 border-t pt-3">
+                            <p className="text-xs text-muted-foreground mb-2">Or add your own custom tag:</p>
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="e.g. unicorn"
+                                value={customTag}
+                                onChange={(e) => setCustomTag(e.target.value)}
+                                className="flex-1"
+                                maxLength={15}
+                              />
+                              <Button 
+                                type="button" 
+                                size="sm" 
+                                onClick={addCustomTag}
+                                disabled={!customTag.trim()}
+                                className="whitespace-nowrap bg-blue-700 hover:bg-blue-800"
+                              >
+                                Add Tag
+                              </Button>
+                            </div>
+                            
+                            {selectedTags.some(tag => !COMMON_TAGS.includes(tag)) && (
+                              <div className="mt-2">
+                                <p className="text-xs text-muted-foreground mb-1">Your custom tags:</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {selectedTags
+                                    .filter(tag => !COMMON_TAGS.includes(tag))
+                                    .map(tag => (
+                                      <Badge
+                                        key={tag}
+                                        variant="default"
+                                        className="bg-blue-100 text-blue-800 hover:bg-blue-200 cursor-pointer"
+                                        onClick={() => toggleTag(tag)}
+                                      >
+                                        #{tag} <X className="ml-1 h-3 w-3" />
+                                      </Badge>
+                                    ))
+                                  }
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

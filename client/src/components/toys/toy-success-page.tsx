@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Share2, ArrowLeft, Check, Facebook, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import confetti from "react-confetti";
+import Confetti from "react-confetti";
 import { Toy } from "@shared/schema";
 import { SiWhatsapp } from "react-icons/si";
 
@@ -67,7 +67,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         {showConfetti && (
-          <confetti
+          <Confetti
             width={windowSize.width}
             height={windowSize.height}
             recycle={false}
