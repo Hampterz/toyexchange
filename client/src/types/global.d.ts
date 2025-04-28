@@ -17,7 +17,11 @@ declare global {
         places?: {
           Autocomplete: new (
             input: HTMLInputElement,
-            options?: { types: string[]; fields: string[] }
+            options?: { 
+              types: string[]; 
+              fields: string[];
+              componentRestrictions?: { country: string | string[] };
+            }
           ) => {
             addListener: (event: string, callback: () => void) => void;
             getPlace: () => { 
@@ -30,8 +34,17 @@ declare global {
                 }
               }
             };
+            unbindAll?: () => void;
+            setFields?: (fields: string[]) => void;
+            setTypes?: (types: string[]) => void;
+            setComponentRestrictions?: (restrictions: { country: string | string[] }) => void;
           };
+          PlaceAutocompleteElement?: new (options: any) => any;
         };
+        Map?: any;
+        Marker?: any;
+        Circle?: any;
+        LatLng?: new (lat: number, lng: number) => any;
       };
       accounts?: {
         id: {

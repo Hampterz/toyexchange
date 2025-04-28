@@ -32,173 +32,190 @@ export function AddressAutocomplete({
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = useState(defaultValue);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [apiLoaded, setApiLoaded] = useState(false);
   const [showFallbackMessage, setShowFallbackMessage] = useState(false);
-  const [initializationAttempted, setInitializationAttempted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  
+  // Check if Google Maps script is already loaded in the DOM
+  const isScriptLoaded = () => {
+    return document.querySelector(`script[src*="maps.googleapis.com/maps/api/js"]`) !== null;
+  };
 
-  // Check if Google Maps API is already loaded
+  // Check if Google Maps API is fully initialized
   const isGoogleMapsLoaded = () => {
     return window.google && window.google.maps && window.google.maps.places;
   };
 
-  // Use an effect to show the fallback message after a delay, but only if initialization was attempted
+  // Load Google Maps script if not already loaded
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isInitialized && initializationAttempted) {
-        setShowFallbackMessage(true);
-      }
-    }, 3000); // Show fallback message after 3 seconds if autocomplete not initialized
-    
-    return () => clearTimeout(timer);
-  }, [isInitialized, initializationAttempted]);
-
-  // Load the Google Maps script on component mount
-  useEffect(() => {
-    // If Google Maps is already loaded, initialize autocomplete directly
-    if (isGoogleMapsLoaded()) {
-      initializeAutocomplete();
-      setScriptLoaded(true);
+    // Skip if already initialized or script is loading
+    if (isInitialized || window.googleMapsScriptLoading) {
       return;
     }
-
-    // Only load the script if it hasn't been loaded already
-    if (!scriptLoaded && !window.googleMapsScriptLoading) {
-      window.googleMapsScriptLoading = true;
-      
-      try {
-        // Define the callback function that will be called when the script loads
-        window.initAutocomplete = () => {
-          setScriptLoaded(true);
-          window.googleMapsScriptLoading = false;
-          
-          // Small delay to ensure the Google Maps API is fully initialized
-          setTimeout(() => {
-            if (inputRef.current) {
-              initializeAutocomplete();
-            }
-          }, 100);
-        };
-
-        // Create the script element
-        const scriptElement = document.createElement("script");
-        scriptElement.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initAutocomplete`;
-        scriptElement.async = true;
-        scriptElement.defer = true;
-        
-        // Add error handling to the script
-        scriptElement.onerror = (error) => {
-          console.error("Error loading Google Maps API:", error);
-          window.googleMapsScriptLoading = false;
-          // If the API key is invalid or has errors, still allow manual input
-          setShowFallbackMessage(true);
-        };
-        
-        // Add the script to the document
-        document.head.appendChild(scriptElement);
-        
-        // Set a timeout to ensure the input is enabled if the API fails to load
-        const enableInputTimeout = setTimeout(() => {
-          if (!isInitialized) {
-            setShowFallbackMessage(true);
-          }
-        }, 5000); // 5 second timeout
-        
-        return () => {
-          clearTimeout(enableInputTimeout);
-        };
-      } catch (error) {
-        console.error("Error setting up Google Maps script:", error);
-        setShowFallbackMessage(true);
-        window.googleMapsScriptLoading = false;
-      }
+    
+    // If API already loaded, initialize directly
+    if (isGoogleMapsLoaded()) {
+      console.log("Google Maps API already loaded, initializing autocomplete");
+      setApiLoaded(true);
+      return;
     }
+    
+    // Skip if script already in DOM but API not fully loaded yet
+    if (isScriptLoaded()) {
+      // Wait for API to initialize
+      const checkInterval = setInterval(() => {
+        if (isGoogleMapsLoaded()) {
+          setApiLoaded(true);
+          clearInterval(checkInterval);
+        }
+      }, 100);
+      
+      // Timeout after 5 seconds
+      const timeout = setTimeout(() => {
+        clearInterval(checkInterval);
+        setShowFallbackMessage(true);
+      }, 5000);
+      
+      return () => {
+        clearInterval(checkInterval);
+        clearTimeout(timeout);
+      };
+    }
+    
+    // Load the script
+    console.log("Loading Google Maps API script");
+    window.googleMapsScriptLoading = true;
+    
+    // Create callback function for when script loads
+    window.initAutocomplete = () => {
+      console.log("Google Maps API initialized via callback");
+      window.googleMapsScriptLoading = false;
+      setApiLoaded(true);
+    };
+    
+    // Create and append script element
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initAutocomplete`;
+    script.async = true;
+    script.defer = true;
+    
+    script.onerror = () => {
+      console.error("Failed to load Google Maps API");
+      window.googleMapsScriptLoading = false;
+      setShowFallbackMessage(true);
+    };
+    
+    document.head.appendChild(script);
+    
+    // Fallback timeout
+    const fallbackTimer = setTimeout(() => {
+      if (!isGoogleMapsLoaded()) {
+        setShowFallbackMessage(true);
+      }
+    }, 7000);
+    
+    return () => {
+      clearTimeout(fallbackTimer);
+    };
   }, [apiKey]);
 
-  // Re-initialize when the script loads
+  // Initialize autocomplete when API is loaded
   useEffect(() => {
-    if (scriptLoaded && !isInitialized && inputRef.current) {
+    if (apiLoaded && inputRef.current && !isInitialized) {
       initializeAutocomplete();
     }
-  }, [scriptLoaded]);
+  }, [apiLoaded, inputRef.current, isInitialized]);
 
   // Initialize the autocomplete functionality
   const initializeAutocomplete = () => {
-    setInitializationAttempted(true);
-    
     if (!inputRef.current || !isGoogleMapsLoaded()) {
-      // Enable fallback mode if Google Maps API isn't available
+      console.log("Cannot initialize autocomplete - missing input ref or Google API");
       setShowFallbackMessage(true);
       return;
     }
     
     try {
+      console.log("Initializing Google Maps Autocomplete");
+      
       // Create the autocomplete instance
-      if (window.google?.maps?.places) {
-        // Ensure any existing autocomplete is cleaned up
-        if (autocompleteRef.current) {
-          // No explicit cleanup method in the API, but we can create a new instance
-          autocompleteRef.current = null;
-        }
-        
-        // Create a new autocomplete instance
+      if (window.google?.maps?.places?.Autocomplete) {
         autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
           types: ["address"],
-          fields: ["formatted_address", "place_id", "geometry"],
+          fields: ["formatted_address", "geometry", "place_id"],
         });
-        
-        // Add listener for place_changed event
-        autocompleteRef.current.addListener("place_changed", () => {
-          const place = autocompleteRef.current.getPlace();
-          
-          if (place && place.formatted_address) {
-            setInputValue(place.formatted_address);
-            
-            // If we have geometry/location data, extract coordinates
-            let coordinates;
-            if (place.geometry && place.geometry.location) {
-              coordinates = {
-                latitude: place.geometry.location.lat(),
-                longitude: place.geometry.location.lng()
-              };
-            }
-            
-            onAddressSelect(place.formatted_address, coordinates, place.place_id);
-          }
-        });
-        
-        // Mark as initialized
-        setIsInitialized(true);
-        setShowFallbackMessage(false);
       } else {
-        throw new Error("Google Maps Places API not available");
+        throw new Error("Google Maps Places Autocomplete not available");
       }
+      
+      // Add listener for place_changed event
+      autocompleteRef.current.addListener("place_changed", () => {
+        const place = autocompleteRef.current.getPlace();
+        
+        if (place && place.formatted_address) {
+          setInputValue(place.formatted_address);
+          
+          let coordinates;
+          if (place.geometry && place.geometry.location) {
+            coordinates = {
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng()
+            };
+          }
+          
+          onAddressSelect(place.formatted_address, coordinates, place.place_id);
+        }
+      });
+      
+      setIsInitialized(true);
+      setShowFallbackMessage(false);
+      console.log("Google Maps Autocomplete initialized successfully");
     } catch (error) {
       console.error("Error initializing Google Maps Autocomplete:", error);
       setShowFallbackMessage(true);
     }
   };
 
+  // When component unmounts, clean up the autocomplete
+  useEffect(() => {
+    return () => {
+      if (autocompleteRef.current && autocompleteRef.current.unbindAll) {
+        autocompleteRef.current.unbindAll();
+      }
+      autocompleteRef.current = null;
+    };
+  }, []);
+
   // Handle manual input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
     
-    // Always pass the current value to parent component
-    // This ensures the form validation doesn't block typing
+    // Always pass the value to parent to prevent validation errors
     onAddressSelect(newValue);
   };
 
   // Handle manual form submission if user presses enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Don't block Enter key if autocomplete dropdown is showing
+    if (e.key === 'Enter' && document.querySelector('.pac-container:not(.pac-logo)')) {
+      return;
+    }
+    
     if (e.key === 'Enter') {
       e.preventDefault();
-      // Call the callback with current value to finalize selection
       if (inputValue.trim()) {
         onAddressSelect(inputValue);
       }
+    }
+  };
+
+  // Focus handling to help with autocomplete
+  const handleFocus = () => {
+    // Re-initialize on focus if needed and API is available
+    if (!isInitialized && isGoogleMapsLoaded() && inputRef.current) {
+      initializeAutocomplete();
     }
   };
 
@@ -213,18 +230,18 @@ export function AddressAutocomplete({
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
         required={required}
         autoFocus={autoFocus}
         disabled={disabled}
-        autoComplete="off" // Prevent browser autocomplete from interfering
+        autoComplete="off"
         spellCheck="false"
         aria-label="Enter your address"
-        // Make mobile keyboard more suitable for address entry
         inputMode="text"
       />
       {showFallbackMessage && (
         <p className="text-xs text-amber-500 mt-1">
-          Address autocomplete unavailable. You can still type your address manually.
+          Address suggestions unavailable. You can still type your address manually.
         </p>
       )}
     </div>
