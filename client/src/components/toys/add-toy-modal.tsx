@@ -293,8 +293,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
           <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
           <Button
             variant="ghost"

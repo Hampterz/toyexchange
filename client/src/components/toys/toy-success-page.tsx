@@ -65,7 +65,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         {showConfetti && (
           <Confetti
             width={windowSize.width}
@@ -75,7 +75,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
             gravity={0.2}
           />
         )}
-        <DialogHeader className="text-center">
+        <DialogHeader className="text-center sticky top-0 bg-background z-10 pb-4">
           <div className="flex justify-center mb-4">
             <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
               <Check className="h-8 w-8 text-green-600" />

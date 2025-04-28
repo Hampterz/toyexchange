@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   location: text("location").notNull(),
+  bio: text("bio"),
   profilePicture: text("profile_picture"),
   googleId: text("google_id").unique(),
   
@@ -44,6 +45,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   name: true,
   location: true,
+  bio: true,
   profilePicture: true,
   googleId: true,
   latitude: true,
