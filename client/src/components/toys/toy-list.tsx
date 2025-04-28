@@ -77,9 +77,16 @@ export function ToyList({ filters = {} }: ToyListProps) {
 
   if (!toys || toys.length === 0) {
     return (
-      <div className="text-center py-12">
-        <h3 className="text-xl font-semibold mb-2">No toys found</h3>
-        <p className="text-neutral-600">Try adjusting your filters or search criteria</p>
+      <div className="text-center py-12 px-4 sm:px-8 bg-blue-50 rounded-xl shadow-sm">
+        <div className="mx-auto max-w-lg">
+          <h3 className="text-xl font-semibold mb-3 text-blue-800">No toys found</h3>
+          <p className="text-blue-700 mb-4">Try adjusting your filters or search criteria to find more toys in your area.</p>
+          <div className="inline-flex items-center justify-center bg-white p-4 rounded-full shadow-sm mb-3">
+            <svg className="w-12 h-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
       </div>
     );
   }
@@ -90,7 +97,7 @@ export function ToyList({ filters = {} }: ToyListProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
         {displayedToys.map((toy) => (
           <ToyCard key={toy.id} toy={toy} onRequestClick={handleRequestClick} />
         ))}
