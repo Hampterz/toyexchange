@@ -95,9 +95,9 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <h2 className="text-2xl font-bold font-heading mb-4">Available Toys</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Filters Sidebar */}
-          <div className="col-span-1 bg-white p-4 rounded-xl shadow-sm">
+          <div className="md:col-span-3 lg:col-span-3 bg-white p-4 sm:p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
             {/* Sort Options */}
             <div className="mb-6">
               <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Sort by</h3>
@@ -136,7 +136,7 @@ export default function HomePage() {
           </div>
           
           {/* Toy Listings */}
-          <div className="col-span-1 md:col-span-3">
+          <div className="col-span-1 md:col-span-9 lg:col-span-9">
             <ToyList filters={filters} />
           </div>
         </div>

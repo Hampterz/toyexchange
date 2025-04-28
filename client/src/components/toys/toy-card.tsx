@@ -190,7 +190,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       {/* Confetti effect when marking a toy as sold */}
       {showConfetti && <ConfettiEffect duration={3000} numberOfPieces={300} />}
       <div 
-        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition card-animated cursor-pointer"
+        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
         onClick={() => setIsExpanded(true)}
       >
         <div className="relative pb-[75%] bg-neutral-100">
