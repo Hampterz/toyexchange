@@ -31,37 +31,58 @@ export function AddressAutocomplete({
   disabled
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = useState(defaultValue);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
   const [showFallbackMessage, setShowFallbackMessage] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+  // Check if Google Maps API is already loaded
+  const isGoogleMapsLoaded = () => {
+    return window.google && window.google.maps && window.google.maps.places;
+  };
+
   // Use an effect to show the fallback message after a delay
   useEffect(() => {
     const timer = setTimeout(() => {
-      setShowFallbackMessage(!autocompleteRef.current);
-    }, 2000); // Show fallback message after 2 seconds if autocomplete not initialized
+      if (!isInitialized) {
+        setShowFallbackMessage(true);
+      }
+    }, 3000); // Show fallback message after 3 seconds if autocomplete not initialized
     
     return () => clearTimeout(timer);
-  }, [autocompleteRef.current]);
+  }, [isInitialized]);
 
   // Load the Google Maps script on component mount
   useEffect(() => {
-    let scriptElement: HTMLScriptElement | null = null;
-    let scriptAddedToHead = false;
+    // If Google Maps is already loaded, initialize autocomplete directly
+    if (isGoogleMapsLoaded()) {
+      initializeAutocomplete();
+      setScriptLoaded(true);
+      return;
+    }
 
-    // Check if Google Maps script is already loaded
-    if (!window.google || !window.google.maps) {
+    // Only load the script if it hasn't been loaded already
+    if (!scriptLoaded && !window.googleMapsScriptLoading) {
+      window.googleMapsScriptLoading = true;
+      
       try {
         // Define the callback function that will be called when the script loads
         window.initAutocomplete = () => {
-          if (inputRef.current && window.google) {
-            initializeAutocomplete();
-          }
+          setScriptLoaded(true);
+          window.googleMapsScriptLoading = false;
+          
+          // Small delay to ensure the Google Maps API is fully initialized
+          setTimeout(() => {
+            if (inputRef.current) {
+              initializeAutocomplete();
+            }
+          }, 100);
         };
 
         // Create the script element
-        scriptElement = document.createElement("script");
+        const scriptElement = document.createElement("script");
         scriptElement.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initAutocomplete`;
         scriptElement.async = true;
         scriptElement.defer = true;
@@ -69,58 +90,43 @@ export function AddressAutocomplete({
         // Add error handling to the script
         scriptElement.onerror = (error) => {
           console.error("Error loading Google Maps API:", error);
+          window.googleMapsScriptLoading = false;
           // If the API key is invalid or has errors, still allow manual input
-          if (inputRef.current) {
-            // Remove the disabled attribute if present
-            inputRef.current.disabled = false;
-          }
+          setShowFallbackMessage(true);
         };
         
         // Add the script to the document
         document.head.appendChild(scriptElement);
-        scriptAddedToHead = true;
         
         // Set a timeout to ensure the input is enabled if the API fails to load
         const enableInputTimeout = setTimeout(() => {
-          if (inputRef.current && inputRef.current.disabled) {
-            inputRef.current.disabled = false;
+          if (!isInitialized) {
+            setShowFallbackMessage(true);
           }
         }, 5000); // 5 second timeout
         
         return () => {
-          // Clean up timeout
           clearTimeout(enableInputTimeout);
-          
-          // Remove the script from head if it was added
-          if (scriptAddedToHead && scriptElement) {
-            try {
-              document.head.removeChild(scriptElement);
-            } catch (e) {
-              console.error("Error removing script:", e);
-            }
-          }
-          window.initAutocomplete = undefined;
         };
       } catch (error) {
         console.error("Error setting up Google Maps script:", error);
-        // If there's an error, make sure the input is still usable
-        if (inputRef.current) {
-          inputRef.current.disabled = false;
-        }
+        setShowFallbackMessage(true);
+        window.googleMapsScriptLoading = false;
       }
-    } else {
-      // If the script is already loaded, initialize autocomplete directly
-      initializeAutocomplete();
     }
   }, [apiKey]);
 
+  // Re-initialize when the script loads
+  useEffect(() => {
+    if (scriptLoaded && !isInitialized && inputRef.current) {
+      initializeAutocomplete();
+    }
+  }, [scriptLoaded, inputRef.current]);
+
   // Initialize the autocomplete functionality
   const initializeAutocomplete = () => {
-    if (!inputRef.current || !window.google || !window.google.maps || !window.google.maps.places) {
-      // If Google Maps Places isn't available, make sure the input works manually
-      if (inputRef.current) {
-        inputRef.current.disabled = false;
-      }
+    if (!inputRef.current || !isGoogleMapsLoaded()) {
+      setShowFallbackMessage(true);
       return;
     }
     
@@ -151,13 +157,12 @@ export function AddressAutocomplete({
         }
       });
       
-      // Successfully initialized - hide the fallback message
+      // Mark as initialized
+      setIsInitialized(true);
       setShowFallbackMessage(false);
     } catch (error) {
       console.error("Error initializing Google Maps Autocomplete:", error);
-      if (inputRef.current) {
-        inputRef.current.disabled = false;
-      }
+      setShowFallbackMessage(true);
     }
   };
 
@@ -172,7 +177,7 @@ export function AddressAutocomplete({
     } else {
       // If Google Maps autocomplete isn't working, still update with manual input
       // This ensures manual entry works even without API access
-      if (!autocompleteRef.current) {
+      if (!isInitialized || showFallbackMessage) {
         onAddressSelect(newValue);
       }
     }
@@ -201,7 +206,7 @@ export function AddressAutocomplete({
         required={required}
         autoFocus={autoFocus}
         disabled={disabled}
-        autoComplete="street-address"
+        autoComplete="off" // Changed to off to prevent conflicts with Google Autocomplete
         spellCheck="false"
         aria-label="Enter your address"
         // Make mobile keyboard more suitable for address entry
@@ -209,7 +214,7 @@ export function AddressAutocomplete({
       />
       {showFallbackMessage && (
         <p className="text-xs text-amber-500 mt-1">
-          Address autocomplete unavailable. You can still type addresses manually.
+          Address autocomplete unavailable. You can still type your address manually.
         </p>
       )}
     </div>
