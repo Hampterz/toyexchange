@@ -64,6 +64,14 @@ export default function AuthPage() {
         // Render the official Google Sign-In button that shows account selector popup
         if (googleButtonRef.current && window.google?.accounts?.id) {
           renderGoogleButton(googleButtonRef.current);
+          
+          // Ensure Google button is fully responsive on mobile
+          if (googleButtonRef.current.firstChild) {
+            const googleButton = googleButtonRef.current.firstChild as HTMLElement;
+            googleButton.style.width = '100%';
+            googleButton.style.display = 'flex';
+            googleButton.style.justifyContent = 'center';
+          }
         }
       } catch (error) {
         console.error("Failed to initialize Google Auth:", error);
