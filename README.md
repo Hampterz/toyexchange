@@ -2,6 +2,27 @@
 
 This comprehensive guide provides step-by-step instructions for deploying the ToyShare application on an AWS server, including detailed database setup for storing user accounts, toy listings, and all application data.
 
+## Introduction for Beginners
+
+If you're new to web deployment, don't worry! This guide is designed to walk you through every single step required to get ToyShare running on your own server. Here's what you need to know:
+
+### What is AWS?
+AWS (Amazon Web Services) is a cloud platform that provides secure servers where you can host your website. Instead of buying physical hardware, you rent virtual servers from Amazon.
+
+### What are we setting up in this guide?
+1. **A web server** - This is where your ToyShare application code will run
+2. **A database** - This stores all user accounts, toy listings, and other data
+3. **Security settings** - To protect your application and data
+4. **Google integration** - For user sign-in and map/location features
+
+### How this guide works:
+- We've broken down EVERY step into small, clear instructions
+- You can follow along even if you've never set up a server before
+- Commands that you need to type are shown in code blocks like `this`
+- The entire process might take 2-3 hours, but at the end, you'll have a fully functioning ToyShare platform!
+
+Let's get started with the setup process!
+
 ## Table of Contents
 
 1. [AWS Account Setup](#aws-account-setup)
@@ -12,11 +33,12 @@ This comprehensive guide provides step-by-step instructions for deploying the To
 6. [Application Deployment](#application-deployment)
 7. [Web Server Configuration](#web-server-configuration)
 8. [SSL Certificate Setup](#ssl-certificate-setup)
-9. [Environment Variables](#environment-variables)
-10. [Securing Your Server](#securing-your-server)
-11. [Backup and Recovery](#backup-and-recovery)
-12. [Monitoring and Maintenance](#monitoring-and-maintenance)
-13. [Troubleshooting](#troubleshooting)
+9. [Google API Keys Setup](#google-api-keys-setup)
+10. [Environment Variables](#environment-variables)
+11. [Securing Your Server](#securing-your-server)
+12. [Backup and Recovery](#backup-and-recovery)
+13. [Monitoring and Maintenance](#monitoring-and-maintenance)
+14. [Troubleshooting](#troubleshooting)
 
 ## AWS Account Setup
 
@@ -500,6 +522,78 @@ pm2 logs toyshare
    - Verify the certificate is valid
    - Check SSL grade at [SSL Labs](https://www.ssllabs.com/ssltest/)
 
+## Google API Keys Setup
+
+Before setting up your environment variables, you need to configure Google API services for maps and authentication:
+
+### 1. Set Up Google OAuth 2.0 Credentials (For User Sign-In)
+
+1. **Create a Google Cloud Project**:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Click "New Project" at the top right
+   - Enter "ToyShare" as Project Name
+   - Click "Create"
+
+2. **Configure OAuth Consent Screen**:
+   - Select your project
+   - In the left menu, go to "APIs & Services" > "OAuth consent screen"
+   - Select "External" user type (unless you have a Google Workspace)
+   - Click "Create"
+   - Fill in the required fields:
+     - App name: ToyShare
+     - User support email: your email address
+     - Developer contact information: your email address
+   - Click "Save and Continue"
+   - For Scopes, add:
+     - ./auth/userinfo.email
+     - ./auth/userinfo.profile
+   - Click "Save and Continue"
+   - Add test users if needed, then click "Save and Continue"
+   - Review your settings and click "Back to Dashboard"
+
+3. **Create OAuth Client ID**:
+   - In the left menu, go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Application type: Web application
+   - Name: ToyShare Web Client
+   - Authorized JavaScript origins:
+     - Add: `http://localhost:3000` (for local testing)
+     - Add: `http://your-ec2-ip-address` (your EC2 server's IP)
+     - Add: `https://yourdomain.com` (your production domain)
+   - Authorized redirect URIs:
+     - Add: `http://localhost:3000/auth` (for local testing)
+     - Add: `http://your-ec2-ip-address/auth` (your EC2 server's IP)
+     - Add: `https://yourdomain.com/auth` (your production domain)
+   - Click "Create"
+   - **⚠️ IMPORTANT**: A popup will show your Client ID and Client Secret. Save these values securely. The Client ID will be used as `VITE_GOOGLE_OAUTH_CLIENT_ID` in your .env file.
+
+### 2. Set Up Google Maps API (For Location Services)
+
+1. **Enable Google Maps API**:
+   - In the same Google Cloud Project, go to "APIs & Services" > "Library"
+   - Search for "Maps JavaScript API" and select it
+   - Click "Enable"
+   - Also enable "Places API" for address autocomplete functionality
+
+2. **Create API Key for Maps**:
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "API Key"
+   - A popup will show your new API key
+   - **⚠️ IMPORTANT**: Save this API key securely. It will be used as `VITE_GOOGLE_MAPS_API_KEY` in your .env file
+
+3. **Restrict API Key (Recommended for Security)**:
+   - After creating the API key, click "Edit API key" (pencil icon)
+   - Under "Application restrictions", select "HTTP referrers (websites)"
+   - Add your domains:
+     - `localhost/*`
+     - `*.yourdomain.com/*`
+     - `*your-ec2-ip-address/*`
+   - Under "API restrictions", select "Restrict key"
+   - Select the following APIs:
+     - Maps JavaScript API
+     - Places API
+   - Click "Save"
+
 ## Environment Variables
 
 Create a `.env` file in the root of your project with all required configuration:
@@ -524,22 +618,17 @@ NODE_ENV=production
 PORT=3000
 SESSION_SECRET=generate-a-long-random-string
 
-# Google API Keys
+# Google API Keys (Required for core functionality)
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 VITE_GOOGLE_OAUTH_CLIENT_ID=your_google_oauth_client_id
 
-# Additional Services (if used)
+# Additional Services (Optional - only if you plan to use these services)
 SENDGRID_API_KEY=your_sendgrid_api_key
 TWILIO_ACCOUNT_SID=your_twilio_account_sid
 TWILIO_AUTH_TOKEN=your_twilio_auth_token
 TWILIO_PHONE_NUMBER=your_twilio_phone_number
 VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
 STRIPE_SECRET_KEY=your_stripe_secret_key
-
-# Firebase Configuration (if used)
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
-VITE_FIREBASE_APP_ID=your_firebase_app_id
 ```
 
 To generate a secure random string for SESSION_SECRET:
