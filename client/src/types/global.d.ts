@@ -45,6 +45,11 @@ declare global {
         Marker?: any;
         Circle?: any;
         LatLng?: new (lat: number, lng: number) => any;
+        event?: {
+          clearInstanceListeners: (instance: any) => void;
+          addListener: (instance: any, eventName: string, handler: Function) => any;
+          removeListener: (listener: any) => void;
+        };
       };
       accounts?: {
         id: {
@@ -59,6 +64,7 @@ declare global {
     handleGoogleCredential?: (response: CredentialResponse) => void;
     handleCredentialResponse?: (response: CredentialResponse) => void;
     initAutocomplete?: () => void;
+    initGoogleMapsAutocomplete?: () => void;
     googleMapsScriptLoading?: boolean;
   }
 }
