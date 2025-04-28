@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
-import { COMMON_TAGS } from "@shared/schema";
+import { TOY_CATEGORIES, COMMON_ATTRIBUTES } from "@shared/schema";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { Slider } from "@/components/ui/slider";
@@ -316,7 +316,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           </PopoverTrigger>
           <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
             <div className="max-h-60 overflow-auto p-2">
-              {COMMON_TAGS.map(tag => (
+              {COMMON_ATTRIBUTES.map(tag => (
                 <div 
                   key={tag}
                   className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
@@ -551,7 +551,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Tags</h3>
         <div className="flex flex-wrap gap-2 mt-3">
-          {COMMON_TAGS.map(tag => (
+          {COMMON_ATTRIBUTES.map(tag => (
             <Badge 
               key={tag} 
               variant={filters.tags.includes(tag) ? "default" : "outline"}

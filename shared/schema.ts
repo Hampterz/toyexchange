@@ -2,6 +2,25 @@ import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Categories and common tags for toys and wishes
+export const TOY_CATEGORIES = [
+  "Action Figures",
+  "Arts & Crafts",
+  "Baby Toys",
+  "Blocks & Building",
+  "Board Games",
+  "Books",
+  "Dolls",
+  "Educational",
+  "Electronic Toys",
+  "Outdoor Toys",
+  "Pretend Play", 
+  "Puzzles",
+  "Stuffed Animals",
+  "Vehicles",
+  "Other"
+];
+
 // User model
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -95,33 +114,18 @@ export const BADGES = {
   }
 };
 
-// Predefined common tags for toys
-export const COMMON_TAGS = [
-  "plush",
-  "educational",
-  "outdoor",
-  "baby",
-  "STEM",
-  "books",
-  "games",
+// Predefined common tags/attributes for toys
+export const COMMON_ATTRIBUTES = [
   "like-new",
   "3-5yrs",
   "6-8yrs",
   "9-12yrs",
   "teen",
-  "wooden",
-  "electronic",
-  "musical",
   "sports",
-  "art",
-  "puzzles",
   "seasonal",
-  "building",
-  "action-figures",
-  "cars",
-  "dolls",
-  "pretend-play",
-  "collectible"
+  "collectible",
+  "STEM",
+  "musical"
 ];
 
 // Toy model

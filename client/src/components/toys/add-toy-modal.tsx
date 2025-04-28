@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { AGE_RANGES, CATEGORIES, CONDITIONS } from "@/lib/utils/constants";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { insertToySchema, COMMON_TAGS, Toy } from "@shared/schema";
+import { insertToySchema, COMMON_ATTRIBUTES, TOY_CATEGORIES, Toy } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -567,7 +567,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                         <div className="pt-2 border-t">
                           <p className="text-xs text-muted-foreground mb-2">Select tags to describe your toy:</p>
                           <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-                            {COMMON_TAGS.map(tag => (
+                            {COMMON_ATTRIBUTES.map(tag => (
                               <Badge
                                 key={tag}
                                 variant={selectedTags.includes(tag) ? "default" : "outline"}
@@ -604,7 +604,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                               </Button>
                             </div>
                             
-                            {selectedTags.some(tag => !COMMON_TAGS.includes(tag)) && (
+                            {selectedTags.some(tag => !COMMON_ATTRIBUTES.includes(tag)) && (
                               <div className="mt-2">
                                 <p className="text-xs text-muted-foreground mb-1">Your custom tags:</p>
                                 <div className="flex flex-wrap gap-1.5">

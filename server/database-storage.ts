@@ -939,4 +939,172 @@ export class DatabaseStorage implements IStorage {
     };
     return this.communityMetrics;
   }
+
+  // ==================== Wish CRUD Methods ====================
+  async getWish(id: number): Promise<Wish | undefined> {
+    const [wish] = await db.select().from(wishes).where(eq(wishes.id, id));
+    return wish;
+  }
+
+  async getWishes(filters?: Record<string, any>): Promise<Wish[]> {
+    let query = db.select().from(wishes).orderBy(desc(wishes.createdAt));
+    
+    if (filters) {
+      // Location filter with array support
+      if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
+        query = query.where(inArray(wishes.location, filters.location));
+      } else if (filters.location && typeof filters.location === 'string' && filters.location !== "any") {
+        query = query.where(eq(wishes.location, filters.location));
+      }
+      
+      // Category filter with array support
+      if (filters.category && Array.isArray(filters.category) && filters.category.length > 0) {
+        query = query.where(inArray(wishes.category, filters.category));
+      } else if (filters.category && typeof filters.category === 'string' && filters.category !== "all") {
+        query = query.where(eq(wishes.category, filters.category));
+      }
+      
+      // Age range filter with array support
+      if (filters.ageRange && Array.isArray(filters.ageRange) && filters.ageRange.length > 0) {
+        query = query.where(inArray(wishes.ageRange, filters.ageRange));
+      } else if (filters.ageRange && typeof filters.ageRange === 'string' && filters.ageRange !== "all") {
+        query = query.where(eq(wishes.ageRange, filters.ageRange));
+      }
+      
+      // Status filter
+      if (filters.status) {
+        query = query.where(eq(wishes.status, filters.status));
+      } else {
+        // By default, only return pending wishes
+        query = query.where(eq(wishes.status, "pending"));
+      }
+      
+      // Search filter - search title, description, and tags
+      if (filters.search && typeof filters.search === 'string' && filters.search.trim() !== '') {
+        const searchTerm = `%${filters.search.trim().toLowerCase()}%`;
+        const searchTermExact = filters.search.trim().toLowerCase();
+        const searchWords = searchTermExact.split(/\s+/).filter(word => word.length > 1);
+        
+        query = query.where(
+          or(
+            // Check title with LIKE for partial and exact matches
+            like(sql`LOWER(${wishes.title})`, searchTerm),
+            // Check if title has exact word matches for more accuracy
+            ...searchWords.map(word => like(sql`LOWER(${wishes.title})`, `%${word}%`)),
+            
+            // Check description with LIKE for partial matches
+            like(sql`LOWER(${wishes.description})`, searchTerm),
+            
+            // Check category for matches
+            like(sql`LOWER(${wishes.category})`, searchTerm),
+            
+            // Check if any tag contains the search term or search words
+            sql`EXISTS (
+              SELECT 1 FROM jsonb_array_elements_text(${wishes.tags}::jsonb) tag 
+              WHERE LOWER(tag) LIKE ${searchTerm} OR ${
+                sql.raw(searchWords.map(word => `LOWER(tag) LIKE '%${word}%'`).join(' OR '))
+              }
+            )`
+          )
+        );
+      }
+    }
+    
+    return query;
+  }
+
+  async getWishesByUser(userId: number): Promise<Wish[]> {
+    return db.select()
+      .from(wishes)
+      .where(eq(wishes.userId, userId))
+      .orderBy(desc(wishes.createdAt));
+  }
+
+  async createWish(insertWish: InsertWish): Promise<Wish> {
+    const [wish] = await db.insert(wishes).values({
+      ...insertWish,
+      createdAt: new Date(),
+      status: insertWish.status || "pending",
+      // Ensure tags is properly handled as JSON
+      tags: Array.isArray(insertWish.tags) ? insertWish.tags : []
+    }).returning();
+    return wish;
+  }
+
+  async updateWish(id: number, updates: Partial<Wish>): Promise<Wish | undefined> {
+    const [updatedWish] = await db.update(wishes)
+      .set(updates)
+      .where(eq(wishes.id, id))
+      .returning();
+    return updatedWish;
+  }
+
+  async deleteWish(id: number): Promise<boolean> {
+    const result = await db.delete(wishes).where(eq(wishes.id, id));
+    return result.rowCount > 0;
+  }
+
+  // ==================== Wish Offer CRUD Methods ====================
+  async getWishOffer(id: number): Promise<WishOffer | undefined> {
+    const [offer] = await db.select().from(wishOffers).where(eq(wishOffers.id, id));
+    return offer;
+  }
+
+  async getWishOffersByWish(wishId: number): Promise<WishOffer[]> {
+    return db.select()
+      .from(wishOffers)
+      .where(eq(wishOffers.wishId, wishId))
+      .orderBy(desc(wishOffers.createdAt));
+  }
+
+  async createWishOffer(insertOffer: InsertWishOffer): Promise<WishOffer> {
+    const [offer] = await db.insert(wishOffers).values({
+      ...insertOffer,
+      createdAt: new Date(),
+      status: insertOffer.status || "pending"
+    }).returning();
+    
+    return offer;
+  }
+
+  async updateWishOfferStatus(id: number, status: string): Promise<WishOffer | undefined> {
+    // First, get the current offer
+    const [offer] = await db.select().from(wishOffers).where(eq(wishOffers.id, id));
+    if (!offer) return undefined;
+    
+    // Update the offer status
+    const [updatedOffer] = await db.update(wishOffers)
+      .set({ status })
+      .where(eq(wishOffers.id, id))
+      .returning();
+    
+    // If the offer is accepted, update the user's sustainability metrics
+    if (status === 'accepted') {
+      // Update offerer's sustainability metrics (shared a toy for a wish)
+      await updateUserSustainabilityMetrics(this, offer.offererId, { 
+        toysSharedIncrement: 1,
+        successfulExchangesIncrement: 1 
+      });
+      
+      // Update wish creator's sustainability metrics (received a toy)
+      const wish = await this.getWish(offer.wishId);
+      if (wish) {
+        await updateUserSustainabilityMetrics(this, wish.userId, { 
+          successfulExchangesIncrement: 1 
+        });
+        
+        // Mark the wish as fulfilled
+        await this.updateWish(wish.id, { status: "fulfilled" });
+        
+        // Update community metrics
+        await this.updateCommunityMetrics({
+          toysSaved: this.communityMetrics.toysSaved + 1,
+          familiesConnected: this.communityMetrics.familiesConnected + 1,
+          wasteReduced: this.communityMetrics.wasteReduced + 2 // Assuming each toy is ~2kg of waste saved
+        });
+      }
+    }
+    
+    return updatedOffer;
+  }
 }

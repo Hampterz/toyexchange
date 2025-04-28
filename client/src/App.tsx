@@ -11,6 +11,9 @@ import UserProfilePage from "@/pages/user-profile-page";
 import FavoritesPage from "@/pages/favorites-page";
 import MessagesPage from "@/pages/messages-page";
 import ToyPage from "@/pages/toy-page";
+import WishesPage from "@/pages/wishes-page";
+import CreateWishPage from "@/pages/create-wish-page";
+import WishDetailPage from "@/pages/wish-detail-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -121,6 +124,17 @@ const Router = () => {
       {/* Public individual toy page - accessible to all users */}
       <Route path="/toys/:id">
         {() => <Layout><ToyPage /></Layout>}
+      </Route>
+
+      {/* Wish List Feature */}
+      <Route path="/wishes">
+        {() => <Layout><WishesPage /></Layout>}
+      </Route>
+      <Route path="/wishes/create">
+        {() => <Layout><CreateWishPage /></Layout>}
+      </Route>
+      <Route path="/wishes/:id">
+        {() => <Layout><WishDetailPage /></Layout>}
       </Route>
       
       {/* Resource Pages */}
