@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,11 +14,10 @@ import Confetti from "react-confetti";
 
 export default function ProfileCustomizationPage() {
   const { user } = useAuth();
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [bio, setBio] = useState<string>("");
-  const [location, setLocation] = useState<string>(user?.location || "");
+  const [userLocation, setUserLocation] = useState<string>(user?.location || "");
   const [profilePicture, setProfilePicture] = useState<string | null>(user?.profilePicture || null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -32,7 +30,7 @@ export default function ProfileCustomizationPage() {
   useEffect(() => {
     // If user is not logged in, redirect to auth page
     if (!user) {
-      navigate("/auth");
+      window.location.href = "/auth";
       return;
     }
 
@@ -46,7 +44,7 @@ export default function ProfileCustomizationPage() {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [user, navigate]);
+  }, [user]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -64,7 +62,7 @@ export default function ProfileCustomizationPage() {
       });
       
       // Navigate to home page after successful update
-      setTimeout(() => navigate("/"), 2500);
+      setTimeout(() => window.location.href = "/", 2500);
     },
     onError: (error: any) => {
       toast({
@@ -118,7 +116,7 @@ export default function ProfileCustomizationPage() {
       // Prepare the profile data
       const updatedData: any = {
         bio,
-        location,
+        location: userLocation,
       };
       
       // If a new profile picture was selected, convert it to base64
@@ -147,7 +145,7 @@ export default function ProfileCustomizationPage() {
   };
 
   const handleSkip = () => {
-    navigate("/");
+    window.location.href = "/";
   };
 
   return (
@@ -225,8 +223,8 @@ export default function ProfileCustomizationPage() {
               <AddressAutocomplete
                 placeholder="Enter your general location"
                 className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
-                defaultValue={location}
-                onAddressSelect={(address) => setLocation(address)}
+                defaultValue={userLocation}
+                onAddressSelect={(address) => setUserLocation(address)}
               />
             </div>
             <p className="text-xs text-muted-foreground">

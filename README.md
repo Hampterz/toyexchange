@@ -1,4 +1,11 @@
-# ToyShare - Complete AWS Deployment Guide
+# ToyShare - Deployment Guides
+
+This repository includes comprehensive deployment guides for the ToyShare application:
+
+1. [AWS Deployment Guide](#aws-deployment-guide) - For deploying on Amazon Web Services
+2. [Hostinger Deployment Guide](./hostinger-instructions.md) - For deploying on Hostinger web hosting
+
+## AWS Deployment Guide
 
 This comprehensive guide provides step-by-step instructions for deploying the ToyShare application on an AWS server, including detailed database setup for storing user accounts, toy listings, and all application data.
 
