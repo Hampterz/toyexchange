@@ -110,11 +110,11 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       <div className="space-y-3 mb-4">
         {/* Direct Location Search - Moved to top */}
         <div className="mb-3">
-          <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2">
+          <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2 shadow-sm">
             <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
             <AddressAutocomplete
               placeholder="Search for a location..."
-              className="w-full border-none focus-visible:ring-0 p-0"
+              className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
               onAddressSelect={(address, coordinates) => {
                 // Add the selected address to the location filters
                 if (address && !filters.location.includes(address)) {
@@ -149,6 +149,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               className="mt-1"
               onValueChange={(value) => {
                 handleFilterChange("distance", value[0]);
+                // Apply filter immediately to improve UX
+                if (filters.latitude && filters.longitude) {
+                  onFilterChange({...filters, distance: value[0]});
+                }
               }}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -386,7 +390,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mb-3">
           <AddressAutocomplete
             placeholder="Enter a location..."
-            className="w-full border-blue-200 focus-visible:ring-blue-700 mb-2"
+            className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
             onAddressSelect={(address, coordinates) => {
               // Add the selected address to the location filters
               if (address && !filters.location.includes(address)) {
@@ -457,6 +461,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               className="flex-1"
               onValueChange={(value) => {
                 handleFilterChange("distance", value[0]);
+                // Apply filter immediately to improve UX
+                if (filters.latitude && filters.longitude) {
+                  onFilterChange({...filters, distance: value[0]});
+                }
               }}
             />
           </div>

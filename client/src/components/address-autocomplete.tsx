@@ -189,12 +189,12 @@ export function AddressAutocomplete({
 
   return (
     <div className="relative">
-      <Input
+      <input
         ref={inputRef}
         type="text"
         id={id}
         placeholder={placeholder}
-        className={cn("address-autocomplete", className)}
+        className={cn("w-full outline-none bg-transparent text-sm", className)}
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
