@@ -34,6 +34,7 @@ export function AddressAutocomplete({
   const [isInitialized, setIsInitialized] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [showFallbackMessage, setShowFallbackMessage] = useState(false);
+  const [initializationAttempted, setInitializationAttempted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -43,16 +44,16 @@ export function AddressAutocomplete({
     return window.google && window.google.maps && window.google.maps.places;
   };
 
-  // Use an effect to show the fallback message after a delay
+  // Use an effect to show the fallback message after a delay, but only if initialization was attempted
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!isInitialized) {
+      if (!isInitialized && initializationAttempted) {
         setShowFallbackMessage(true);
       }
     }, 3000); // Show fallback message after 3 seconds if autocomplete not initialized
     
     return () => clearTimeout(timer);
-  }, [isInitialized]);
+  }, [isInitialized, initializationAttempted]);
 
   // Load the Google Maps script on component mount
   useEffect(() => {
@@ -125,8 +126,9 @@ export function AddressAutocomplete({
 
   // Initialize the autocomplete functionality
   const initializeAutocomplete = () => {
+    setInitializationAttempted(true);
+    
     if (!inputRef.current || !isGoogleMapsLoaded()) {
-      setShowFallbackMessage(true);
       return;
     }
     

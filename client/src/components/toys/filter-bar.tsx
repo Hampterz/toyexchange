@@ -115,9 +115,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             <AddressAutocomplete
               placeholder="Search for a location..."
               className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
-              onAddressSelect={(address, coordinates) => {
-                // Add the selected address to the location filters
-                if (address && !filters.location.includes(address)) {
+              onAddressSelect={(address, coordinates, placeId) => {
+                // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
+                // or if it has coordinates (both ensure a complete address was selected)
+                if (address && !filters.location.includes(address) && (placeId || coordinates)) {
                   handleMultiSelectChange("location", address);
                   
                   // If we have coordinates, update the latitude and longitude
@@ -391,9 +392,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <AddressAutocomplete
             placeholder="Enter a location..."
             className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
-            onAddressSelect={(address, coordinates) => {
-              // Add the selected address to the location filters
-              if (address && !filters.location.includes(address)) {
+            onAddressSelect={(address, coordinates, placeId) => {
+              // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
+              // or if it has coordinates (both ensure a complete address was selected)
+              if (address && !filters.location.includes(address) && (placeId || coordinates)) {
                 const newLocations = [...filters.location, address];
                 handleFilterChange("location", newLocations);
                 
