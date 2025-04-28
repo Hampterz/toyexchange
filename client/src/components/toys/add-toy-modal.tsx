@@ -609,7 +609,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                 <p className="text-xs text-muted-foreground mb-1">Your custom tags:</p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {selectedTags
-                                    .filter(tag => !COMMON_TAGS.includes(tag))
+                                    .filter(tag => !COMMON_ATTRIBUTES.includes(tag))
                                     .map(tag => (
                                       <Badge
                                         key={tag}
