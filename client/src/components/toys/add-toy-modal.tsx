@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Upload, AlertCircle, Tag } from "lucide-react";
+import { X, Upload, AlertCircle, Tag, MapPin } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { AddressAutocomplete } from "@/components/address-autocomplete";
 
 interface AddToyModalProps {
   isOpen: boolean;
@@ -423,10 +424,23 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                     <FormItem>
                       <FormLabel>Pickup Location</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter your preferred pickup location" 
-                          {...field} 
-                        />
+                        <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
+                          <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
+                          <AddressAutocomplete
+                            placeholder="Search for a pickup location"
+                            className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
+                            defaultValue={field.value}
+                            onAddressSelect={(address, coordinates) => {
+                              field.onChange(address);
+                              
+                              // Update coordinates in the database when available
+                              if (coordinates) {
+                                // Store latitude and longitude with the toy in the future
+                                console.log("Selected coordinates:", coordinates);
+                              }
+                            }}
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
