@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Input } from "@/components/ui/input";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 // Define the props for the AddressAutocomplete component
@@ -29,72 +28,77 @@ export function AddressAutocomplete({
   disabled
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = useState(defaultValue || "");
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [apiError, setApiError] = useState(false);
+  const [isAutocompleteActive, setIsAutocompleteActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
+  const apiLoadAttemptedRef = useRef(false);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-  // Load the Google Maps script
+  // Initialize Google Maps Autocomplete
   useEffect(() => {
-    // If Google Maps is already loaded, don't load again
-    if (window.google && window.google.maps && window.google.maps.places) {
-      setScriptLoaded(true);
-      return;
-    }
-    
-    // Check if script tag already exists
-    const existingScript = document.getElementById('google-maps-script');
-    if (existingScript) {
-      // Script already exists, wait for it to load
-      const checkLoaded = setInterval(() => {
-        if (window.google && window.google.maps && window.google.maps.places) {
-          setScriptLoaded(true);
-          clearInterval(checkLoaded);
-        }
-      }, 100);
-      
-      // Set a timeout for the check
-      setTimeout(() => clearInterval(checkLoaded), 10000);
-      return;
-    }
-    
-    // Create a global callback that will be called when Google Maps loads
-    window.initGoogleMapsAutocomplete = function() {
-      setScriptLoaded(true);
-    };
-    
-    // Create and append the script element
-    const script = document.createElement('script');
-    script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMapsAutocomplete`;
-    script.async = true;
-    document.head.appendChild(script);
-    
-    // Clean up
-    return () => {
-      // Remove the global callback
-      window.initGoogleMapsAutocomplete = function() {};
-    };
-  }, [apiKey]);
+    // Only attempt to load once
+    if (apiLoadAttemptedRef.current) return;
+    apiLoadAttemptedRef.current = true;
 
-  // Initialize autocomplete once the script is loaded
-  useEffect(() => {
-    if (!scriptLoaded || !inputRef.current) {
-      return;
-    }
-    
     try {
-      // Create the autocomplete instance
+      // Check if Google Maps API is already loaded
       if (window.google?.maps?.places?.Autocomplete) {
-        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-          types: ['address'],
-          fields: ['formatted_address', 'geometry', 'place_id']
-        });
-      } else {
+        initializeAutocomplete();
         return;
       }
-      
-      // Add listener for place selection
+
+      // Set a global callback for when the script loads
+      const callbackName = 'gmapsCallback' + Date.now();
+      window[callbackName] = () => {
+        if (window.google?.maps?.places?.Autocomplete) {
+          initializeAutocomplete();
+        } else {
+          setApiError(true);
+        }
+        // Clean up callback
+        delete window[callbackName];
+      };
+
+      // Load the Google Maps API script
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=${callbackName}`;
+      script.async = true;
+      script.onerror = () => setApiError(true);
+      document.head.appendChild(script);
+
+      // Timeout for API loading
+      const timeout = setTimeout(() => {
+        if (!isAutocompleteActive) {
+          setApiError(true);
+        }
+      }, 5000);
+
+      return () => {
+        clearTimeout(timeout);
+        // Clean up the global callback
+        if (window[callbackName]) {
+          delete window[callbackName];
+        }
+      };
+    } catch (error) {
+      console.error("Error setting up Google Maps API:", error);
+      setApiError(true);
+    }
+  }, [apiKey]);
+
+  // Initialize autocomplete on the input element
+  const initializeAutocomplete = () => {
+    if (!inputRef.current) return;
+
+    try {
+      // Create the autocomplete instance
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['address'],
+        fields: ['formatted_address', 'geometry', 'place_id']
+      });
+
+      // Add place selection handler
       autocompleteRef.current.addListener('place_changed', () => {
         const place = autocompleteRef.current.getPlace();
         if (place && place.formatted_address) {
@@ -111,37 +115,32 @@ export function AddressAutocomplete({
           onAddressSelect(place.formatted_address, coordinates, place.place_id);
         }
       });
+
+      setIsAutocompleteActive(true);
     } catch (error) {
-      console.error('Error initializing Google Maps Autocomplete:', error);
+      console.error("Error initializing autocomplete:", error);
+      setApiError(true);
     }
-    
-    // Clean up on unmount
+  };
+
+  // Clean up the autocomplete instance when the component unmounts
+  useEffect(() => {
     return () => {
       if (autocompleteRef.current && window.google?.maps?.event) {
         window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
         autocompleteRef.current = null;
       }
     };
-  }, [scriptLoaded, inputRef.current]);
+  }, []);
 
-  // Handle input changes
+  // Called when the input value changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
     
-    // Always notify the parent component about the input change
-    // This is crucial to prevent form validation errors from disabling the input
+    // Always update the parent with the current value
+    // This prevents form validation from disabling input in the middle of typing
     onAddressSelect(value);
-  };
-
-  // Handle Enter key press
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (inputValue.trim()) {
-        onAddressSelect(inputValue);
-      }
-    }
   };
 
   return (
@@ -154,7 +153,12 @@ export function AddressAutocomplete({
         className={cn("w-full outline-none bg-transparent text-sm", className)}
         value={inputValue}
         onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && inputValue.trim()) {
+            e.preventDefault();
+            onAddressSelect(inputValue);
+          }
+        }}
         required={required}
         autoFocus={autoFocus}
         disabled={disabled}
@@ -165,4 +169,11 @@ export function AddressAutocomplete({
       />
     </div>
   );
+}
+
+// Declare the global callback for TypeScript
+declare global {
+  interface Window {
+    [key: string]: any;
+  }
 }
