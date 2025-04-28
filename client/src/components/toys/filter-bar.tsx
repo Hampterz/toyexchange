@@ -456,7 +456,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <div className="flex items-center gap-2">
             <Ruler className="h-4 w-4 text-blue-600" />
             <Slider
-              value={[filters.distance || 25]}
+              value={[filters.distance || 10]}
               min={1}
               max={100}
               step={1}
