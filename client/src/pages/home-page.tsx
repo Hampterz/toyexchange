@@ -124,7 +124,7 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Enhanced Smart Search */}
+            {/* Search */}
             <div className="mb-6">
               <ToySearch 
                 onSearch={(query) => handleFilterChange({...filters, search: query})} 

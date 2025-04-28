@@ -23,7 +23,6 @@ export function ToySearch({ onSearch, initialValue = "" }: ToySearchProps) {
 
   return (
     <div className="w-full max-w-md">
-      <h3 className="text-sm font-medium text-blue-800 mb-2">Smart Search</h3>
       <form 
         onSubmit={handleSubmit} 
         className="relative flex w-full transition-all"

@@ -24,9 +24,8 @@ export const CATEGORIES = [
 
 // Toy condition options
 export const CONDITIONS = [
-  "New",
   "Like New",
-  "Gently Used",
+  "Used",
   "Well Loved"
 ];
 
