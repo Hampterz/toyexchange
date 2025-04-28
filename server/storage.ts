@@ -210,6 +210,10 @@ export class MemStorage implements IStorage {
   private toyHistoriesMap: Map<number, ToyHistory>;
   private safetyTipsMap: Map<number, SafetyTip>;
   
+  // Wish system storage maps
+  private wishesMap: Map<number, Wish>;
+  private wishOffersMap: Map<number, WishOffer>;
+  
   private userCurrentId: number = 1;
   private toyCurrentId: number = 1;
   private messageCurrentId: number = 1;
@@ -225,6 +229,10 @@ export class MemStorage implements IStorage {
   private meetupLocationCurrentId: number = 1;
   private toyHistoryCurrentId: number = 1;
   private safetyTipCurrentId: number = 1;
+  
+  // Wish system IDs
+  private wishCurrentId: number = 1;
+  private wishOfferCurrentId: number = 1;
   
   sessionStore: session.SessionStore;
 
@@ -244,6 +252,10 @@ export class MemStorage implements IStorage {
     this.meetupLocationsMap = new Map();
     this.toyHistoriesMap = new Map();
     this.safetyTipsMap = new Map();
+    
+    // Initialize wish system maps
+    this.wishesMap = new Map();
+    this.wishOffersMap = new Map();
     
     // Initialize community metrics
     this.communityMetrics = {
@@ -776,6 +788,157 @@ export class MemStorage implements IStorage {
       ...metrics
     };
     return this.communityMetrics;
+  }
+
+  // Wish CRUD methods
+  async getWish(id: number): Promise<Wish | undefined> {
+    return this.wishesMap.get(id);
+  }
+
+  async getWishes(filters?: Record<string, any>): Promise<Wish[]> {
+    let wishes = Array.from(this.wishesMap.values());
+    
+    if (filters) {
+      if (filters.location && filters.location !== "any") {
+        wishes = wishes.filter(wish => wish.location === filters.location);
+      }
+      if (filters.ageRange && filters.ageRange !== "any") {
+        wishes = wishes.filter(wish => wish.ageRange === filters.ageRange);
+      }
+      if (filters.category && filters.category !== "any") {
+        wishes = wishes.filter(wish => wish.category === filters.category);
+      }
+      
+      // Filter by status (pending, fulfilled, etc.)
+      if (filters.status) {
+        wishes = wishes.filter(wish => wish.status === filters.status);
+      } else {
+        // By default, only return pending wishes
+        wishes = wishes.filter(wish => wish.status === "pending");
+      }
+      
+      // Filter by search term (title, description)
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        wishes = wishes.filter(wish => {
+          const wishTags = Array.isArray(wish.tags) ? wish.tags : [];
+          const matchInTags = wishTags.some(tag => 
+            tag.toLowerCase().includes(searchLower)
+          );
+          
+          return wish.title.toLowerCase().includes(searchLower) || 
+                 wish.description.toLowerCase().includes(searchLower) ||
+                 matchInTags;
+        });
+      }
+    }
+    
+    // Sort by newest first (default)
+    return wishes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getWishesByUser(userId: number): Promise<Wish[]> {
+    return Array.from(this.wishesMap.values())
+      .filter(wish => wish.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createWish(insertWish: InsertWish): Promise<Wish> {
+    const id = this.wishCurrentId++;
+    const createdAt = new Date();
+    
+    // Ensure tags is an array
+    const tags = Array.isArray(insertWish.tags) ? insertWish.tags : [];
+    
+    // Set default status to pending
+    const status = insertWish.status || "pending";
+    
+    const wish: Wish = { 
+      ...insertWish, 
+      id, 
+      createdAt,
+      tags,
+      status
+    };
+    
+    this.wishesMap.set(id, wish);
+    return wish;
+  }
+
+  async updateWish(id: number, updates: Partial<Wish>): Promise<Wish | undefined> {
+    const wish = this.wishesMap.get(id);
+    if (!wish) return undefined;
+    
+    const updatedWish = { ...wish, ...updates };
+    this.wishesMap.set(id, updatedWish);
+    return updatedWish;
+  }
+
+  async deleteWish(id: number): Promise<boolean> {
+    return this.wishesMap.delete(id);
+  }
+
+  // Wish Offer CRUD methods
+  async getWishOffer(id: number): Promise<WishOffer | undefined> {
+    return this.wishOffersMap.get(id);
+  }
+
+  async getWishOffersByWish(wishId: number): Promise<WishOffer[]> {
+    return Array.from(this.wishOffersMap.values())
+      .filter(offer => offer.wishId === wishId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createWishOffer(insertOffer: InsertWishOffer): Promise<WishOffer> {
+    const id = this.wishOfferCurrentId++;
+    const createdAt = new Date();
+    
+    // Ensure status is set (default to pending if not provided)
+    const status = insertOffer.status || "pending";
+    
+    const offer: WishOffer = { 
+      ...insertOffer, 
+      id, 
+      createdAt,
+      status
+    };
+    
+    this.wishOffersMap.set(id, offer);
+    return offer;
+  }
+
+  async updateWishOfferStatus(id: number, status: string): Promise<WishOffer | undefined> {
+    const offer = this.wishOffersMap.get(id);
+    if (!offer) return undefined;
+    
+    const updatedOffer = { ...offer, status };
+    this.wishOffersMap.set(id, updatedOffer);
+    
+    // If the offer is accepted, update the user's sustainability metrics
+    if (status === 'accepted') {
+      // Update offerer's sustainability metrics (shared a toy for a wish)
+      await updateUserSustainabilityMetrics(this, offer.offererId, { 
+        toysSharedIncrement: 1,
+        successfulExchangesIncrement: 1 
+      });
+      
+      // Update wish creator's sustainability metrics (received a toy)
+      const wish = await this.getWish(offer.wishId);
+      if (wish) {
+        await updateUserSustainabilityMetrics(this, wish.userId, { 
+          successfulExchangesIncrement: 1 
+        });
+        
+        // Update community metrics
+        await this.updateCommunityMetrics({
+          toysSaved: this.communityMetrics.toysSaved + 1,
+          familiesConnected: this.communityMetrics.familiesConnected + 1,
+          wasteReduced: this.communityMetrics.wasteReduced + 2 // Assuming each toy is ~2kg of waste saved
+        });
+      }
+    }
+    
+    return updatedOffer;
   }
 }
 

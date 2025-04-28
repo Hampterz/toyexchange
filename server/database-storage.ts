@@ -12,6 +12,8 @@ import {
   meetupLocations, type MeetupLocation, type InsertMeetupLocation,
   toyHistories, type ToyHistory, type InsertToyHistory,
   safetyTips, type SafetyTip, type InsertSafetyTip,
+  wishes, type Wish, type InsertWish,
+  wishOffers, type WishOffer, type InsertWishOffer,
   BADGES 
 } from "@shared/schema";
 import session from "express-session";
