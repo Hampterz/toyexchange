@@ -475,10 +475,11 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                     className="relative"
                     onClick={() => {
                       const currentImageFiles = form.watch("imageFiles");
-                      // If already has images, click image upload; otherwise let them choose
+                      const currentVideoFiles = form.watch("videoFiles");
+                      // If already has images or videos, continue with that type; otherwise let them choose
                       if (currentImageFiles && currentImageFiles.length > 0) {
                         document.getElementById('image-upload')?.click();
-                      } else if (form.watch("videoFiles")?.length > 0) {
+                      } else if (currentVideoFiles && currentVideoFiles.length > 0) {
                         document.getElementById('video-upload')?.click();
                       } else {
                         document.getElementById('media-select')?.click();
