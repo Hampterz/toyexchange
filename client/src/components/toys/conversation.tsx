@@ -22,8 +22,18 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Get messages between the two users
-  const { data: messages, isLoading } = useQuery<Message[]>({
+  const { data: messages, isLoading, refetch } = useQuery<Message[]>({
     queryKey: [`/api/messages/${otherUserId}`],
+    enabled: !!otherUserId,
+    queryFn: async () => {
+      const res = await fetch(`/api/messages/${otherUserId}`, {
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      return res.json();
+    }
   });
 
   // Send a new message
@@ -39,6 +49,8 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
     },
     onSuccess: () => {
       setNewMessage("");
+      // Immediately refetch the messages to show the new message
+      refetch();
       queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
@@ -126,7 +138,7 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
                 <div className={`max-w-[75%] ${isSentByMe ? 'bg-primary text-white' : 'bg-neutral-100'} rounded-lg px-4 py-2`}>
                   <p>{message.content}</p>
                   <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                    {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                   </div>
                 </div>
               </div>
