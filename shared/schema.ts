@@ -120,16 +120,30 @@ export const BADGES = {
 
 // Predefined common tags/attributes for toys
 export const COMMON_ATTRIBUTES = [
-  "like-new",
-  "3-5yrs",
-  "6-8yrs",
-  "9-12yrs",
-  "teen",
-  "sports",
-  "seasonal",
-  "collectible",
-  "STEM",
-  "musical"
+  "Educational", 
+  "Outdoor", 
+  "Indoor", 
+  "Wooden", 
+  "Electronic", 
+  "Creative", 
+  "STEM", 
+  "Sports", 
+  "Music", 
+  "Art", 
+  "Dolls", 
+  "Vehicles", 
+  "Building", 
+  "Puzzles", 
+  "Games", 
+  "Stuffed Animals",
+  "Role Play", 
+  "Collectibles", 
+  "Sensory",
+  "Preschool",
+  "Baby",
+  "Toddler",
+  "School-Age",
+  "Teens"
 ];
 
 // Toy model
