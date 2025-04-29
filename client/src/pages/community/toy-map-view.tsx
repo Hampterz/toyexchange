@@ -134,7 +134,7 @@ export default function ToyMapView() {
               <SelectValue placeholder={getLocationDisplay()} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Current: {getLocationDisplay()}</SelectItem>
+              <SelectItem value="current">Current: {getLocationDisplay()}</SelectItem>
               <SelectItem value="New York, NY">New York, NY</SelectItem>
               <SelectItem value="Los Angeles, CA">Los Angeles, CA</SelectItem>
               <SelectItem value="Chicago, IL">Chicago, IL</SelectItem>
@@ -203,14 +203,14 @@ export default function ToyMapView() {
               <div className="space-y-2">
                 <h3 className="text-sm font-medium">Category</h3>
                 <Select 
-                  value={category || ""} 
-                  onValueChange={(value) => setCategory(value || null)}
+                  value={category || "all-categories"} 
+                  onValueChange={(value) => setCategory(value === "all-categories" ? null : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all-categories">All Categories</SelectItem>
                     <SelectItem value="action-figures">Action Figures</SelectItem>
                     <SelectItem value="board-games">Board Games</SelectItem>
                     <SelectItem value="building-blocks">Building Blocks</SelectItem>
@@ -228,14 +228,14 @@ export default function ToyMapView() {
               <div className="space-y-2">
                 <h3 className="text-sm font-medium">Age Range</h3>
                 <Select 
-                  value={ageRange || ""} 
-                  onValueChange={(value) => setAgeRange(value || null)}
+                  value={ageRange || "all-ages"} 
+                  onValueChange={(value) => setAgeRange(value === "all-ages" ? null : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Ages" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Ages</SelectItem>
+                    <SelectItem value="all-ages">All Ages</SelectItem>
                     <SelectItem value="0-2">0-2 years</SelectItem>
                     <SelectItem value="3-5">3-5 years</SelectItem>
                     <SelectItem value="6-8">6-8 years</SelectItem>
