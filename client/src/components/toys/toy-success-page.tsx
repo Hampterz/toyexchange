@@ -64,7 +64,8 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      {/* We don't use onOpenChange={onClose} here to prevent closing when clicking outside */}
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         {showConfetti && (
           <Confetti
@@ -83,7 +84,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
           </div>
           <DialogTitle className="text-xl font-bold text-center">Toy Successfully Shared!</DialogTitle>
           <p className="text-muted-foreground mt-2">
-            Your toy is now visible to families in your community. Share it to expand its reach!
+            Your toy is now visible to members in your community. Share it to expand its reach!
           </p>
         </DialogHeader>
 
@@ -142,7 +143,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
               <p className="text-blue-700 font-medium">Impact Stats</p>
               <p className="text-blue-600 text-xs mt-1">
                 You've shared {toy?.userId ? "your first" : "another"} toy! 
-                Toy sharing reduces waste in landfills and helps other families.
+                Toy sharing reduces waste in landfills and helps other members in the community.
               </p>
             </div>
           </div>

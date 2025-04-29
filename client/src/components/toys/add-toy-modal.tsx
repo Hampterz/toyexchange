@@ -312,7 +312,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      {/* We don't use onOpenChange={onClose} here to prevent closing when clicking outside */}
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
           <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
