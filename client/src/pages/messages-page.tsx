@@ -122,22 +122,24 @@ export default function MessagesPage() {
   const isLoading = isLoadingMessages || isLoadingConversations;
 
   return (
-    <div className="page-transition">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold mb-6 flex items-center">
-          <MessageSquare className="mr-2 h-6 w-6 text-primary" />
-          Messages
-        </h1>
+    <div className="page-transition bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold flex items-center">
+            <MessageSquare className="mr-2 h-6 w-6 text-primary" />
+            Messages
+          </h1>
+        </div>
 
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : !conversationsData || conversationsData.length === 0 ? (
-          <div className="text-center py-16 bg-neutral-50 rounded-lg border border-neutral-200">
+          <div className="text-center py-16 bg-white rounded-xl border border-neutral-100 shadow-sm">
             <MessageSquare className="h-16 w-16 mx-auto text-neutral-300 mb-4" />
             <h2 className="text-xl font-semibold mb-2">No conversations yet</h2>
-            <p className="text-neutral-600 mb-6">
+            <p className="text-neutral-600 mb-6 max-w-md mx-auto">
               When you message other users about their toys, you'll see your conversations here
             </p>
             <Button 
@@ -148,57 +150,55 @@ export default function MessagesPage() {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-col md:flex-row gap-4 bg-white rounded-xl shadow-sm overflow-hidden">
             {/* Conversation List */}
-            <div className="md:w-1/3">
-              <Card className="overflow-hidden">
-                <div className="bg-muted py-3 px-4 border-b">
-                  <h2 className="font-semibold">Conversations</h2>
-                </div>
-                <div className="divide-y">
-                  {conversationsData.map((otherUser) => {
-                    if (otherUser.id === user.id) return null;
-                    
-                    const unreadCount = getUnreadCount(otherUser.id);
-                    const lastMessage = getLastMessage(otherUser.id);
-                    
-                    return (
-                      <div 
-                        key={otherUser.id}
-                        className={`p-4 cursor-pointer hover:bg-muted/50 transition hover:scale-[1.01] ${
-                          selectedUser === otherUser.id ? 'bg-muted' : ''
-                        }`}
-                        onClick={() => setSelectedUser(otherUser.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <AvatarWithFallback user={otherUser} />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-center">
-                              <h3 className="font-medium truncate">{otherUser.name}</h3>
-                              {lastMessage && (
-                                <span className="text-xs text-muted-foreground">
-                                  {lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleDateString() : ''}
-                                </span>
-                              )}
-                            </div>
+            <div className="md:w-1/3 border-r">
+              <div className="py-3 px-4 border-b bg-white">
+                <h2 className="font-semibold text-neutral-700">Conversations</h2>
+              </div>
+              <div className="divide-y max-h-[600px] overflow-y-auto">
+                {conversationsData.map((otherUser) => {
+                  if (otherUser.id === user.id) return null;
+                  
+                  const unreadCount = getUnreadCount(otherUser.id);
+                  const lastMessage = getLastMessage(otherUser.id);
+                  
+                  return (
+                    <div 
+                      key={otherUser.id}
+                      className={`p-4 cursor-pointer hover:bg-blue-50 transition ${
+                        selectedUser === otherUser.id ? 'bg-blue-50 border-l-4 border-l-primary' : ''
+                      }`}
+                      onClick={() => setSelectedUser(otherUser.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <AvatarWithFallback user={otherUser} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-center">
+                            <h3 className="font-medium truncate">{otherUser.name}</h3>
                             {lastMessage && (
-                              <p className="text-sm text-muted-foreground truncate">
-                                {lastMessage.senderId === user.id ? "You: " : ""}
-                                {lastMessage.content}
-                              </p>
+                              <span className="text-xs text-neutral-500">
+                                {lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleDateString([], {month: 'short', day: 'numeric'}) : ''}
+                              </span>
                             )}
                           </div>
-                          {unreadCount > 0 && (
-                            <div className="bg-primary text-white text-xs font-bold h-5 min-w-5 rounded-full flex items-center justify-center px-1.5">
-                              {unreadCount}
-                            </div>
+                          {lastMessage && (
+                            <p className={`text-sm truncate ${unreadCount > 0 ? 'font-medium text-neutral-800' : 'text-neutral-500'}`}>
+                              {lastMessage.senderId === user.id ? "You: " : ""}
+                              {lastMessage.content}
+                            </p>
                           )}
                         </div>
+                        {unreadCount > 0 && (
+                          <div className="bg-primary text-white text-xs font-bold h-5 min-w-5 rounded-full flex items-center justify-center px-1.5">
+                            {unreadCount}
+                          </div>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
-              </Card>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             
             {/* Conversation Content */}

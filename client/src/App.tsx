@@ -63,7 +63,7 @@ import SafetyTipsManagement from "@/pages/admin/safety-tips-management";
 import MeetupLocationVerification from "@/pages/admin/meetup-location-verification";
 
 // Layout component that wraps all pages with consistent header/footer
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children, showFooter = false }: { children: React.ReactNode, showFooter?: boolean }) => {
   const [searchQuery, setSearchQuery] = useState("");
   
   const handleSearchChange = (value: string) => {
@@ -81,7 +81,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <main className="flex-grow">
         {children}
       </main>
-      <Footer />
+      {showFooter && <Footer />}
       <MobileNav onAddToyClick={handleAddToyClick} />
     </div>
   );
@@ -92,7 +92,7 @@ const Router = () => {
     <Switch>
       {/* Main App Routes */}
       <Route path="/">
-        {() => <Layout><HomePage /></Layout>}
+        {() => <Layout showFooter={true}><HomePage /></Layout>}
       </Route>
       <Route path="/auth">
         {() => <Layout><AuthPage /></Layout>}

@@ -154,10 +154,10 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
   }
 
   return (
-    <Card className="h-[500px] flex flex-col">
-      <CardHeader className="border-b px-4 py-3 flex-shrink-0">
+    <Card className="h-[600px] flex flex-col shadow-none border-none">
+      <CardHeader className="border-b px-4 py-3 flex-shrink-0 bg-white">
         <div className="flex items-center space-x-3">
-          <AvatarWithFallback user={otherUser ?? null} />
+          <AvatarWithFallback user={otherUser ?? null} className="border-2 border-blue-100" />
           <div>
             <h3 className="font-medium">{otherUser?.name || "User"}</h3>
             <p className="text-xs text-muted-foreground">{otherUser?.location || ""}</p>
@@ -165,7 +165,7 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {!messages || messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-center text-muted-foreground">
             <div>
@@ -182,7 +182,18 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
                 key={message.id}
                 className={`flex ${isSentByMe ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`max-w-[75%] ${isSentByMe ? 'bg-primary text-white' : 'bg-neutral-100'} rounded-lg px-4 py-2`}>
+                {!isSentByMe && (
+                  <div className="mr-2 self-end mb-1">
+                    <AvatarWithFallback user={otherUser ?? null} className="h-6 w-6" />
+                  </div>
+                )}
+                <div 
+                  className={`max-w-[75%] ${
+                    isSentByMe 
+                      ? 'bg-primary text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
+                      : 'bg-white text-gray-800 border border-gray-200 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
+                  } px-4 py-2`}
+                >
                   <p>{message.content}</p>
                   <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                     {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
@@ -195,17 +206,17 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
         <div ref={messagesEndRef} />
       </CardContent>
       
-      <CardFooter className="border-t p-3">
+      <CardFooter className="border-t p-3 bg-white">
         <form onSubmit={handleSendMessage} className="flex w-full space-x-2">
           <Textarea
             placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            className="flex-1 min-h-[60px] max-h-[120px]"
+            className="flex-1 min-h-[50px] max-h-[100px] border-gray-200 focus-visible:ring-primary resize-none"
           />
           <Button 
             type="submit" 
-            className="bg-primary hover:bg-primary/90 self-end"
+            className="bg-primary hover:bg-primary/90 self-end rounded-full h-10 w-10 p-0 shadow-md"
             disabled={!newMessage.trim() || sendMessageMutation.isPending}
           >
             {sendMessageMutation.isPending ? (
