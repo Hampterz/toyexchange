@@ -35,10 +35,15 @@ export default function ProfileCustomizationPage() {
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
   
-  // Redirect to home if user is not logged in
+  // Redirect to home if user is not logged in or doesn't need profile customization
   useEffect(() => {
-    if (!isLoading && !user) {
-      navigate("/auth");
+    if (!isLoading) {
+      if (!user) {
+        navigate("/auth");
+      } else if (!user.googleId) {
+        // If not a Google user, no need for profile customization
+        navigate("/");
+      }
     }
   }, [user, isLoading, navigate]);
   

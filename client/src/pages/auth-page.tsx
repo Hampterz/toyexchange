@@ -359,7 +359,12 @@ export default function AuthPage() {
   };
 
   const onRegisterSubmit = (data: z.infer<typeof registerUserSchema>) => {
-    registerMutation.mutate(data);
+    registerMutation.mutate(data, {
+      onSuccess: () => {
+        // Regular registration - just redirect to home page
+        navigate('/');
+      }
+    });
   };
   
   // Handle Google Sign-in
