@@ -160,7 +160,12 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
           <AvatarWithFallback user={otherUser ?? null} className="border-2 border-blue-100" />
           <div>
             <h3 className="font-medium">{otherUser?.name || "User"}</h3>
-            {/* Location is only shown if explicitly shared */}
+            {otherUser?.locationPrivacy === 'exact_location' && (
+              <p className="text-xs text-muted-foreground">{otherUser.location}</p>
+            )}
+            {otherUser?.locationPrivacy === 'city_only' && (
+              <p className="text-xs text-muted-foreground">{otherUser.cityName || otherUser.location?.split(',')[0]}</p>
+            )}
           </div>
         </div>
       </CardHeader>

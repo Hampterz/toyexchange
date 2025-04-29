@@ -71,6 +71,13 @@ export default function ProfilePage() {
     }));
   };
 
+  const handleLocationPrivacyChange = (value: string) => {
+    setProfileData((prev) => ({
+      ...prev,
+      locationPrivacy: value,
+    }));
+  };
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -157,8 +164,29 @@ export default function ProfilePage() {
                           className="mt-1"
                         />
                       </div>
+                      <div className="mt-4">
+                        <Label>Location Privacy</Label>
+                        <RadioGroup 
+                          value={profileData.locationPrivacy} 
+                          onValueChange={handleLocationPrivacyChange}
+                          className="mt-2 space-y-2"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="city_only" id="city_only" />
+                            <Label htmlFor="city_only" className="cursor-pointer">Show city only</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="exact_location" id="exact_location" />
+                            <Label htmlFor="exact_location" className="cursor-pointer">Show exact location</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="private" id="private" />
+                            <Label htmlFor="private" className="cursor-pointer">Keep location private</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
                       <Button 
-                        className="w-full mt-2 btn-animated" 
+                        className="w-full mt-4 btn-animated" 
                         onClick={handleSaveProfile}
                         disabled={isLoading}
                       >

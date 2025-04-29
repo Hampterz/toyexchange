@@ -264,7 +264,9 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               <div className="flex items-center">
                 <MapPin className="text-neutral-500 mr-0.5 xs:mr-1 h-2.5 w-2.5 xs:h-3 xs:w-3 flex-shrink-0" />
                 <span className="text-neutral-500 text-[9px] xs:text-xs truncate max-w-[120px] xs:max-w-[150px]">
-                  {toy.location}
+                  {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
+                   toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
+                   toyOwner?.cityName || toy.location.split(',')[0]}
                   {toy.distance && (
                     <span className="ml-0.5 xs:ml-1 text-blue-600 font-medium">
                       ({Math.round(toy.distance * 10) / 10} mi)
@@ -334,7 +336,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                         </div>
                         <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
                           <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-                          <span className="truncate">{toyOwner.location}</span>
+                          <span className="truncate">
+                            {toyOwner.locationPrivacy === 'exact_location' ? toyOwner.location :
+                             toyOwner.locationPrivacy === 'private' ? 'Location hidden' :
+                             toyOwner.cityName || toyOwner.location.split(',')[0]}
+                          </span>
                         </div>
                       </div>
                       <div className="flex flex-col items-center">
