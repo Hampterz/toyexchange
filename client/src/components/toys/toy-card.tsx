@@ -12,6 +12,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SocialShareButtons } from "@/components/social/social-share-buttons";
 import ConfettiEffect from "@/components/ui/confetti-effect";
+import { UserBadge } from "@/components/ui/user-badge";
 
 interface ToyCardProps {
   toy: ToyWithDistance;
@@ -311,6 +312,13 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-neutral-600 cursor-pointer">
                       <span className="text-[10px] sm:text-xs">Shared by:</span>
                       <span className="font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[150px]">{toyOwner.name}</span>
+                      {toyOwner.currentBadge && (
+                        <UserBadge 
+                          badgeName={toyOwner.currentBadge} 
+                          className="ml-1 text-sm" 
+                          showTooltip={true}
+                        />
+                      )}
                     </div>
                   </HoverCardTrigger>
                   <HoverCardContent className="w-72 sm:w-80 p-3 sm:p-4">
@@ -528,6 +536,13 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                         <HoverCardTrigger className="inline-block mt-1">
                           <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
                             <span className="font-medium">{toyOwner.name}</span>
+                            {toyOwner.currentBadge && (
+                              <UserBadge 
+                                badgeName={toyOwner.currentBadge} 
+                                className="text-lg" 
+                                showTooltip={true}
+                              />
+                            )}
                           </div>
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80 p-4">
