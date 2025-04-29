@@ -155,6 +155,7 @@ export function AddressAutocomplete({
   }, []);
 
   // Update the Google Autocomplete styling to make it more clickable
+  // and prevent the dialog from closing when selecting an address
   useEffect(() => {
     // Add a style tag to make Google's autocomplete dropdown more clickable
     const styleId = "google-autocomplete-style";
@@ -172,6 +173,23 @@ export function AddressAutocomplete({
       `;
       document.head.appendChild(style);
     }
+    
+    // Add a global event listener to prevent clicks within the pac-container
+    // from bubbling up and closing parent dialogs
+    const preventClosing = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Check if the click is within a pac-container
+      if (target.closest('.pac-container')) {
+        e.stopPropagation();
+      }
+    };
+    
+    document.addEventListener('mousedown', preventClosing, true);
+    
+    // Clean up
+    return () => {
+      document.removeEventListener('mousedown', preventClosing, true);
+    };
   }, []);
   
   return (
