@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Toy, ToyWithDistance } from "@shared/schema";
 import { ToyCard } from "./toy-card";
-import { RequestToyModal } from "./request-toy-modal";
+import { MessageDialog } from "./message-dialog";
 import { Button } from "@/components/ui/button";
 
 interface ToyListProps {
@@ -11,7 +11,7 @@ interface ToyListProps {
 
 export function ToyList({ filters = {} }: ToyListProps) {
   const [selectedToy, setSelectedToy] = useState<ToyWithDistance | null>(null);
-  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   const [visibleToys, setVisibleToys] = useState(8); // Initial number of toys to show
   
   // Use filters directly
@@ -52,7 +52,7 @@ export function ToyList({ filters = {} }: ToyListProps) {
 
   const handleRequestClick = (toy: ToyWithDistance) => {
     setSelectedToy(toy);
-    setIsRequestModalOpen(true);
+    setIsMessageDialogOpen(true);
   };
 
   const handleLoadMore = () => {
@@ -117,10 +117,13 @@ export function ToyList({ filters = {} }: ToyListProps) {
       )}
 
       {selectedToy && (
-        <RequestToyModal
-          toy={selectedToy}
-          isOpen={isRequestModalOpen}
-          onClose={() => setIsRequestModalOpen(false)}
+        <MessageDialog
+          open={isMessageDialogOpen}
+          onOpenChange={setIsMessageDialogOpen}
+          receiverId={selectedToy.userId}
+          receiverName={selectedToy.owner?.name || "Toy Owner"}
+          toyId={selectedToy.id}
+          toyName={selectedToy.title}
         />
       )}
     </>
