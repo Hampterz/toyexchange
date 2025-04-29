@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   Menu, X, Bell, Search, Settings, LogOut, 
-  HelpCircle, LifeBuoy, Shield 
+  HelpCircle, LifeBuoy, Shield, MessageCircle 
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,6 +25,9 @@ import { Badge } from "@/components/ui/badge";
 import { ToySearch } from "@/components/toys/toy-search";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Logo } from "@/components/layout/logo";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 type HeaderProps = {
   onSearchChange?: (value: string) => void;
@@ -36,7 +39,50 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
   const [, navigate] = useLocation();
   const { user, logoutMutation } = useAuth();
   const isMobile = useIsMobile();
-  const [unreadMessages, setUnreadMessages] = useState(0); // This would be fetched from the server in a real app
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const { toast } = useToast();
+  
+  // Fetch messages to count unread ones
+  const { data: messages } = useQuery({
+    queryKey: ['/api/messages'],
+    queryFn: async () => {
+      if (!user) return [];
+      try {
+        const response = await apiRequest("GET", "/api/messages");
+        return await response.json();
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+        return [];
+      }
+    },
+    enabled: !!user,
+    refetchInterval: 30000, // Refetch every 30 seconds to check for new messages
+  });
+
+  // Update unread message count whenever messages change
+  useEffect(() => {
+    if (messages && user) {
+      const unreadCount = messages.filter(
+        (message: any) => message.receiverId === user.id && !message.read
+      ).length;
+      
+      setUnreadMessages(unreadCount);
+      
+      // Show notification for new messages
+      if (unreadCount > 0) {
+        // Only show notification when count increases
+        const shouldNotify = unreadCount > 0 && unreadCount !== unreadMessages;
+        if (shouldNotify) {
+          toast({
+            title: `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}`,
+            description: "You have new messages waiting for you",
+            variant: "default",
+            className: "bg-blue-50 border-blue-200",
+          });
+        }
+      }
+    }
+  }, [messages, user]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -103,6 +149,7 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
                 </DropdownMenu>
                 <Link href="/messages">
                   <Button variant="ghost" size="sm" className="text-blue-700 relative">
+                    <MessageCircle className="mr-2 h-4 w-4" />
                     Messages
                     {unreadMessages > 0 && (
                       <Badge 
@@ -248,6 +295,7 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
                     className="w-full justify-start relative"
                     onClick={() => setIsMenuOpen(false)}
                   >
+                    <MessageCircle className="mr-2 h-4 w-4" />
                     Messages
                     {unreadMessages > 0 && (
                       <Badge 

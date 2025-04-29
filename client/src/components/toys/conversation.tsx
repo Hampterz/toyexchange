@@ -88,23 +88,13 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: number) => {
       try {
-        const res = await fetch(`/api/messages/${messageId}/read`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ read: true })
-        });
-        
-        if (!res.ok) {
-          throw new Error("Failed to mark message as read");
-        }
-        
-        return await res.json();
+        // Use the apiRequest utility for better error handling
+        const response = await apiRequest("PATCH", `/api/messages/${messageId}/read`, { read: true });
+        return await response.json();
       } catch (error) {
         console.error("Mark as read error:", error);
-        throw error;
+        // Don't throw the error, just log it to prevent unhandled promise rejections
+        return { success: false, error };
       }
     },
     onSuccess: () => {
@@ -116,19 +106,32 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
     },
     onError: (error) => {
       console.error("Mark as read error:", error);
+      // We'll handle the error silently to prevent disrupting the user experience
     }
   });
 
   // Mark unread messages as read when conversation is opened
   useEffect(() => {
-    if (messages) {
-      messages.forEach(message => {
-        if (message.receiverId === userId && !message.read) {
-          markAsReadMutation.mutate(message.id);
-        }
-      });
+    if (messages && messages.length > 0) {
+      // Use a single-fire effect to avoid infinite loops
+      const unreadMessages = messages.filter(message => 
+        message.receiverId === userId && !message.read
+      );
+      
+      if (unreadMessages.length > 0) {
+        // Process each message with a small delay to avoid overwhelming the server
+        unreadMessages.forEach((message, index) => {
+          setTimeout(() => {
+            try {
+              markAsReadMutation.mutate(message.id);
+            } catch (error) {
+              console.error(`Failed to mark message ${message.id} as read:`, error);
+            }
+          }, index * 200); // Stagger requests with 200ms delay between them
+        });
+      }
     }
-  }, [messages, userId, markAsReadMutation]);
+  }, [messages?.length, userId]);
 
   // Scroll to bottom of messages when new messages arrive
   useEffect(() => {
