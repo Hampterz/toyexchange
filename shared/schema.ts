@@ -46,6 +46,8 @@ export const users = pgTable("users", {
   // Location & Safety preferences
   latitude: text("latitude"),
   longitude: text("longitude"),
+  cityName: text("city_name"),
+  locationPrivacy: text("location_privacy").default("city_only"), // "city_only", "exact_location", "private"
   preferredMeetupLocations: text("preferred_meetup_locations").array(),
   safetyPreferences: jsonb("safety_preferences"),
   
@@ -73,6 +75,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   googleId: true,
   latitude: true,
   longitude: true,
+  cityName: true,
+  locationPrivacy: true,
   preferredMeetupLocations: true,
   safetyPreferences: true,
   childProfiles: true,

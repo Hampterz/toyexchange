@@ -12,8 +12,10 @@ import {
   FormField, 
   FormItem, 
   FormLabel, 
-  FormMessage 
+  FormMessage, 
+  FormDescription
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +26,7 @@ const profileCustomizationSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters").max(30),
   name: z.string().min(2, "Full name must be at least 2 characters").max(100),
   location: z.string().min(5, "Please provide a complete address"),
+  locationPrivacy: z.enum(["city_only", "exact_location", "private"]).default("city_only"),
   bio: z.string().optional(),
 });
 
@@ -54,6 +57,7 @@ export default function ProfileCustomizationPage() {
       username: user?.username || "",
       name: user?.name || "",
       location: user?.location || "",
+      locationPrivacy: user?.locationPrivacy as ("city_only" | "exact_location" | "private") || "city_only",
       bio: user?.bio || "",
     },
   });
@@ -65,6 +69,7 @@ export default function ProfileCustomizationPage() {
         username: user.username || "",
         name: user.name || "",
         location: user.location || "",
+        locationPrivacy: user?.locationPrivacy as ("city_only" | "exact_location" | "private") || "city_only",
         bio: user.bio || "",
       });
     }
@@ -187,6 +192,66 @@ export default function ProfileCustomizationPage() {
                     <p className="text-xs text-blue-500 mt-1">
                       Your address helps us connect you with other members nearby. It will only be shared when you agree to a toy exchange.
                     </p>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="locationPrivacy"
+                render={({ field }) => (
+                  <FormItem className="space-y-4">
+                    <FormLabel className="text-blue-800">Location Privacy Settings</FormLabel>
+                    <FormDescription className="text-blue-600">
+                      Choose how your location will be shared with other members
+                    </FormDescription>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 border border-blue-100 rounded-md p-3 hover:bg-blue-50 transition-colors">
+                          <RadioGroupItem value="city_only" id="city_only" />
+                          <label
+                            htmlFor="city_only"
+                            className="flex-1 cursor-pointer font-medium text-blue-700"
+                          >
+                            City Name Only
+                            <p className="text-sm font-normal text-muted-foreground">
+                              Only share your city name with other members (recommended for privacy)
+                            </p>
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 border border-blue-100 rounded-md p-3 hover:bg-blue-50 transition-colors">
+                          <RadioGroupItem value="exact_location" id="exact_location" />
+                          <label
+                            htmlFor="exact_location"
+                            className="flex-1 cursor-pointer font-medium text-blue-700"
+                          >
+                            Exact Location
+                            <p className="text-sm font-normal text-muted-foreground">
+                              Share your exact location with other members when they view your profile
+                            </p>
+                          </label>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 border border-blue-100 rounded-md p-3 hover:bg-blue-50 transition-colors">
+                          <RadioGroupItem value="private" id="private" />
+                          <label
+                            htmlFor="private"
+                            className="flex-1 cursor-pointer font-medium text-blue-700"
+                          >
+                            Private
+                            <p className="text-sm font-normal text-muted-foreground">
+                              Keep your location completely private and only share it via messages when you choose to
+                            </p>
+                          </label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
