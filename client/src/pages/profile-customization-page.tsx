@@ -88,8 +88,8 @@ export default function ProfileCustomizationPage() {
         variant: "default",
       });
       
-      // Redirect to profile page
-      navigate("/profile");
+      // Redirect to home page
+      navigate("/");
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({

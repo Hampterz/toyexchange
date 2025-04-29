@@ -187,31 +187,30 @@ export default function AuthPage() {
             // Get the authenticated user from response
             const userData = await res.json();
             
-            // Show confetti to celebrate the sign-in
-            setShowConfetti(true);
-            
-            // Show success notification
-            toast({
-              title: "Welcome to ToyShare! 🎉",
-              description: `Hi ${userData.name.split(' ')[0]}, you've successfully signed in with Google.`,
-              variant: "default",
-            });
-            
-            // Redirect after a short delay so they can see the confetti
-            setTimeout(() => {
-              setShowConfetti(false);
+            // Check if this user needs profile customization (this flag is set by the server)
+            if (userData.needsProfileCustomization) {
+              console.log("New user detected, redirecting to profile customization");
+              // Force reload to ensure session is recognized properly
+              window.location.href = '/profile-customization';
+            } else {
+              // Only show confetti and toast for returning users
+              setShowConfetti(true);
               
-              // Check if this user needs profile customization (this flag is set by the server)
-              if (userData.needsProfileCustomization) {
-                console.log("New user detected, redirecting to profile customization");
-                // Force reload to ensure session is recognized properly
-                window.location.href = '/profile-customization';
-              } else {
+              // Show success notification
+              toast({
+                title: "Welcome to ToyShare! 🎉",
+                description: `Hi ${userData.name.split(' ')[0]}, you've successfully signed in with Google.`,
+                variant: "default",
+              });
+              
+              // Redirect after a short delay so they can see the confetti
+              setTimeout(() => {
+                setShowConfetti(false);
                 console.log("Returning user, redirecting to home page");
                 // Force reload to ensure session is recognized properly
                 window.location.href = '/';
-              }
-            }, 2000);
+              }, 1500);
+            }
           } catch (apiError) {
             console.error("API error during Google auth:", apiError);
             throw new Error("Failed to authenticate with server");
