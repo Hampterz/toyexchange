@@ -88,7 +88,11 @@ const UserProfilePage: React.FC = () => {
               
               <div className="flex items-center text-sm">
                 <MapPin className="mr-2 h-4 w-4 opacity-70" />
-                <span>{user.location}</span>
+                <span>
+                  {user.locationPrivacy === 'exact_location' ? user.location : 
+                   user.locationPrivacy === 'private' ? 'Location hidden' : 
+                   user.cityName || user.location.split(',')[0]}
+                </span>
               </div>
               
               <Separator className="my-3" />

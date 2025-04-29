@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { ProfileToys } from "@/components/profile/profile-toys";
 import { ProfileRequests } from "@/components/profile/profile-requests";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +25,7 @@ export default function ProfilePage() {
     name: user?.name || "",
     location: user?.location || "",
     email: user?.email || "",
+    locationPrivacy: user?.locationPrivacy || "city_only",
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
 
@@ -124,6 +126,13 @@ export default function ProfilePage() {
                       <div>
                         <Label className="text-sm text-muted-foreground">Location</Label>
                         <p>{user.location}</p>
+                        <p className="text-xs text-blue-500 mt-1">
+                          {user.locationPrivacy === 'city_only' 
+                            ? 'Only your city is visible to others' 
+                            : user.locationPrivacy === 'exact_location'
+                            ? 'Your exact location is visible to others'
+                            : 'Your location is private'}
+                        </p>
                       </div>
                     </>
                   ) : (
