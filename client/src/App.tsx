@@ -102,6 +102,9 @@ const Router = () => {
       <Route path="/reset-password/:token">
         {() => <Layout><ResetPasswordPage /></Layout>}
       </Route>
+      <Route path="/reset-password">
+        {() => <Layout><ResetPasswordPage /></Layout>}
+      </Route>
       <Route path="/profile">
         {() => (
           <Layout>
