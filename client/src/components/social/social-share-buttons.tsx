@@ -111,29 +111,7 @@ export function SocialShareButtons({ url, title, description = "" }: SocialShare
           </TooltipContent>
         </Tooltip>
         
-        {/* LinkedIn */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className="bg-white text-[#0A66C2] hover:bg-[#0A66C2] hover:text-white border-[#0A66C2]"
-              onClick={() => {
-                window.open(
-                  `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}&summary=${encodedDescription}`,
-                  "_blank",
-                  "width=600,height=400"
-                );
-              }}
-            >
-              <Linkedin className="h-4 w-4" />
-              <span className="sr-only">Share on LinkedIn</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Share on LinkedIn</p>
-          </TooltipContent>
-        </Tooltip>
+
         
         {/* Email */}
         <Tooltip>
