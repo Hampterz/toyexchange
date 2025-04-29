@@ -187,6 +187,11 @@ export interface IStorage {
   getWishOffersByWish(wishId: number): Promise<WishOffer[]>;
   createWishOffer(offer: InsertWishOffer): Promise<WishOffer>;
   updateWishOfferStatus(id: number, status: string): Promise<WishOffer | undefined>;
+  
+  // Password reset functionality
+  savePasswordResetToken(userId: number, token: string, expiry: Date): Promise<User | undefined>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
+  updatePassword(userId: number, newPassword: string): Promise<User | undefined>;
 
   // Session store
   sessionStore: session.SessionStore;

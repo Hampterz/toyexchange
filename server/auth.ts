@@ -297,6 +297,126 @@ export function setupAuth(app: Express) {
       next(error);
     }
   });
+
+  // Password reset request - Step 1: Request a reset token
+  app.post("/api/request-password-reset", async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      // Even if user doesn't exist, we don't want to reveal that info
+      // for security reasons, so we always return success
+      if (!user) {
+        return res.json({ 
+          success: true, 
+          message: "If an account with that email exists, a password reset link has been sent." 
+        });
+      }
+      
+      // Generate a reset token and expiry (24 hours from now)
+      const resetToken = randomBytes(32).toString('hex');
+      const resetTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+      
+      // Save token to database
+      await storage.savePasswordResetToken(user.id, resetToken, resetTokenExpiry);
+      
+      // Create reset URL
+      const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+      
+      // For demo purposes, we'll just log the URL instead of sending an email
+      console.log('Password reset URL (would be emailed):', resetUrl);
+      
+      // TODO: Send email with reset link using SendGrid or another service
+      // This would be implemented once email credentials are configured
+      
+      return res.json({ 
+        success: true, 
+        message: "If an account with that email exists, a password reset link has been sent.",
+        // In development, return the token for testing
+        ...(process.env.NODE_ENV === 'development' ? { resetToken, resetUrl } : {})
+      });
+    } catch (error) {
+      console.error("Password reset request error:", error);
+      next(error);
+    }
+  });
+  
+  // Password reset - Step 2: Verify token and reset password
+  app.post("/api/reset-password", async (req, res, next) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Token and new password are required" 
+        });
+      }
+      
+      // Validate password
+      if (newPassword.length < 6) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Password must be at least 6 characters" 
+        });
+      }
+      
+      // Find user by reset token
+      const user = await storage.getUserByResetToken(token);
+      
+      // Check if token exists and is valid
+      if (!user || !user.resetTokenExpiry || new Date(user.resetTokenExpiry) < new Date()) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid or expired password reset token" 
+        });
+      }
+      
+      // Hash new password
+      const hashedPassword = await hashPassword(newPassword);
+      
+      // Update user's password and clear reset token
+      await storage.updatePassword(user.id, hashedPassword);
+      
+      return res.json({ 
+        success: true, 
+        message: "Password has been reset successfully. You can now log in with your new password." 
+      });
+    } catch (error) {
+      console.error("Password reset error:", error);
+      next(error);
+    }
+  });
+  
+  // Verify if a reset token is valid
+  app.get("/api/verify-reset-token/:token", async (req, res, next) => {
+    try {
+      const { token } = req.params;
+      
+      if (!token) {
+        return res.status(400).json({ valid: false });
+      }
+      
+      // Find user by reset token
+      const user = await storage.getUserByResetToken(token);
+      
+      // Check if token exists and is valid
+      if (!user || !user.resetTokenExpiry || new Date(user.resetTokenExpiry) < new Date()) {
+        return res.json({ valid: false });
+      }
+      
+      return res.json({ valid: true });
+    } catch (error) {
+      console.error("Token verification error:", error);
+      next(error);
+    }
+  });
   
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);

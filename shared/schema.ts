@@ -55,6 +55,10 @@ export const users = pgTable("users", {
   // Notification preferences
   notificationPreferences: jsonb("notification_preferences"),
   
+  // Password reset functionality
+  resetToken: text("reset_token"),
+  resetTokenExpiry: timestamp("reset_token_expiry"),
+  
   createdAt: timestamp("created_at").defaultNow(),
 });
 
