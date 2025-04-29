@@ -945,6 +945,43 @@ export class MemStorage implements IStorage {
     
     return updatedOffer;
   }
+  
+  // Password reset functionality
+  async savePasswordResetToken(userId: number, token: string, expiry: Date): Promise<User | undefined> {
+    const user = this.usersMap.get(userId);
+    if (!user) return undefined;
+    
+    const updatedUser = { 
+      ...user, 
+      resetToken: token, 
+      resetTokenExpiry: expiry 
+    };
+    
+    this.usersMap.set(userId, updatedUser);
+    return updatedUser;
+  }
+  
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    return Array.from(this.usersMap.values()).find(
+      (user) => user.resetToken === token
+    );
+  }
+  
+  async updatePassword(userId: number, newPassword: string): Promise<User | undefined> {
+    const user = this.usersMap.get(userId);
+    if (!user) return undefined;
+    
+    const updatedUser = { 
+      ...user, 
+      password: newPassword,
+      // Clear the reset token and expiry
+      resetToken: null,
+      resetTokenExpiry: null
+    };
+    
+    this.usersMap.set(userId, updatedUser);
+    return updatedUser;
+  }
 }
 
 // Import DatabaseStorage from new file

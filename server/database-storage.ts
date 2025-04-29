@@ -1107,4 +1107,56 @@ export class DatabaseStorage implements IStorage {
     
     return updatedOffer;
   }
+  
+  // Password reset functionality
+  async savePasswordResetToken(userId: number, token: string, expiry: Date): Promise<User | undefined> {
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ 
+          resetToken: token, 
+          resetTokenExpiry: expiry 
+        })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return user;
+    } catch (error) {
+      console.error("Error saving password reset token:", error);
+      return undefined;
+    }
+  }
+  
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.resetToken, token));
+      
+      return user;
+    } catch (error) {
+      console.error("Error getting user by reset token:", error);
+      return undefined;
+    }
+  }
+  
+  async updatePassword(userId: number, newPassword: string): Promise<User | undefined> {
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ 
+          password: newPassword,
+          resetToken: null, 
+          resetTokenExpiry: null 
+        })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return user;
+    } catch (error) {
+      console.error("Error updating password:", error);
+      return undefined;
+    }
+  }
 }
