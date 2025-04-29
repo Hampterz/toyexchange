@@ -311,37 +311,38 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       {/* We don't use onOpenChange={onClose} here to prevent closing when clicking outside */}
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="sticky top-0 bg-white z-20 pb-4 border-b mb-4">
+      <DialogContent className="max-w-xl max-h-[90vh] overflow-hidden p-0">
+        <div className="sticky top-0 bg-white border-b py-4 px-6 z-20 w-full">
           <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
-        </DialogHeader>
-
-        {!user ? (
-          <div className="space-y-4">
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-blue-700 mt-0.5 mr-2" />
-                <div>
-                  <h3 className="font-medium text-blue-800 mb-1">Sign in required</h3>
-                  <p className="text-blue-700 mb-4">
-                    You need to be signed in to share toys. Please sign in or create an account to continue.
-                  </p>
-                  <Button 
-                    className="bg-blue-700 hover:bg-blue-800"
-                    onClick={() => {
-                      onClose();
-                      window.location.href = '/auth';
-                    }}
-                  >
-                    Sign In or Register
-                  </Button>
+        </div>
+        
+        <div className="overflow-y-auto p-6">
+          {!user ? (
+            <div className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <div className="flex items-start">
+                  <AlertCircle className="h-5 w-5 text-blue-700 mt-0.5 mr-2" />
+                  <div>
+                    <h3 className="font-medium text-blue-800 mb-1">Sign in required</h3>
+                    <p className="text-blue-700 mb-4">
+                      You need to be signed in to share toys. Please sign in or create an account to continue.
+                    </p>
+                    <Button 
+                      className="bg-blue-700 hover:bg-blue-800"
+                      onClick={() => {
+                        onClose();
+                        window.location.href = '/auth';
+                      }}
+                    >
+                      Sign In or Register
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          ) : (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -608,6 +609,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             </form>
           </Form>
         )}
+        </div>
       </DialogContent>
     </Dialog>
   );
