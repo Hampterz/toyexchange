@@ -197,22 +197,30 @@ export function setupAuth(app: Express) {
           
           try {
             // Create the user with all available information
+            // Make sure we have a proper name format by using first and last name if available
+            const formattedName = name || (givenName && familyName 
+              ? `${givenName} ${familyName}` 
+              : givenName || email.split('@')[0]);
+            
             user = await storage.createUser({
               username,
               email,
-              name,  // Use full name with proper capitalization
+              name: formattedName,  // Use properly formatted name
               password: await hashPassword(randomPassword),
               googleId: id,
               location: location || 'Unknown location',
               profilePicture: picture || '',
               latitude: latitude || null,
-              longitude: longitude || null
+              longitude: longitude || null,
+              // Store first and last name if available in userProfile
+              ...(givenName ? { firstName: givenName } : {}),
+              ...(familyName ? { lastName: familyName } : {})
             });
             
             console.log(`Successfully created new user: ${user.id} - ${user.name} (${user.email})`);
-          } catch (createError) {
-            console.error("Failed to create user:", createError);
-            return res.status(500).json({ message: "Failed to create user account", error: createError.message });
+          } catch (error) {
+            console.error("Failed to create user:", error);
+            return res.status(500).json({ message: "Failed to create user account", error: String(error) });
           }
         }
       } else {
