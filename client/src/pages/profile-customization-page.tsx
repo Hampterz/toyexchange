@@ -176,7 +176,6 @@ export default function ProfileCustomizationPage() {
                         onAddressSelect={(address) => {
                           field.onChange(address);
                         }}
-                        emptyPlaceholder=""
                       />
                     </FormControl>
                     <FormMessage />

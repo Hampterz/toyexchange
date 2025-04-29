@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Upload, AlertCircle, Tag, MapPin } from "lucide-react";
+import { X, Upload, AlertCircle, Tag, MapPin, Image as ImageIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -296,13 +296,6 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
           <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
-          <Button
-            variant="ghost"
-            className="absolute right-4 top-4 rounded-sm opacity-70 h-auto p-2"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         {!user ? (
@@ -481,62 +474,70 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="imageFiles"
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <FormItem>
-                    <FormLabel>Photos</FormLabel>
-                    <FormControl>
-                      <div className="cursor-pointer" onClick={() => document.getElementById('image-upload')?.click()}>
-                        {renderImagePreview()}
-                        <Input
-                          id="image-upload"
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          ref={ref}
-                          name={name}
-                          onBlur={onBlur}
-                          onChange={(e) => {
-                            onChange(e.target.files);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="videoFiles"
-                render={({ field: { ref, name, onBlur, onChange } }) => (
-                  <FormItem>
-                    <FormLabel>Video (Optional)</FormLabel>
-                    <FormControl>
-                      <div className="cursor-pointer" onClick={() => document.getElementById('video-upload')?.click()}>
-                        {renderVideoPreview()}
-                        <Input
-                          id="video-upload"
-                          type="file"
-                          accept="video/mp4,video/webm,video/mov,video/quicktime"
-                          className="hidden"
-                          ref={ref}
-                          name={name}
-                          onBlur={onBlur}
-                          onChange={(e) => {
-                            onChange(e.target.files);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+                <h3 className="text-sm font-medium text-blue-800 mb-3 flex items-center">
+                  <ImageIcon className="h-4 w-4 mr-1" /> Media Upload
+                </h3>
+                
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="imageFiles"
+                    render={({ field: { ref, name, onBlur, onChange } }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs text-blue-700">Photos (Up to 4)</FormLabel>
+                        <FormControl>
+                          <div className="cursor-pointer" onClick={() => document.getElementById('image-upload')?.click()}>
+                            {renderImagePreview()}
+                            <Input
+                              id="image-upload"
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              className="hidden"
+                              ref={ref}
+                              name={name}
+                              onBlur={onBlur}
+                              onChange={(e) => {
+                                onChange(e.target.files);
+                              }}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="videoFiles"
+                    render={({ field: { ref, name, onBlur, onChange } }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs text-blue-700">Video (Optional)</FormLabel>
+                        <FormControl>
+                          <div className="cursor-pointer" onClick={() => document.getElementById('video-upload')?.click()}>
+                            {renderVideoPreview()}
+                            <Input
+                              id="video-upload"
+                              type="file"
+                              accept="video/mp4,video/webm,video/mov,video/quicktime"
+                              className="hidden"
+                              ref={ref}
+                              name={name}
+                              onBlur={onBlur}
+                              onChange={(e) => {
+                                onChange(e.target.files);
+                              }}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               
               <FormField
                 control={form.control}
@@ -548,84 +549,16 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                       <span>Tags</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="border rounded-md p-3">
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {selectedTags.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">No tags selected</p>
-                          ) : (
-                            selectedTags.map(tag => (
-                              <Badge 
-                                key={tag}
-                                className="bg-primary text-white cursor-pointer animate-fadeIn"
-                                onClick={() => toggleTag(tag)}
-                              >
-                                #{tag} <X className="ml-1 h-3 w-3" />
-                              </Badge>
-                            ))
-                          )}
-                        </div>
-                        <div className="pt-2 border-t">
-                          <p className="text-xs text-muted-foreground mb-2">Select tags to describe your toy:</p>
-                          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
-                            {COMMON_ATTRIBUTES.map(tag => (
-                              <Badge
-                                key={tag}
-                                variant={selectedTags.includes(tag) ? "default" : "outline"}
-                                className={`cursor-pointer ${
-                                  selectedTags.includes(tag) 
-                                    ? 'bg-primary hover:bg-primary/80' 
-                                    : 'hover:bg-muted/50'
-                                }`}
-                                onClick={() => toggleTag(tag)}
-                              >
-                                #{tag}
-                              </Badge>
-                            ))}
-                          </div>
-                          
-                          <div className="mt-3 border-t pt-3">
-                            <p className="text-xs text-muted-foreground mb-2">Or add your own custom tag:</p>
-                            <div className="flex gap-2">
-                              <Input
-                                placeholder="e.g. unicorn"
-                                value={customTag}
-                                onChange={(e) => setCustomTag(e.target.value)}
-                                className="flex-1"
-                                maxLength={15}
-                              />
-                              <Button 
-                                type="button" 
-                                size="sm" 
-                                onClick={addCustomTag}
-                                disabled={!customTag.trim()}
-                                className="whitespace-nowrap bg-blue-700 hover:bg-blue-800"
-                              >
-                                Add Tag
-                              </Button>
-                            </div>
-                            
-                            {selectedTags.some(tag => !COMMON_ATTRIBUTES.includes(tag)) && (
-                              <div className="mt-2">
-                                <p className="text-xs text-muted-foreground mb-1">Your custom tags:</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {selectedTags
-                                    .filter(tag => !COMMON_ATTRIBUTES.includes(tag))
-                                    .map(tag => (
-                                      <Badge
-                                        key={tag}
-                                        variant="default"
-                                        className="bg-blue-100 text-blue-800 hover:bg-blue-200 cursor-pointer"
-                                        onClick={() => toggleTag(tag)}
-                                      >
-                                        #{tag} <X className="ml-1 h-3 w-3" />
-                                      </Badge>
-                                    ))
-                                  }
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                      <div className="p-1">
+                        <TagSelector 
+                          availableTags={COMMON_ATTRIBUTES}
+                          selectedTags={selectedTags}
+                          onTagsChange={setSelectedTags}
+                          placeholder="Select tags to describe your toy"
+                        />
+                        <FormDescription className="mt-2 text-xs text-blue-600">
+                          Tags help other parents find your toy more easily
+                        </FormDescription>
                       </div>
                     </FormControl>
                     <FormMessage />
