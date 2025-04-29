@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import SustainabilityBadge from "@/components/profile/sustainability-badge";
+
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -279,7 +279,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     onRequestClick(toy);
                   }}
                 >
-                  Request
+                  Message
                 </Button>
               )}
               
@@ -303,7 +303,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               )}
             </div>
             
-            {/* Sustainability Badge */}
+            {/* User Information */}
             {toyOwner && !isOwner && (
               <div className="flex items-center justify-between">
                 <HoverCard>
@@ -333,12 +333,6 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     </div>
                   </HoverCardContent>
                 </HoverCard>
-                {toyOwner.currentBadge && (
-                  <SustainabilityBadge 
-                    user={toyOwner} 
-                    className="text-[10px] sm:text-xs py-0.5 scale-90 origin-right"
-                  />
-                )}
               </div>
             )}
           </div>
@@ -534,9 +528,6 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                         <HoverCardTrigger className="inline-block mt-1">
                           <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
                             <span className="font-medium">{toyOwner.name}</span>
-                            {toyOwner.currentBadge && (
-                              <SustainabilityBadge user={toyOwner} className="text-xs py-0.5" />
-                            )}
                           </div>
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80 p-4">
@@ -570,7 +561,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                         onRequestClick(toy);
                       }}
                     >
-                      Request This Toy
+                      Message Owner
                     </Button>
                   )}
                 </div>
