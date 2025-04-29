@@ -266,7 +266,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 <span className="text-neutral-500 text-[9px] xs:text-xs truncate max-w-[120px] xs:max-w-[150px]">
                   {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
                    toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
-                   toyOwner?.cityName || toy.location.split(',')[0]}
+                   toy.location.split(',')[0]}
                   {toy.distance && (
                     <span className="ml-0.5 xs:ml-1 text-blue-600 font-medium">
                       ({Math.round(toy.distance * 10) / 10} mi)
@@ -500,8 +500,10 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 <div className="flex items-center text-neutral-700 text-sm">
                   <MapPin className="h-4 w-4 mr-1 text-neutral-500" />
                   <span>
-                    {toy.location}
-                    {toy.distance && (
+                    {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
+                     toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
+                     toy.location.split(',')[0]}
+                    {toy.distance && toyOwner?.locationPrivacy !== 'private' && (
                       <span className="ml-1 text-blue-600 font-medium">
                         ({Math.round(toy.distance * 10) / 10} miles away)
                       </span>
@@ -534,7 +536,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   <SocialShareButtons
                     url={getShareableUrl()}
                     title={`Check out this toy on ToyShare: ${toy.title}`}
-                    description={`${toy.description} - Available for exchange in ${toy.location}`}
+                    description={`${toy.description} - Available for exchange${
+                      toyOwner?.locationPrivacy === 'private' ? '' : 
+                      toyOwner?.locationPrivacy === 'exact_location' ? ` in ${toy.location}` : 
+                      ` in ${toy.location.split(',')[0]}`
+                    }`}
                   />
                 </div>
               </div>
@@ -567,7 +573,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                               </div>
                               <div className="flex items-center text-sm text-neutral-500 mt-1">
                                 <MapPin className="h-3 w-3 mr-1" />
-                                <span>{toyOwner.location}</span>
+                                <span>
+                                  {toyOwner.locationPrivacy === 'exact_location' ? toyOwner.location :
+                                   toyOwner.locationPrivacy === 'private' ? 'Location hidden' :
+                                   toyOwner.location.split(',')[0]}
+                                </span>
                               </div>
                             </div>
                             <div className="flex flex-col items-center">
