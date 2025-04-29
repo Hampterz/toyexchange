@@ -16,7 +16,7 @@ export default function MessagesPage() {
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
 
   // Get all messages for the current user
-  const { data: messagesData, isLoading: isLoadingMessages } = useQuery({
+  const { data: messagesData, isLoading: isLoadingMessages } = useQuery<Message[]>({
     queryKey: ["/api/messages"],
     queryFn: async () => {
       const response = await fetch("/api/messages", {
@@ -31,14 +31,14 @@ export default function MessagesPage() {
   });
 
   // Get all users who have messaged with the current user
-  const { data: conversationsData, isLoading: isLoadingConversations } = useQuery({
+  const { data: conversationsData, isLoading: isLoadingConversations } = useQuery<User[]>({
     queryKey: ["/api/users"],
     queryFn: async () => {
       if (!messagesData) return [];
       
       // Extract unique user IDs from messages
       const userIds = new Set<number>();
-      messagesData.forEach(message => {
+      messagesData.forEach((message: Message) => {
         if (message.senderId !== user?.id) {
           userIds.add(message.senderId);
         }
@@ -49,13 +49,26 @@ export default function MessagesPage() {
       
       // Get user details for each unique user
       const userPromises = Array.from(userIds).map(async (userId) => {
-        const response = await fetch(`/api/users/${userId}`, {
-          credentials: "include",
-        });
-        return response.json();
+        try {
+          const response = await fetch(`/api/users/${userId}`, {
+            credentials: "include",
+          });
+          
+          if (!response.ok) {
+            console.error(`Could not fetch user with ID ${userId}`);
+            return null;
+          }
+          
+          return await response.json();
+        } catch (error) {
+          console.error(`Error fetching user with ID ${userId}:`, error);
+          return null;
+        }
       });
       
-      return Promise.all(userPromises);
+      const results = await Promise.all(userPromises);
+      // Filter out any null values from failed requests
+      return results.filter((user): user is User => user !== null);
     },
     enabled: !!messagesData && !!user,
   });
@@ -72,7 +85,7 @@ export default function MessagesPage() {
     if (!messagesData) return 0;
     
     return messagesData.filter(
-      message => message.senderId === userId && message.receiverId === user?.id && !message.read
+      (message: Message) => message.senderId === userId && message.receiverId === user?.id && !message.read
     ).length;
   };
 
@@ -81,7 +94,7 @@ export default function MessagesPage() {
     if (!messagesData) return null;
     
     const conversationMessages = messagesData.filter(
-      message => 
+      (message: Message) => 
         (message.senderId === userId && message.receiverId === user?.id) ||
         (message.senderId === user?.id && message.receiverId === userId)
     );
@@ -90,7 +103,11 @@ export default function MessagesPage() {
     
     // Sort by date and get the most recent
     return conversationMessages.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a: Message, b: Message) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      }
     )[0];
   };
 
@@ -160,7 +177,7 @@ export default function MessagesPage() {
                               <h3 className="font-medium truncate">{otherUser.name}</h3>
                               {lastMessage && (
                                 <span className="text-xs text-muted-foreground">
-                                  {new Date(lastMessage.createdAt).toLocaleDateString()}
+                                  {lastMessage.createdAt ? new Date(lastMessage.createdAt).toLocaleDateString() : ''}
                                 </span>
                               )}
                             </div>
