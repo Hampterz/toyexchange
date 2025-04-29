@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Toy, ToyWithDistance } from "@shared/schema";
+import { ToyWithDistance } from "@shared/schema";
 import { ToyCard } from "./toy-card";
 import { MessageDialog } from "./message-dialog";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ export function ToyList({ filters = {} }: ToyListProps) {
     queryKey: [`/api/toys?${queryParams}`],
   });
 
-  const handleRequestClick = (toy: ToyWithDistance) => {
+  const handleMessageClick = (toy: ToyWithDistance) => {
     setSelectedToy(toy);
     setIsMessageDialogOpen(true);
   };
@@ -99,7 +99,7 @@ export function ToyList({ filters = {} }: ToyListProps) {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-6 px-2 sm:px-0">
         {displayedToys.map((toy) => (
-          <ToyCard key={toy.id} toy={toy} onRequestClick={handleRequestClick} />
+          <ToyCard key={toy.id} toy={toy} onRequestClick={handleMessageClick} />
         ))}
       </div>
 
@@ -121,7 +121,7 @@ export function ToyList({ filters = {} }: ToyListProps) {
           open={isMessageDialogOpen}
           onOpenChange={setIsMessageDialogOpen}
           receiverId={selectedToy.userId}
-          receiverName={selectedToy.owner?.name || "Toy Owner"}
+          receiverName="Toy Owner"
           toyId={selectedToy.id}
           toyName={selectedToy.title}
         />
