@@ -197,10 +197,19 @@ export default function AuthPage() {
               variant: "default",
             });
             
-            // Redirect to home page after a short delay so they can see the confetti
+            // Redirect after a short delay so they can see the confetti
+            // If it's a new user (created within the last minute), send them to profile customization
             setTimeout(() => {
               setShowConfetti(false);
-              navigate('/');
+              
+              // Check if this appears to be a new user based on creation time
+              if (userData.createdAt && new Date(userData.createdAt).getTime() > Date.now() - 60000) {
+                console.log("New user detected, redirecting to profile customization");
+                navigate('/profile-customization');
+              } else {
+                console.log("Returning user, redirecting to home page");
+                navigate('/');
+              }
             }, 2000);
           } catch (apiError) {
             console.error("API error during Google auth:", apiError);
