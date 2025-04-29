@@ -143,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get toys by user
+  // Get toys by user (with userId in URL)
   app.get("/api/users/:userId/toys", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
@@ -151,6 +151,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(toys);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch user's toys" });
+    }
+  });
+  
+  // Get toys by current logged-in user
+  app.get("/api/toys/by-user", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const toys = await storage.getToysByUser(userId);
+      res.json(toys);
+    } catch (error) {
+      console.error("Error fetching toys by user:", error);
+      res.status(500).json({ message: "Failed to fetch toy" });
     }
   });
 
