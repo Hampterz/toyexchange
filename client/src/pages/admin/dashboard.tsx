@@ -13,6 +13,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { getQueryFn, queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,6 +31,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
   
   // Resolve report mutation
   const resolveReportMutation = useMutation({
@@ -483,7 +494,7 @@ export default function AdminDashboard() {
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => deleteUserMutation.mutate(user.id)}
+                                onClick={() => setUserToDelete(user.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -619,6 +630,33 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+        
+        {/* Confirmation Dialog for User Deletion */}
+        <AlertDialog open={userToDelete !== null} onOpenChange={() => setUserToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure you want to delete this user?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the user account 
+                and all associated data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-500 hover:bg-red-600 text-white"
+                onClick={() => {
+                  if (userToDelete) {
+                    deleteUserMutation.mutate(userToDelete);
+                    setUserToDelete(null);
+                  }
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
