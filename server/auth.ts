@@ -116,7 +116,13 @@ export function setupAuth(app: Express) {
   app.post("/api/login", passport.authenticate("local"), (req, res) => {
     // Don't return password in response
     const { password, ...userWithoutPassword } = req.user as SelectUser;
-    res.status(200).json(userWithoutPassword);
+    
+    // For regular login, we don't redirect to profile customization
+    // Only Google accounts with auto-generated usernames need customization
+    res.status(200).json({
+      ...userWithoutPassword,
+      needsProfileCustomization: false
+    });
   });
 
   app.post("/api/logout", (req, res, next) => {
@@ -290,9 +296,10 @@ export function setupAuth(app: Express) {
         const isNewAccount = userWithoutPassword.username.match(/\d{4}$/);
         
         // Return a flag indicating if the user should be redirected to the profile customization page
+        // Only users who logged in with Google and have an auto-generated username need to customize their profile
         res.status(200).json({
           ...userWithoutPassword,
-          needsProfileCustomization: isNewAccount
+          needsProfileCustomization: !!userWithoutPassword.googleId && isNewAccount
         });
       });
     } catch (error) {
