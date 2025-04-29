@@ -17,7 +17,8 @@ import { insertToySchema, COMMON_ATTRIBUTES, TOY_CATEGORIES, Toy } from "@shared
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { TagSelector } from "@/components/ui/tag-selector";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { ToySuccessPage } from "./toy-success-page";
 

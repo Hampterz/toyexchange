@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import Confetti from "react-confetti";
 import { Toy } from "@shared/schema";
 import { SiWhatsapp } from "react-icons/si";
+import { useLocation } from "wouter";
 
 interface ToySuccessPageProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
     height: window.innerHeight,
   });
   const [showConfetti, setShowConfetti] = useState(true);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const handleResize = () => {
