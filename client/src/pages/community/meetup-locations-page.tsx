@@ -279,7 +279,7 @@ export default function MeetupLocationsPage() {
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="park">Parks</SelectItem>
             <SelectItem value="library">Libraries</SelectItem>
             <SelectItem value="community-center">Community Centers</SelectItem>
