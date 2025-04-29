@@ -38,7 +38,7 @@ const formSchema = insertToySchema
   .extend({
     // Custom image upload field for the form - required
     imageFiles: z
-      .instanceof(FileList)
+      .instanceof(FileList, { message: "Please insert an image" })
       .refine((files) => files.length > 0, "At least one image is required")
       .refine((files) => files.length <= 4, "Maximum of 4 images allowed")
       .refine(
@@ -51,7 +51,7 @@ const formSchema = insertToySchema
       ),
     // Custom video upload field for the form
     videoFiles: z
-      .instanceof(FileList)
+      .instanceof(FileList, { message: "Please insert a valid video file" })
       .optional()
       .refine(
         (files) => !files || files.length <= 1,
@@ -225,70 +225,67 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
     setSelectedTags([]);
   };
 
-  const renderImagePreview = () => {
-    const files = form.watch("imageFiles");
+  const renderMediaUploads = () => {
+    const imageFiles = form.watch("imageFiles");
+    const videoFiles = form.watch("videoFiles");
     
-    if (!files || files.length === 0) {
-      return (
-        <div className="border-2 border-dashed border-neutral-300 rounded-md p-6 text-center">
-          <Upload className="mx-auto h-12 w-12 text-neutral-400" />
-          <div className="mt-2">
-            <p className="text-sm text-neutral-600">
-              Drag and drop up to 4 images, or click to upload
-            </p>
-            <p className="text-xs text-neutral-500 mt-1">
-              PNG, JPG, WEBP up to 5MB
-            </p>
-          </div>
-        </div>
-      );
-    }
-
     return (
-      <div className="grid grid-cols-2 gap-2">
-        {Array.from(files).map((file, index) => (
-          <div key={index} className="relative border rounded-md overflow-hidden h-24">
-            <img
-              src={URL.createObjectURL(file)}
-              alt={`Preview ${index + 1}`}
-              className="w-full h-full object-cover"
-            />
+      <div className="space-y-4">
+        {/* Image/Video Upload Area */}
+        {(!imageFiles || imageFiles.length === 0) && (!videoFiles || videoFiles.length === 0) ? (
+          <div className="border-2 border-dashed border-neutral-300 rounded-md p-6 text-center">
+            <Upload className="mx-auto h-12 w-12 text-neutral-400" />
+            <div className="mt-2">
+              <p className="text-sm text-neutral-600">
+                Upload media by clicking here or drag and drop files
+              </p>
+              <p className="text-xs text-neutral-500 mt-1">
+                Images: PNG, JPG, WEBP (up to 4, max 5MB each)
+              </p>
+              <p className="text-xs text-neutral-500 mt-1">
+                Video: MP4, WEBM, MOV (optional, max 50MB)
+              </p>
+            </div>
           </div>
-        ))}
-      </div>
-    );
-  };
-  
-  const renderVideoPreview = () => {
-    const files = form.watch("videoFiles");
-    
-    if (!files || files.length === 0) {
-      return (
-        <div className="border-2 border-dashed border-neutral-300 rounded-md p-6 text-center">
-          <Upload className="mx-auto h-12 w-12 text-neutral-400" />
-          <div className="mt-2">
-            <p className="text-sm text-neutral-600">
-              Add a video of the toy in action
-            </p>
-            <p className="text-xs text-neutral-500 mt-1">
-              MP4, WEBM, MOV up to 50MB
-            </p>
+        ) : (
+          <div className="space-y-4">
+            {/* Images Preview */}
+            {imageFiles && imageFiles.length > 0 && (
+              <div>
+                <p className="text-xs text-blue-700 mb-2">Photos ({imageFiles.length}/4)</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {Array.from(imageFiles).map((file, index) => (
+                    <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-24">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Video Preview */}
+            {videoFiles && videoFiles.length > 0 && (
+              <div>
+                <p className="text-xs text-blue-700 mb-2">Video</p>
+                <div className="border rounded-md overflow-hidden">
+                  {Array.from(videoFiles).map((file, index) => (
+                    <div key={`vid-${index}`} className="relative h-32 bg-gray-100 flex items-center justify-center">
+                      <video
+                        src={URL.createObjectURL(file)}
+                        controls
+                        className="max-h-full max-w-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="border rounded-md overflow-hidden">
-        {Array.from(files).map((file, index) => (
-          <div key={index} className="relative h-32 bg-gray-100 flex items-center justify-center">
-            <video
-              src={URL.createObjectURL(file)}
-              controls
-              className="max-h-full max-w-full"
-            />
-          </div>
-        ))}
+        )}
       </div>
     );
   };
@@ -472,16 +469,50 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   <ImageIcon className="h-4 w-4 mr-1" /> Media Upload
                 </h3>
                 
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="imageFiles"
-                    render={({ field: { ref, name, onBlur, onChange } }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-blue-700">Photos (Up to 4)</FormLabel>
-                        <FormControl>
-                          <div className="cursor-pointer" onClick={() => document.getElementById('image-upload')?.click()}>
-                            {renderImagePreview()}
+                <div>
+                  {/* Unified Media Upload Area */}
+                  <div 
+                    className="relative"
+                    onClick={() => {
+                      const currentImageFiles = form.watch("imageFiles");
+                      // If already has images, click image upload; otherwise let them choose
+                      if (currentImageFiles && currentImageFiles.length > 0) {
+                        document.getElementById('image-upload')?.click();
+                      } else if (form.watch("videoFiles")?.length > 0) {
+                        document.getElementById('video-upload')?.click();
+                      } else {
+                        document.getElementById('media-select')?.click();
+                      }
+                    }}
+                  >
+                    {renderMediaUploads()}
+                  </div>
+                  
+                  {/* Hidden file inputs for actual uploads */}
+                  <div>
+                    {/* Used just for initial media type selection */}
+                    <select
+                      id="media-select"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.value === "image") {
+                          document.getElementById('image-upload')?.click();
+                        } else if (e.target.value === "video") {
+                          document.getElementById('video-upload')?.click();
+                        }
+                      }}
+                    >
+                      <option value="">Select media type</option>
+                      <option value="image">Upload Images</option>
+                      <option value="video">Upload Video</option>
+                    </select>
+                    
+                    <FormField
+                      control={form.control}
+                      name="imageFiles"
+                      render={({ field: { ref, name, onBlur, onChange } }) => (
+                        <FormItem className="m-0 p-0">
+                          <FormControl>
                             <Input
                               id="image-upload"
                               type="file"
@@ -495,22 +526,18 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                 onChange(e.target.files);
                               }}
                             />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="videoFiles"
-                    render={({ field: { ref, name, onBlur, onChange } }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-blue-700">Video (Optional)</FormLabel>
-                        <FormControl>
-                          <div className="cursor-pointer" onClick={() => document.getElementById('video-upload')?.click()}>
-                            {renderVideoPreview()}
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="videoFiles"
+                      render={({ field: { ref, name, onBlur, onChange } }) => (
+                        <FormItem className="m-0 p-0">
+                          <FormControl>
                             <Input
                               id="video-upload"
                               type="file"
@@ -523,12 +550,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                 onChange(e.target.files);
                               }}
                             />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
               
