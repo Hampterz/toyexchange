@@ -461,7 +461,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allowedUpdates = {
         name: req.body.name,
         email: req.body.email,
+        username: req.body.username,
         location: req.body.location,
+        bio: req.body.bio,
         profilePicture: req.body.profilePicture
       };
       
