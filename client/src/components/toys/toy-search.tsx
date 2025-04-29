@@ -29,26 +29,24 @@ export function ToySearch({ onSearch, initialValue = "" }: ToySearchProps) {
       >
         <Input
           type="text"
-          placeholder="Search"
+          placeholder="Search toys..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="rounded-r-none border-r-0 focus-visible:ring-blue-500 pl-4 pr-10 py-2 shadow-sm"
+          className="rounded-r-none border-r-0 focus-visible:ring-blue-500 pl-4 py-2 shadow-sm text-sm"
           aria-label="Search for toys"
           autoComplete="off"
           spellCheck="false"
         />
         <Button 
           type="submit" 
-          className="rounded-l-none bg-blue-700 hover:bg-blue-800 shadow-sm"
+          className="rounded-l-none bg-blue-700 hover:bg-blue-800 shadow-sm px-3 sm:px-4"
           aria-label="Search for toys"
         >
-          <Search className="h-4 w-4 mr-2" />
+          <Search className="h-4 w-4 sm:mr-2" />
           <span className="hidden sm:inline">Search</span>
         </Button>
       </form>
-      <div className="text-xs text-gray-500 mt-1 pl-1 hidden sm:block">
-        Search by toy name, description or tags
-      </div>
+      {/* Removed the description text as requested */}
     </div>
   );
 }
