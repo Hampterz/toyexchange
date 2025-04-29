@@ -19,7 +19,7 @@ export default function SafetyTips() {
         <div className="bg-blue-50 p-6 rounded-lg mb-8">
           <h2 className="text-blue-900 mt-0">Your Safety is Our Priority</h2>
           <p className="mb-0">
-            At ToyShare, we're committed to creating a safe environment for families to exchange toys. 
+            At ToyShare, we're committed to creating a safe environment for members to exchange toys. 
             While we take measures to promote safety on our platform, it's important to follow these 
             guidelines when arranging and conducting toy exchanges.
           </p>
@@ -181,9 +181,9 @@ export default function SafetyTips() {
           </p>
         </div>
 
-        <h2>Additional Tips for Families</h2>
+        <h2>Additional Tips for Members with Children</h2>
 
-        <h3>For Parents with Young Children</h3>
+        <h3>For Those with Young Children</h3>
         <ul>
           <li>When bringing children to exchanges, maintain supervision at all times</li>
           <li>Consider having another adult attend so one person can watch the children while the other handles the exchange</li>
@@ -195,7 +195,7 @@ export default function SafetyTips() {
         <ul>
           <li>Start with small exchanges to build trust with community members</li>
           <li>After positive experiences with the same user, you might feel comfortable with more convenient arrangements</li>
-          <li>Consider joining local toy-sharing groups to build relationships with families in your area</li>
+          <li>Consider joining local toy-sharing groups to build relationships with other members in your area</li>
           <li>Remember that safety should always remain a priority, even with users you've exchanged with before</li>
         </ul>
 
@@ -203,7 +203,7 @@ export default function SafetyTips() {
           <h3 className="text-white mt-0 mb-3">Remember</h3>
           <p className="mb-0 text-white">
             Your safety is more important than any toy exchange. If at any point you feel uncomfortable or unsafe, 
-            it's okay to cancel the exchange. Trust your instincts and prioritize your family's well-being.
+            it's okay to cancel the exchange. Trust your instincts and prioritize your personal well-being.
           </p>
         </div>
       </div>
