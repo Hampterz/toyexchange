@@ -33,28 +33,49 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
         throw new Error('Failed to fetch messages');
       }
       return res.json();
-    }
+    },
+    refetchInterval: 5000, // Auto-refetch every 5 seconds to get new messages
   });
 
   // Send a new message
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      const res = await apiRequest("POST", "/api/messages", {
-        receiverId: otherUserId,
-        content,
-        toyId: 0, // This is required by the schema but may not be relevant for direct messages
-        read: false
-      });
-      return await res.json();
+      try {
+        const res = await fetch("/api/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            receiverId: otherUserId,
+            content,
+            toyId: 0, // This is required by the schema but may not be relevant for direct messages
+            read: false
+          })
+        });
+        
+        if (!res.ok) {
+          throw new Error("Failed to send message");
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error("Message send error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       setNewMessage("");
       // Immediately refetch the messages to show the new message
-      refetch();
-      queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      setTimeout(() => {
+        refetch();
+        queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      }, 300);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Message send error:", error);
       toast({
         title: "Failed to send message",
         description: "Please try again",
@@ -66,13 +87,36 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
   // Mark messages as read
   const markAsReadMutation = useMutation({
     mutationFn: async (messageId: number) => {
-      const res = await apiRequest("PATCH", `/api/messages/${messageId}/read`, { read: true });
-      return await res.json();
+      try {
+        const res = await fetch(`/api/messages/${messageId}/read`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ read: true })
+        });
+        
+        if (!res.ok) {
+          throw new Error("Failed to mark message as read");
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error("Mark as read error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
-      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      // Small delay to ensure DB operation completes before refetching
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
+        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      }, 300);
     },
+    onError: (error) => {
+      console.error("Mark as read error:", error);
+    }
   });
 
   // Mark unread messages as read when conversation is opened

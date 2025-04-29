@@ -8,6 +8,7 @@ import { Loader2, MessageSquare } from "lucide-react";
 import { AddToyModal } from "@/components/toys/add-toy-modal";
 import { Conversation } from "@/components/toys/conversation";
 import { Button } from "@/components/ui/button";
+import { Message, User } from "@shared/schema";
 
 export default function MessagesPage() {
   const { user } = useAuth();
@@ -17,6 +18,15 @@ export default function MessagesPage() {
   // Get all messages for the current user
   const { data: messagesData, isLoading: isLoadingMessages } = useQuery({
     queryKey: ["/api/messages"],
+    queryFn: async () => {
+      const response = await fetch("/api/messages", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch messages");
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
 
