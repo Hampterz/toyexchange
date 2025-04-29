@@ -50,7 +50,17 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
-        const user = await storage.getUserByUsername(username);
+        // Check if the input is an email (contains @)
+        const isEmail = username.includes('@');
+        
+        // Find user by username or email
+        let user;
+        if (isEmail) {
+          user = await storage.getUserByEmail(username);
+        } else {
+          user = await storage.getUserByUsername(username);
+        }
+        
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);
         } else {
@@ -274,7 +284,16 @@ export function setupAuth(app: Express) {
         
         // Don't return password in response
         const { password, ...userWithoutPassword } = user;
-        res.status(200).json(userWithoutPassword);
+        
+        // Check if this is a new user account or if the username was auto-generated
+        // We detect auto-generated usernames by checking if they end with a timestamp (4 digits)
+        const isNewAccount = userWithoutPassword.username.match(/\d{4}$/);
+        
+        // Return a flag indicating if the user should be redirected to the profile customization page
+        res.status(200).json({
+          ...userWithoutPassword,
+          needsProfileCustomization: isNewAccount
+        });
       });
     } catch (error) {
       console.error("Error in Google auth:", error);

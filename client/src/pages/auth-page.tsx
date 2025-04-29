@@ -419,9 +419,9 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-blue-800">Username</FormLabel>
+                            <FormLabel className="text-blue-800">Username or Email</FormLabel>
                             <FormControl>
-                              <Input placeholder="Enter your username" className="border-blue-200 focus-visible:ring-blue-700" {...field} />
+                              <Input placeholder="Enter your username or email" className="border-blue-200 focus-visible:ring-blue-700" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

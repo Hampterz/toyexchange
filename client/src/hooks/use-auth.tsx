@@ -19,7 +19,7 @@ export const registerUserSchema = insertUserSchema.extend({
 
 // Login schema is simpler than registration
 export const loginUserSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  username: z.string().min(1, "Username or email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
