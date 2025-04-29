@@ -1,49 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, Check, Tag, Search, ChevronsUpDown } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { X, Check, ChevronsUpDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 interface TagSelectorProps {
   availableTags: string[];
   selectedTags: string[];
   onTagsChange: (tags: string[]) => void;
-  className?: string;
   placeholder?: string;
+  allowCustomTags?: boolean;
+  className?: string;
 }
 
 export function TagSelector({
   availableTags,
   selectedTags,
   onTagsChange,
+  placeholder = "Select tags...",
+  allowCustomTags = true,
   className,
-  placeholder = "Select tags..."
 }: TagSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [customTag, setCustomTag] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState("");
 
-  // Filter tags based on search query
-  const filteredTags = availableTags
-    .filter(tag => !selectedTags.includes(tag))
-    .filter(tag => tag.toLowerCase().includes(search.toLowerCase()));
-
-  // Toggle tag selection
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
       onTagsChange(selectedTags.filter(t => t !== tag));
@@ -52,36 +34,19 @@ export function TagSelector({
     }
   };
 
-  // Add custom tag
-  const addCustomTag = () => {
-    const trimmedTag = customTag.trim();
-    if (trimmedTag && !selectedTags.includes(trimmedTag)) {
-      onTagsChange([...selectedTags, trimmedTag]);
-      setCustomTag('');
-    }
+  const removeTag = (tag: string) => {
+    onTagsChange(selectedTags.filter(t => t !== tag));
   };
 
-  // Handle custom tag input key press
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && inputValue && allowCustomTags) {
       e.preventDefault();
-      addCustomTag();
+      if (!selectedTags.includes(inputValue.trim()) && inputValue.trim() !== "") {
+        onTagsChange([...selectedTags, inputValue.trim()]);
+        setInputValue("");
+      }
     }
   };
-
-  // Close the popover when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (open && inputRef.current && !inputRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [open]);
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -91,108 +56,81 @@ export function TagSelector({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between text-muted-foreground h-auto min-h-10"
+            className="w-full justify-between"
           >
-            <div className="flex items-center">
-              <Tag className="mr-2 h-4 w-4" />
-              {selectedTags.length > 0 ? `${selectedTags.length} tags selected` : placeholder}
-            </div>
+            {selectedTags.length > 0
+              ? `${selectedTags.length} tag${selectedTags.length > 1 ? "s" : ""} selected`
+              : placeholder}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="start">
-          <Command className="w-full">
+          <Command>
             <CommandInput 
               placeholder="Search tags..." 
-              value={search}
-              onValueChange={setSearch}
-              className="h-9"
+              value={inputValue}
+              onValueChange={setInputValue}
+              onKeyDown={handleInputKeyDown}
             />
             <CommandList>
-              <CommandEmpty className="py-3 px-4">
-                <div className="space-y-2">
-                  <p className="text-sm">No tags found.</p>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      value={customTag}
-                      onChange={(e) => setCustomTag(e.target.value)}
-                      placeholder="Add custom tag..."
-                      className="h-8 flex-1"
-                      onKeyDown={handleKeyPress}
-                      ref={inputRef}
-                    />
-                    <Button 
-                      size="sm" 
-                      onClick={addCustomTag} 
-                      disabled={!customTag.trim()}
-                      className="h-8 bg-blue-600 hover:bg-blue-700"
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </div>
-              </CommandEmpty>
-              <CommandGroup className="max-h-52 overflow-y-auto">
-                {filteredTags.map((tag) => (
-                  <CommandItem
-                    key={tag}
-                    onSelect={() => toggleTag(tag)}
-                    className="flex items-center justify-between cursor-pointer"
+              <CommandEmpty>
+                {allowCustomTags && inputValue.trim() !== "" ? (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-left"
+                    onClick={() => {
+                      if (!selectedTags.includes(inputValue.trim())) {
+                        onTagsChange([...selectedTags, inputValue.trim()]);
+                        setInputValue("");
+                        setOpen(false);
+                      }
+                    }}
                   >
-                    <div className="flex items-center">
-                      {tag}
-                    </div>
-                    <Check
-                      className={cn(
-                        "h-4 w-4 opacity-0 transition-opacity",
-                        selectedTags.includes(tag) && "opacity-100"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-              {filteredTags.length > 0 && (
-                <div className="border-t p-2">
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      value={customTag}
-                      onChange={(e) => setCustomTag(e.target.value)}
-                      placeholder="Add custom tag..."
-                      className="h-8 flex-1"
-                      onKeyDown={handleKeyPress}
-                      ref={inputRef}
-                    />
-                    <Button 
-                      size="sm" 
-                      onClick={addCustomTag} 
-                      disabled={!customTag.trim()}
-                      className="h-8 bg-blue-600 hover:bg-blue-700"
+                    Add "{inputValue.trim()}"
+                  </Button>
+                ) : (
+                  "No tags found."
+                )}
+              </CommandEmpty>
+              <CommandGroup>
+                {availableTags
+                  .filter(tag => !selectedTags.includes(tag))
+                  .map(tag => (
+                    <CommandItem
+                      key={tag}
+                      value={tag}
+                      onSelect={() => {
+                        toggleTag(tag);
+                        setInputValue("");
+                      }}
                     >
-                      Add
-                    </Button>
-                  </div>
-                </div>
-              )}
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {tag}
+                    </CommandItem>
+                  ))}
+              </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
 
-      {/* Display selected tags */}
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {selectedTags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="default"
-              className="py-1 px-2 bg-blue-100 text-blue-800 hover:bg-blue-200"
-            >
-              #{tag}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {selectedTags.map(tag => (
+            <Badge key={tag} variant="secondary" className="px-3 py-1 text-xs">
+              {tag}
               <button
-                className="ml-1 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={() => toggleTag(tag)}
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="ml-2 rounded-full text-muted-foreground hover:text-foreground"
               >
                 <X className="h-3 w-3" />
+                <span className="sr-only">Remove {tag} tag</span>
               </button>
             </Badge>
           ))}

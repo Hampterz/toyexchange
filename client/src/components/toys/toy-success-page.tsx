@@ -169,7 +169,9 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
               className="bg-blue-700 hover:bg-blue-800"
               onClick={() => {
                 onClose();
-                window.location.href = `/toy/${toy?.id}`;
+                if (toy?.id) {
+                  setLocation(`/toy/${toy.id}`);
+                }
               }}
             >
               <Share2 className="mr-2 h-4 w-4" />

@@ -122,7 +122,10 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       setAddedToy(data);
       setShowSuccessPage(true);
       
+      // Invalidate all relevant toy queries to ensure the UI is refreshed
       queryClient.invalidateQueries({ queryKey: ["/api/toys"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/toys/by-user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/community-metrics"] });
       
       // Only reset the form, don't close the modal
       reset();
