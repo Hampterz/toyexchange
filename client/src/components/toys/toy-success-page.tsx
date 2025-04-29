@@ -60,7 +60,17 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
         break;
     }
 
-    window.open(shareUrl, "_blank");
+    // Open in a new window with specific dimensions
+    const width = 550;
+    const height = 420;
+    const left = Math.round((window.innerWidth - width) / 2);
+    const top = Math.round((window.innerHeight - height) / 2);
+    
+    window.open(
+      shareUrl,
+      `share_${platform}`,
+      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
+    );
   };
 
   return (

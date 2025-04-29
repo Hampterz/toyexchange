@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Check, ChevronsUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,28 @@ export function TagSelector({
 }: TagSelectorProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [filteredTags, setFilteredTags] = useState(availableTags);
+
+  // Initialize filtered tags when component mounts
+  useEffect(() => {
+    setFilteredTags(availableTags.filter(tag => !selectedTags.includes(tag)));
+  }, [availableTags, selectedTags]);
+  
+  // When input value changes, filter the available tags
+  const updateFilteredTags = (value: string) => {
+    setInputValue(value);
+    if (value.trim() === "") {
+      setFilteredTags(availableTags.filter(tag => !selectedTags.includes(tag)));
+    } else {
+      setFilteredTags(
+        availableTags.filter(
+          tag => 
+            !selectedTags.includes(tag) && 
+            tag.toLowerCase().includes(value.toLowerCase())
+        )
+      );
+    }
+  };
 
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -32,6 +54,7 @@ export function TagSelector({
     } else {
       onTagsChange([...selectedTags, tag]);
     }
+    updateFilteredTags("");
   };
 
   const removeTag = (tag: string) => {
@@ -44,6 +67,7 @@ export function TagSelector({
       if (!selectedTags.includes(inputValue.trim()) && inputValue.trim() !== "") {
         onTagsChange([...selectedTags, inputValue.trim()]);
         setInputValue("");
+        updateFilteredTags("");
       }
     }
   };
@@ -69,7 +93,7 @@ export function TagSelector({
             <CommandInput 
               placeholder="Search tags..." 
               value={inputValue}
-              onValueChange={setInputValue}
+              onValueChange={updateFilteredTags}
               onKeyDown={handleInputKeyDown}
             />
             <CommandList>
@@ -93,26 +117,24 @@ export function TagSelector({
                 )}
               </CommandEmpty>
               <CommandGroup>
-                {availableTags
-                  .filter(tag => !selectedTags.includes(tag))
-                  .map(tag => (
-                    <CommandItem
-                      key={tag}
-                      value={tag}
-                      onSelect={() => {
-                        toggleTag(tag);
-                        setInputValue("");
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {tag}
-                    </CommandItem>
-                  ))}
+                {filteredTags.map(tag => (
+                  <CommandItem
+                    key={tag}
+                    value={tag}
+                    onSelect={() => {
+                      toggleTag(tag);
+                      setInputValue("");
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {tag}
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </CommandList>
           </Command>
