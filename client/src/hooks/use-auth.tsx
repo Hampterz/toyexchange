@@ -56,17 +56,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return await res.json();
     },
-    onSuccess: (user: Omit<SelectUser, "password">) => {
+    onSuccess: (user: Omit<SelectUser, "password"> & { needsProfileCustomization?: boolean }) => {
       queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "Welcome back!",
         description: `You are now logged in as ${user.name}`,
       });
       
-      // Force page reload to ensure session is recognized
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
+      // Check if user needs to complete their profile (for Google auth users)
+      if (user.needsProfileCustomization) {
+        setTimeout(() => {
+          window.location.href = "/profile-customization";
+        }, 1000);
+      } else {
+        // Regular redirect to home page
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -109,8 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       
       // Reload the page to ensure the session is recognized
+      // For manual registration, go directly to home page (no profile customization needed)
       setTimeout(() => {
-        window.location.href = "/profile-customization";
+        window.location.href = "/";
       }, 1500);
     },
     onError: (error: Error) => {
