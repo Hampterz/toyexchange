@@ -40,37 +40,54 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
 
   const shareToy = (platform: "facebook" | "twitter" | "whatsapp") => {
     if (!toy) return;
-
-    const toyUrl = `${window.location.origin}/toy/${toy.id}`;
-    const title = `Check out this toy: ${toy.title} on ToyShare!`;
-    const text = `I just shared a ${toy.condition} ${toy.title} on ToyShare. It's looking for a new home! #ToyShare #SustainableToys`;
-
-    let shareUrl = "";
     
-    switch (platform) {
-      case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(toyUrl)}&quote=${encodeURIComponent(text)}`;
-        break;
-      case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(toyUrl)}&text=${encodeURIComponent(text)}`;
-        break;
+    try {
+      const toyUrl = `${window.location.origin}/toy/${toy.id}`;
+      const title = `Check out this toy: ${toy.title} on ToyShare!`;
+      const text = `I just shared a ${toy.condition} ${toy.title} on ToyShare. It's looking for a new home! #ToyShare #SustainableToys`;
 
-      case "whatsapp":
-        shareUrl = `https://wa.me/?text=${encodeURIComponent(`${text} ${toyUrl}`)}`;
-        break;
+      let shareUrl = "";
+      
+      switch (platform) {
+        case "facebook":
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(toyUrl)}&quote=${encodeURIComponent(text)}`;
+          break;
+        case "twitter":
+          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(toyUrl)}&text=${encodeURIComponent(text)}`;
+          break;
+        case "whatsapp":
+          shareUrl = `https://wa.me/?text=${encodeURIComponent(`${text} ${toyUrl}`)}`;
+          break;
+        default:
+          console.error("Unknown platform:", platform);
+          return;
+      }
+
+      // Safety check
+      if (!shareUrl) {
+        console.error("Failed to generate share URL");
+        return;
+      }
+
+      // Open in a new window with specific dimensions
+      const width = 550;
+      const height = 420;
+      const left = Math.round((window.innerWidth - width) / 2);
+      const top = Math.round((window.innerHeight - height) / 2);
+      
+      const shareWindow = window.open(
+        shareUrl,
+        `share_${platform}`,
+        `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
+      );
+      
+      // Extra safety check
+      if (!shareWindow) {
+        alert("Please allow popups for this website to share toys");
+      }
+    } catch (error) {
+      console.error("Error sharing toy:", error);
     }
-
-    // Open in a new window with specific dimensions
-    const width = 550;
-    const height = 420;
-    const left = Math.round((window.innerWidth - width) / 2);
-    const top = Math.round((window.innerHeight - height) / 2);
-    
-    window.open(
-      shareUrl,
-      `share_${platform}`,
-      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
-    );
   };
 
   return (
