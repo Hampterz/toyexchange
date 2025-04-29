@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Share2, ArrowLeft, Check, Facebook, Twitter, Linkedin } from "lucide-react";
+import { Share2, ArrowLeft, Check, Facebook, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Confetti from "react-confetti";
@@ -38,7 +38,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
     };
   }, []);
 
-  const shareToy = (platform: "facebook" | "twitter" | "linkedin" | "whatsapp") => {
+  const shareToy = (platform: "facebook" | "twitter" | "whatsapp") => {
     if (!toy) return;
 
     const toyUrl = `${window.location.origin}/toy/${toy.id}`;
@@ -54,9 +54,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
       case "twitter":
         shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(toyUrl)}&text=${encodeURIComponent(text)}`;
         break;
-      case "linkedin":
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(toyUrl)}`;
-        break;
+
       case "whatsapp":
         shareUrl = `https://wa.me/?text=${encodeURIComponent(`${text} ${toyUrl}`)}`;
         break;
@@ -128,14 +126,7 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
             >
               <Twitter className="h-5 w-5 text-blue-400" />
             </Button>
-            <Button 
-              onClick={() => shareToy("linkedin")} 
-              variant="outline" 
-              className="p-2 h-auto w-auto"
-              aria-label="Share on LinkedIn"
-            >
-              <Linkedin className="h-5 w-5 text-blue-700" />
-            </Button>
+
             <Button 
               onClick={() => shareToy("whatsapp")} 
               variant="outline" 
