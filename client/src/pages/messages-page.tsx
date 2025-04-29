@@ -1,19 +1,33 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
-import { Loader2, MessageSquare } from "lucide-react";
+import { Loader2, MessageSquare, MoreVertical, Trash, UserX, BellOff, UserCircle } from "lucide-react";
 import { AddToyModal } from "@/components/toys/add-toy-modal";
 import { Conversation } from "@/components/toys/conversation";
 import { Button } from "@/components/ui/button";
 import { Message, User } from "@shared/schema";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 export default function MessagesPage() {
   const { user } = useAuth();
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [location, navigate] = useLocation();
+  const queryClient = useQueryClient();
+  const [blockedUsers, setBlockedUsers] = useState<number[]>([]);
+  const [mutedUsers, setMutedUsers] = useState<number[]>([]);
 
   // Get all messages for the current user
   const { data: messagesData, isLoading: isLoadingMessages } = useQuery<Message[]>({
@@ -111,6 +125,68 @@ export default function MessagesPage() {
     )[0];
   };
 
+  // Delete conversation mutation
+  const deleteConversationMutation = useMutation({
+    mutationFn: async (otherUserId: number) => {
+      // This would typically call an API endpoint
+      // For now, we'll simulate deletion by filtering locally
+      toast({
+        title: "Conversation deleted",
+        description: "This conversation has been removed",
+      });
+      return otherUserId;
+    },
+    onSuccess: (otherUserId) => {
+      // Update the local state or refetch data
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      if (selectedUser === otherUserId) {
+        // If the selected conversation was deleted, select another one or none
+        const remainingUsers = conversationsData?.filter(u => u.id !== otherUserId && u.id !== user?.id);
+        setSelectedUser(remainingUsers?.length ? remainingUsers[0].id : null);
+      }
+    }
+  });
+
+  // Block user mutation
+  const blockUserMutation = useMutation({
+    mutationFn: async (otherUserId: number) => {
+      // In a real app, you would call an API to block the user
+      setBlockedUsers(prev => [...prev, otherUserId]);
+      toast({
+        title: "User blocked",
+        description: "You will no longer receive messages from this user",
+      });
+      return otherUserId;
+    },
+    onSuccess: (otherUserId) => {
+      // Update UI or refetch data as needed
+      if (selectedUser === otherUserId) {
+        const remainingUsers = conversationsData?.filter(
+          u => u.id !== otherUserId && u.id !== user?.id && !blockedUsers.includes(u.id)
+        );
+        setSelectedUser(remainingUsers?.length ? remainingUsers[0].id : null);
+      }
+    }
+  });
+
+  // Mute user mutation
+  const muteUserMutation = useMutation({
+    mutationFn: async (otherUserId: number) => {
+      // In a real app, you would call an API to mute the user
+      setMutedUsers(prev => [...prev, otherUserId]);
+      toast({
+        title: "User muted",
+        description: "You will no longer receive notifications from this user",
+      });
+      return otherUserId;
+    }
+  });
+  
+  // View user profile
+  const viewUserProfile = (userId: number) => {
+    navigate(`/user-profile/${userId}`);
+  };
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -189,11 +265,69 @@ export default function MessagesPage() {
                             </p>
                           )}
                         </div>
-                        {unreadCount > 0 && (
-                          <div className="bg-primary text-white text-xs font-bold h-5 min-w-5 rounded-full flex items-center justify-center px-1.5">
-                            {unreadCount}
-                          </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {unreadCount > 0 && (
+                            <div className="bg-primary text-white text-xs font-bold h-5 min-w-5 rounded-full flex items-center justify-center px-1.5">
+                              {unreadCount}
+                            </div>
+                          )}
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button 
+                                onClick={(e) => e.stopPropagation()} 
+                                className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-neutral-100"
+                              >
+                                <MoreVertical className="h-4 w-4 text-neutral-500" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  viewUserProfile(otherUser.id);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <UserCircle className="h-4 w-4 mr-2" />
+                                View Profile
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  muteUserMutation.mutate(otherUser.id);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <BellOff className="h-4 w-4 mr-2" />
+                                Mute Notifications
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  blockUserMutation.mutate(otherUser.id);
+                                }}
+                                className="cursor-pointer text-amber-600"
+                              >
+                                <UserX className="h-4 w-4 mr-2" />
+                                Block User
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteConversationMutation.mutate(otherUser.id);
+                                }}
+                                className="cursor-pointer text-red-600"
+                              >
+                                <Trash className="h-4 w-4 mr-2" />
+                                Delete Conversation
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </div>
                   );

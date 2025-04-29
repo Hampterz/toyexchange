@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useParams } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import { User, Toy, ToyWithDistance } from '@shared/schema';
+import React, { useState, useEffect } from 'react';
+import { useParams, useLocation } from 'wouter';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { User, Toy, ToyWithDistance, Wish } from '@shared/schema';
 import { format } from 'date-fns';
 import { 
   Tabs, 
@@ -14,12 +14,28 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ToyCard } from '@/components/toys/toy-card';
-import { Loader2, CalendarDays, MapPin, Award } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, CalendarDays, MapPin, Award, MessageSquare, Mail, Heart, UserPlus, UserMinus, ThumbsUp } from 'lucide-react';
+import { AvatarWithFallback } from '@/components/ui/avatar-with-fallback';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/use-auth';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { UserBadge } from '@/components/ui/user-badge';
 
 
 const UserProfilePage: React.FC = () => {
   const params = useParams();
   const userId = params.userId ? parseInt(params.userId) : undefined;
+  const [location, navigate] = useLocation();
+  const { user: currentUser } = useAuth();
+  const { toast } = useToast();
+  
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('active');
   
   const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: [`/api/users/${userId}`],
@@ -30,12 +46,97 @@ const UserProfilePage: React.FC = () => {
     queryKey: [`/api/users/${userId}/toys`],
     enabled: !!userId,
   });
-
-  const [selectedTab, setSelectedTab] = useState('active');
+  
+  const { data: wishes, isLoading: wishesLoading } = useQuery<Wish[]>({
+    queryKey: [`/api/users/${userId}/wishes`],
+    enabled: !!userId,
+  });
+  
+  // Check if current user is following the profile user
+  const { data: followStatus } = useQuery<{isFollowing: boolean}>({
+    queryKey: [`/api/follow-status/${userId}`],
+    enabled: !!userId && !!currentUser,
+  });
+  
+  // Update following state when data changes
+  useEffect(() => {
+    if (followStatus) {
+      setIsFollowing(followStatus.isFollowing);
+    }
+  }, [followStatus]);
+  
+  // Follow/unfollow mutation
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest(
+        "POST", 
+        `/api/users/${isFollowing ? 'unfollow' : 'follow'}`, 
+        { userId }
+      );
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: isFollowing ? 'Unfollowed' : 'Following',
+        description: isFollowing 
+          ? `You are no longer following ${user?.name}` 
+          : `You are now following ${user?.name}`,
+      });
+      setIsFollowing(!isFollowing);
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: `Failed to ${isFollowing ? 'unfollow' : 'follow'} user`,
+        variant: 'destructive',
+      });
+    }
+  });
+  
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/messages", {
+        receiverId: userId,
+        content: messageContent,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Message Sent',
+        description: `Your message has been sent to ${user?.name}`,
+      });
+      setMessageDialogOpen(false);
+      setMessageContent('');
+      // Redirect to messages page
+      navigate('/messages');
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to send message',
+        variant: 'destructive',
+      });
+    }
+  });
+  
+  // Handle message sending
+  const handleSendMessage = () => {
+    if (!messageContent.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a message',
+        variant: 'destructive',
+      });
+      return;
+    }
+    sendMessageMutation.mutate();
+  };
   
   // Handle request button clicks
   const handleRequestToy = (toy: ToyWithDistance) => {
-    window.location.href = `/toys/${toy.id}`;
+    navigate(`/toys/${toy.id}`);
   };
 
   if (userLoading) {
@@ -72,15 +173,57 @@ const UserProfilePage: React.FC = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle className="text-2xl">{user.name}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-2xl">{user.name}</CardTitle>
+                  {user.currentBadge && (
+                    <UserBadge badgeName={user.currentBadge} showTooltip={true} className="text-lg" />
+                  )}
+                </div>
                 <CardDescription>{user.username}</CardDescription>
               </div>
             </div>
+            {currentUser && currentUser.id !== userId && (
+              <div className="flex gap-2 mt-4">
+                <Button 
+                  className="flex-1"
+                  variant="outline"
+                  onClick={() => setMessageDialogOpen(true)}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Message
+                </Button>
+                <Button 
+                  className="flex-1"
+                  variant={isFollowing ? "outline" : "default"}
+                  onClick={() => followMutation.mutate()}
+                  disabled={followMutation.isPending}
+                >
+                  {followMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : isFollowing ? (
+                    <UserMinus className="mr-2 h-4 w-4" />
+                  ) : (
+                    <UserPlus className="mr-2 h-4 w-4" />
+                  )}
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent>
-
-
             <div className="space-y-3">
+              {user.bio && (
+                <div>
+                  <p className="text-sm text-neutral-700">{user.bio}</p>
+                  <Separator className="my-3" />
+                </div>
+              )}
+            
+              <div className="flex items-center text-sm">
+                <Mail className="mr-2 h-4 w-4 opacity-70" />
+                <span>{user.email}</span>
+              </div>
+              
               <div className="flex items-center text-sm">
                 <CalendarDays className="mr-2 h-4 w-4 opacity-70" />
                 <span>Joined {user.createdAt ? format(new Date(user.createdAt), 'MMMM yyyy') : 'Unknown'}</span>
@@ -97,14 +240,18 @@ const UserProfilePage: React.FC = () => {
               
               <Separator className="my-3" />
               
-              <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-2xl font-bold">{user.toysShared}</p>
+                  <p className="text-xl font-bold">{user.toysShared || 0}</p>
                   <p className="text-xs text-muted-foreground">Toys Shared</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{user.successfulExchanges}</p>
+                  <p className="text-xl font-bold">{user.successfulExchanges || 0}</p>
                   <p className="text-xs text-muted-foreground">Exchanges</p>
+                </div>
+                <div>
+                  <p className="text-xl font-bold">{(user as any).followers || 0}</p>
+                  <p className="text-xs text-muted-foreground">Followers</p>
                 </div>
               </div>
               
@@ -122,6 +269,27 @@ const UserProfilePage: React.FC = () => {
                           {badge}
                         </Badge>
                       ))}
+                    </div>
+                  </div>
+                </>
+              )}
+              
+              {currentUser && (user as any).rating && (user as any).rating > 0 && (
+                <>
+                  <Separator className="my-3" />
+                  <div>
+                    <h3 className="text-sm font-medium mb-2 flex items-center">
+                      <ThumbsUp className="mr-1 h-4 w-4" />
+                      Trust Score
+                    </h3>
+                    <div className="flex items-center">
+                      <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-green-500 rounded-full"
+                          style={{ width: `${Math.min((user as any).rating * 20, 100)}%` }}
+                        ></div>
+                      </div>
+                      <span className="ml-2 text-sm font-medium">{(user as any).rating}/5</span>
                     </div>
                   </div>
                 </>
@@ -180,6 +348,42 @@ const UserProfilePage: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Message Dialog */}
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Message to {user?.name}</DialogTitle>
+            <DialogDescription>
+              Write your message below. The recipient will be notified.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Textarea
+              placeholder="Your message..."
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setMessageDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSendMessage}
+              disabled={sendMessageMutation.isPending || !messageContent.trim()}
+            >
+              {sendMessageMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : 'Send Message'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
