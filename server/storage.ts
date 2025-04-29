@@ -370,6 +370,15 @@ export class MemStorage implements IStorage {
   async getAllUsers(): Promise<User[]> {
     return Array.from(this.usersMap.values());
   }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    const userExists = this.usersMap.has(id);
+    if (userExists) {
+      this.usersMap.delete(id);
+      return true;
+    }
+    return false;
+  }
 
   // Toy CRUD methods
   async getToy(id: number): Promise<Toy | undefined> {

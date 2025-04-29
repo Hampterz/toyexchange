@@ -215,6 +215,13 @@ export class DatabaseStorage implements IStorage {
   async getAllUsers(): Promise<User[]> {
     return db.select().from(users);
   }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    const [deletedUser] = await db.delete(users)
+      .where(eq(users.id, id))
+      .returning();
+    return !!deletedUser;
+  }
 
   // ==================== Toy CRUD Methods ====================
   async getToy(id: number): Promise<Toy | undefined> {
