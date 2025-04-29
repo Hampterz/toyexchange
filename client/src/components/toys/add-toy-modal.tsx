@@ -36,9 +36,10 @@ const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/mov", "video/qui
 const formSchema = insertToySchema
   .omit({ userId: true, images: true, videos: true, isAvailable: true })
   .extend({
-    // Custom image upload field for the form
+    // Custom image upload field for the form - required
     imageFiles: z
       .instanceof(FileList)
+      .refine((files) => files.length > 0, "At least one image is required")
       .refine((files) => files.length <= 4, "Maximum of 4 images allowed")
       .refine(
         (files) => Array.from(files).every((file) => file.size <= MAX_FILE_SIZE),
@@ -64,6 +65,12 @@ const formSchema = insertToySchema
         (files) => !files || Array.from(files).every((file) => ACCEPTED_VIDEO_TYPES.includes(file.type)),
         "Only .mp4, .webm, and .mov formats are supported"
       ),
+    // Make fields required that weren't before
+    title: z.string().min(1, "Title is required"),
+    description: z.string().min(1, "Description is required"),
+    ageRanges: z.array(z.string()).min(1, "Select at least one age range"),
+    condition: z.string().min(1, "Condition is required"),
+    location: z.string().min(1, "Location is required"),
   });
 
 type FormValues = z.infer<typeof formSchema>;

@@ -1,9 +1,12 @@
 // Age ranges for toys
 export const AGE_RANGES = [
-  "0-2 years",
-  "3-5 years",
-  "6-9 years",
-  "10+ years"
+  "0-12 months",
+  "1-2 years",
+  "3-4 years",
+  "5-7 years",
+  "8-10 years",
+  "11-13 years",
+  "14+ years"
 ];
 
 // Toy categories
