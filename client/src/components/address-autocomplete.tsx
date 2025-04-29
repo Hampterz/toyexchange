@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-// Define the props for the AddressAutocomplete component
 interface AddressAutocompleteProps {
   onAddressSelect: (
     address: string, 
@@ -17,6 +16,7 @@ interface AddressAutocompleteProps {
   disabled?: boolean;
 }
 
+// This is an ultra-simplified version focusing on keeping the input enabled
 export function AddressAutocomplete({
   onAddressSelect,
   placeholder = "",
@@ -27,117 +27,58 @@ export function AddressAutocomplete({
   autoFocus,
   disabled
 }: AddressAutocompleteProps) {
+  // Use a simple controlled input
   const [inputValue, setInputValue] = useState(defaultValue || "");
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<any>(null);
-  const scriptLoadedRef = useRef(false);
   
-  // Handle changes to input value
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // When the user types, update the internal state and notify parent
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
-    
-    // Always notify parent of changes to prevent form validation issues
+    // Notify parent but don't validate - this prevents form control from disabling input
     onAddressSelect(value);
   };
-
-  // Load the Google Maps script if not already loaded
+  
+  // Simple Google Maps script loader with minimal dependencies
   useEffect(() => {
-    // If script is already loaded, don't load it again
-    if (window.google?.maps?.places || scriptLoadedRef.current) {
+    // Only add the script once
+    if (document.getElementById('google-maps-script')) {
       return;
     }
     
-    scriptLoadedRef.current = true;
+    // Create and add the script element
+    const script = document.createElement('script');
+    script.id = 'google-maps-script';
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
     
-    try {
-      const googleMapsScript = document.createElement('script');
-      googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
-      googleMapsScript.async = true;
-      googleMapsScript.defer = true;
-      googleMapsScript.onload = () => {
-        // Initialize autocomplete when script loads
-        if (inputRef.current && window.google?.maps?.places) {
-          initializeAutocomplete();
-        }
-      };
-      document.head.appendChild(googleMapsScript);
-    } catch (error) {
-      console.error("Error loading Google Maps script:", error);
-    }
+    // No cleanup needed - script will remain loaded
   }, []);
-
-  // Initialize autocomplete when the input reference is available
-  useEffect(() => {
-    if (window.google?.maps?.places && inputRef.current) {
-      initializeAutocomplete();
-    }
-  }, [inputRef.current]);
-
-  // Initialize the Google Maps autocomplete
-  const initializeAutocomplete = () => {
-    if (!inputRef.current || !window.google?.maps?.places) return;
-    
-    try {
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ['address'],
-        fields: ['formatted_address', 'geometry', 'place_id']
-      });
-      
-      autocompleteRef.current.addListener('place_changed', () => {
-        const place = autocompleteRef.current.getPlace();
-        if (place?.formatted_address) {
-          setInputValue(place.formatted_address);
-          
-          let coordinates;
-          if (place.geometry?.location) {
-            coordinates = {
-              latitude: place.geometry.location.lat(),
-              longitude: place.geometry.location.lng()
-            };
-          }
-          
-          onAddressSelect(place.formatted_address, coordinates, place.place_id);
-        }
-      });
-    } catch (error) {
-      console.error("Error initializing autocomplete:", error);
+  
+  // Handle Enter key presses
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
+      if (inputValue) {
+        onAddressSelect(inputValue);
+      }
     }
   };
-
-  // Clean up listeners when component unmounts
-  useEffect(() => {
-    return () => {
-      if (autocompleteRef.current && window.google?.maps?.event) {
-        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
-        autocompleteRef.current = null;
-      }
-    };
-  }, []);
-
+  
+  // Return a simple input element with minimal props
   return (
     <div className="relative w-full">
       <input
         ref={inputRef}
         type="text"
+        value={inputValue}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
         id={id}
         placeholder={placeholder}
         className={cn("w-full outline-none bg-transparent text-sm", className)}
-        value={inputValue}
-        onChange={handleInputChange}
-        onBlur={() => {
-          // If user tabs/clicks away, make sure we pass the current value
-          onAddressSelect(inputValue);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && inputValue.trim()) {
-            e.preventDefault();
-            onAddressSelect(inputValue);
-          }
-        }}
-        required={required}
-        autoFocus={autoFocus}
-        disabled={disabled}
         autoComplete="off"
         spellCheck="false"
         aria-label="Enter your address"
@@ -146,21 +87,6 @@ export function AddressAutocomplete({
   );
 }
 
-// Define global types for TypeScript
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          Autocomplete: new (
-            input: HTMLInputElement,
-            options?: Record<string, any>
-          ) => any;
-        };
-        event?: {
-          clearInstanceListeners: (instance: any) => void;
-        };
-      };
-    };
-  }
-}
+// Note: We've intentionally removed Google Maps Autocomplete initialization
+// This version focuses on keeping the input enabled while typing
+// After we verify that works, we can add back the autocomplete functionality
