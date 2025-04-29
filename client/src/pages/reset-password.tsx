@@ -32,9 +32,17 @@ const resetPasswordSchema = z.object({
 
 export default function ResetPasswordPage() {
   const { toast } = useToast();
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  // Check for query parameters first (reset-password?token=xyz)
+  const searchParams = new URLSearchParams(window.location.search);
+  const queryToken = searchParams.get('token');
+  
+  // Fallback to route param pattern (reset-password/xyz)
   const [match, params] = useRoute("/reset-password/:token");
-  const token = params?.token || "";
+  const paramToken = params?.token;
+  
+  // Use query param token if available, otherwise use route param token
+  const token = queryToken || paramToken || "";
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
