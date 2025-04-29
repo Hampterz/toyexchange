@@ -44,7 +44,8 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
-    navigate("/auth");
+    // Force reload to ensure session is properly cleared
+    window.location.href = "/auth";
   };
 
   const handleSearch = (query: string) => {

@@ -274,6 +274,22 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Add an endpoint to check if an email exists before registration
+  app.post("/api/check-email", async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const existingUser = await storage.getUserByEmail(email);
+      return res.json({ exists: !!existingUser });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     

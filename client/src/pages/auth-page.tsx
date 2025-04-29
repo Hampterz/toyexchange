@@ -205,10 +205,12 @@ export default function AuthPage() {
               // Check if this appears to be a new user based on creation time
               if (userData.createdAt && new Date(userData.createdAt).getTime() > Date.now() - 60000) {
                 console.log("New user detected, redirecting to profile customization");
-                navigate('/profile-customization');
+                // Force reload to ensure session is recognized properly
+                window.location.href = '/profile-customization';
               } else {
                 console.log("Returning user, redirecting to home page");
-                navigate('/');
+                // Force reload to ensure session is recognized properly
+                window.location.href = '/';
               }
             }, 2000);
           } catch (apiError) {

@@ -35,7 +35,7 @@ type AuthContextType = {
 type LoginData = z.infer<typeof loginUserSchema>;
 type RegisterData = z.infer<typeof registerUserSchema>;
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
@@ -71,8 +71,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
-      const res = await apiRequest("POST", "/api/register", userData);
-      return await res.json();
+      // First check if email already exists
+      try {
+        const checkRes = await apiRequest("POST", "/api/check-email", { email: userData.email });
+        const checkData = await checkRes.json();
+        
+        if (checkData.exists) {
+          throw new Error("This email address is already registered. Please use a different email or sign in.");
+        }
+        
+        // If email is unique, proceed with registration
+        const res = await apiRequest("POST", "/api/register", userData);
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Registration failed. Please try again.");
+        }
+        
+        return await res.json();
+      } catch (error: any) {
+        throw new Error(error.message || "Registration failed. Please try again.");
+      }
     },
     onSuccess: (user: Omit<SelectUser, "password">) => {
       queryClient.setQueryData(["/api/user"], user);
@@ -80,6 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Registration successful!",
         description: `Welcome to ToyShare, ${user.name}!`,
       });
+      
+      // Reload the page to ensure the session is recognized
+      setTimeout(() => {
+        window.location.href = "/profile-customization";
+      }, 1500);
     },
     onError: (error: Error) => {
       toast({
