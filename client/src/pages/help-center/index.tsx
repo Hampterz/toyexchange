@@ -53,7 +53,7 @@ export default function HelpCenter() {
                 <li className="hover:text-blue-500 cursor-pointer">How to create an account</li>
                 <li className="hover:text-blue-500 cursor-pointer">Setting up your profile</li>
                 <li className="hover:text-blue-500 cursor-pointer">Browsing available toys</li>
-                <li className="hover:text-blue-500 cursor-pointer">Understanding sustainability badges</li>
+                <li className="hover:text-blue-500 cursor-pointer">Finding and requesting toys</li>
               </ul>
             </CardContent>
           </Card>

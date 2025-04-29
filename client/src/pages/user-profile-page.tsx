@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ToyCard } from '@/components/toys/toy-card';
 import { Loader2, CalendarDays, MapPin, Award } from 'lucide-react';
-import SustainabilityBadge from '@/components/profile/sustainability-badge';
+
 
 const UserProfilePage: React.FC = () => {
   const params = useParams();
@@ -78,10 +78,7 @@ const UserProfilePage: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {/* Sustainability Badge */}
-            <div className="mb-6">
-              <SustainabilityBadge user={user} />
-            </div>
+
 
             <div className="space-y-3">
               <div className="flex items-center text-sm">

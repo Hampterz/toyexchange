@@ -97,9 +97,8 @@ export function ProfileToys({ userId }: ProfileToysProps) {
         familiesConnected: 1 // Increment by 1
       });
       
-      // Update the user's sustainability metrics
-      await apiRequest("PATCH", `/api/users/${userId}/sustainability`, {
-        toysShared: 1,
+      // Update user exchange count
+      await apiRequest("PATCH", `/api/users/${userId}`, {
         successfulExchanges: 1
       });
     },

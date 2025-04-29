@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { ProfileToys } from "@/components/profile/profile-toys";
 import { ProfileRequests } from "@/components/profile/profile-requests";
-import { SustainabilityBadge } from "@/components/profile/sustainability-badge";
+
 import { Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -171,9 +171,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            <div className="mt-6">
-              <SustainabilityBadge user={user} showDetails={true} />
-            </div>
+
 
             <Button 
               className="w-full mt-4 bg-orange-500 hover:bg-orange-600 btn-animated" 
