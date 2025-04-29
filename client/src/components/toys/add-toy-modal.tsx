@@ -233,17 +233,17 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       <div className="space-y-4">
         {/* Image/Video Upload Area */}
         {(!imageFiles || imageFiles.length === 0) && (!videoFiles || videoFiles.length === 0) ? (
-          <div className="border-2 border-dashed border-neutral-300 rounded-md p-6 text-center">
-            <Upload className="mx-auto h-12 w-12 text-neutral-400" />
+          <div className="border-2 border-dashed border-blue-200 rounded-md p-6 text-center bg-blue-50 hover:bg-blue-100 transition-colors">
+            <Upload className="mx-auto h-12 w-12 text-blue-600" />
             <div className="mt-2">
-              <p className="text-sm text-neutral-600">
-                Upload media by clicking here or drag and drop files
+              <p className="text-sm font-medium text-blue-800">
+                Click here to add images
               </p>
-              <p className="text-xs text-neutral-500 mt-1">
-                Images: PNG, JPG, WEBP (up to 4, max 5MB each)
+              <p className="text-xs text-blue-700 mt-1">
+                Upload up to 4 photos (PNG, JPG, WEBP)
               </p>
-              <p className="text-xs text-neutral-500 mt-1">
-                Video: MP4, WEBM, MOV (optional, max 50MB)
+              <p className="text-xs text-blue-700 mt-1 font-bold">
+                Required: At least one image
               </p>
             </div>
           </div>
@@ -252,7 +252,23 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             {/* Images Preview */}
             {imageFiles && imageFiles.length > 0 && (
               <div>
-                <p className="text-xs text-blue-700 mb-2">Photos ({imageFiles.length}/4)</p>
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-xs text-blue-700">Photos ({imageFiles.length}/4)</p>
+                  {imageFiles.length < 4 && (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      className="text-blue-700 border-blue-200 py-0 h-6 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        document.getElementById('image-upload')?.click();
+                      }}
+                    >
+                      Add More Images
+                    </Button>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   {Array.from(imageFiles).map((file, index) => (
                     <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-24">
@@ -264,13 +280,34 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                     </div>
                   ))}
                 </div>
+                
+                {/* Form validation feedback */}
+                {Object.keys(form.formState.errors).includes('imageFiles') && (
+                  <p className="text-sm font-medium text-red-600 mt-2">
+                    {form.formState.errors.imageFiles?.message as string}
+                  </p>
+                )}
               </div>
             )}
             
             {/* Video Preview */}
             {videoFiles && videoFiles.length > 0 && (
               <div>
-                <p className="text-xs text-blue-700 mb-2">Video</p>
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-xs text-blue-700">Video</p>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    className="text-red-700 border-red-200 py-0 h-6 text-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      form.setValue("videoFiles", undefined);
+                    }}
+                  >
+                    Remove Video
+                  </Button>
+                </div>
                 <div className="border rounded-md overflow-hidden">
                   {Array.from(videoFiles).map((file, index) => (
                     <div key={`vid-${index}`} className="relative h-32 bg-gray-100 flex items-center justify-center">
@@ -282,6 +319,13 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                     </div>
                   ))}
                 </div>
+                
+                {/* Form validation feedback */}
+                {Object.keys(form.formState.errors).includes('videoFiles') && (
+                  <p className="text-sm font-medium text-red-600 mt-2">
+                    {form.formState.errors.videoFiles?.message as string}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -473,20 +517,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 </h3>
                 
                 <div>
-                  {/* Unified Media Upload Area */}
+                  {/* Simplified Media Upload Area */}
                   <div 
-                    className="relative"
+                    className="relative cursor-pointer"
                     onClick={() => {
-                      const currentImageFiles = form.watch("imageFiles");
-                      const currentVideoFiles = form.watch("videoFiles");
-                      // If already has images or videos, continue with that type; otherwise let them choose
-                      if (currentImageFiles && currentImageFiles.length > 0) {
-                        document.getElementById('image-upload')?.click();
-                      } else if (currentVideoFiles && currentVideoFiles.length > 0) {
-                        document.getElementById('video-upload')?.click();
-                      } else {
-                        document.getElementById('media-select')?.click();
-                      }
+                      // Always open the image upload dialog directly - simplifies the experience
+                      document.getElementById('image-upload')?.click();
                     }}
                   >
                     {renderMediaUploads()}
@@ -494,22 +530,21 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   
                   {/* Hidden file inputs for actual uploads */}
                   <div>
-                    {/* Used just for initial media type selection */}
-                    <select
-                      id="media-select"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.value === "image") {
-                          document.getElementById('image-upload')?.click();
-                        } else if (e.target.value === "video") {
+                    {/* Video upload option is still available via a separate button */}
+                    <div className="mt-2 text-center">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        className="text-blue-700 border-blue-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           document.getElementById('video-upload')?.click();
-                        }
-                      }}
-                    >
-                      <option value="">Select media type</option>
-                      <option value="image">Upload Images</option>
-                      <option value="video">Upload Video</option>
-                    </select>
+                        }}
+                      >
+                        Add Video (Optional)
+                      </Button>
+                    </div>
                     
                     <FormField
                       control={form.control}
