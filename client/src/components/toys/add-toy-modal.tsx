@@ -83,7 +83,6 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [videoUrls, setVideoUrls] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [customTag, setCustomTag] = useState<string>("");
   const [addedToy, setAddedToy] = useState<Toy | null>(null);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
 
@@ -93,8 +92,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       title: "",
       description: "",
       ageRange: "",
+      ageRanges: [],
       condition: "",
-      category: "",
       location: user?.location || "",
       tags: [],
     },
@@ -107,16 +106,6 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
-  };
-  
-  // Add a custom tag
-  const addCustomTag = () => {
-    if (customTag.trim() === "" || selectedTags.includes(customTag.trim())) {
-      return;
-    }
-    
-    setSelectedTags(prev => [...prev, customTag.trim()]);
-    setCustomTag("");
   };
 
   const addToyMutation = useMutation({
@@ -187,9 +176,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         userId: user.id,
         title: data.title,
         description: data.description,
-        ageRange: data.ageRange,
+        ageRange: data.ageRanges.join(", "), // Use the multi-select age ranges and join them
         condition: data.condition,
-        category: data.category,
+        category: "Other", // Default to Other as category is hidden
         location: data.location,
         images: images,
         videos: videos,
@@ -367,123 +356,95 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="ageRange"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Age Range</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select age range" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {AGE_RANGES.map((age) => (
-                            <SelectItem key={age} value={age}>
-                              {age}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="ageRanges"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Age Ranges (Select all that apply)</FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+                        {AGE_RANGES.map((age) => (
+                          <div key={age} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={`age-${age}`}
+                              checked={field.value?.includes(age)}
+                              onChange={(e) => {
+                                const updated = e.target.checked
+                                  ? [...(field.value || []), age]
+                                  : (field.value || []).filter((a) => a !== age);
+                                field.onChange(updated);
+                              }}
+                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+                            />
+                            <label htmlFor={`age-${age}`} className="text-sm">{age}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="condition"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Condition</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select condition" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {CONDITIONS.map((condition) => (
-                            <SelectItem key={condition} value={condition}>
-                              {condition}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {CATEGORIES.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pickup Location</FormLabel>
+              <FormField
+                control={form.control}
+                name="condition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Condition</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
                       <FormControl>
-                        <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
-                          <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
-                          <AddressAutocomplete
-                            placeholder="Search for a pickup location"
-                            className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
-                            defaultValue={field.value}
-                            onAddressSelect={(address, coordinates) => {
-                              field.onChange(address);
-                              
-                              // Update coordinates in the database when available
-                              if (coordinates) {
-                                // Store latitude and longitude with the toy in the future
-                                console.log("Selected coordinates:", coordinates);
-                              }
-                            }}
-                          />
-                        </div>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select condition" />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      <SelectContent>
+                        {CONDITIONS.map((condition) => (
+                          <SelectItem key={condition} value={condition}>
+                            {condition}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pickup Location</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
+                        <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
+                        <AddressAutocomplete
+                          placeholder="Search for a pickup location"
+                          className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
+                          defaultValue={field.value}
+                          onAddressSelect={(address, coordinates) => {
+                            field.onChange(address);
+                            
+                            // Update coordinates in the database when available
+                            if (coordinates) {
+                              // Store latitude and longitude with the toy in the future
+                              console.log("Selected coordinates:", coordinates);
+                            }
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
                 <h3 className="text-sm font-medium text-blue-800 mb-3 flex items-center">
@@ -566,6 +527,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                           selectedTags={selectedTags}
                           onTagsChange={setSelectedTags}
                           placeholder="Select tags to describe your toy"
+                          allowCustomTags={false}
                         />
                         <FormDescription className="mt-2 text-xs text-blue-600">
                           Tags help other parents find your toy more easily
