@@ -182,7 +182,7 @@ export const COMMON_ATTRIBUTES = [
   "Screen-Free",
   
   // Arts and Creative
-  "Music", 
+  "Musical", 
   "Art", 
   "Crafts",
   "Drawing",
