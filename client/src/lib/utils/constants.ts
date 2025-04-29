@@ -28,8 +28,7 @@ export const CATEGORIES = [
 // Toy condition options
 export const CONDITIONS = [
   "Like New",
-  "Used",
-  "Well Loved"
+  "Used"
 ];
 
 // Sample locations (cities/neighborhoods)

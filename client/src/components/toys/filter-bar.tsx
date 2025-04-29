@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Baby, Grid, Star, Tag, Search, Ruler } from "lucide-react";
+import { MapPin, Baby, Grid, Star, Tag, Search, Ruler, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
 import { TOY_CATEGORIES, COMMON_ATTRIBUTES } from "@shared/schema";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -547,25 +556,58 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         </div>
       </div>
       
-      {/* Tags Filter */}
+      {/* Tags Filter - Converted to Dropdown */}
       <div className="mb-6">
         <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Tags</h3>
-        <div className="flex flex-wrap gap-2 mt-3">
-          {COMMON_ATTRIBUTES.map(tag => (
-            <Badge 
-              key={tag} 
-              variant={filters.tags.includes(tag) ? "default" : "outline"}
-              className={`cursor-pointer py-1 px-3 transition-all ${
-                filters.tags.includes(tag) 
-                  ? "bg-blue-100 text-blue-800 hover:bg-blue-200" 
-                  : "bg-white text-neutral-600 hover:bg-gray-100"
-              }`}
-              onClick={() => toggleTag(tag)}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              className="w-full justify-between text-left font-normal"
             >
-              #{tag}
-            </Badge>
-          ))}
-        </div>
+              <div className="flex items-center">
+                <Tag className="mr-2 h-4 w-4 shrink-0" />
+                <span>Select Tags ({filters.tags.length || 0})</span>
+              </div>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
+            <div className="max-h-60 overflow-auto p-2">
+              {COMMON_ATTRIBUTES.map(tag => (
+                <div 
+                  key={tag}
+                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                  onClick={() => toggleTag(tag)}
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={filters.tags.includes(tag)}
+                    readOnly
+                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
+                  />
+                  <span>{tag}</span>
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+        
+        {/* Show selected tags and allow removal */}
+        {filters.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {filters.tags.map(tag => (
+              <Badge 
+                key={tag} 
+                variant="default"
+                className="cursor-pointer py-1 px-3 transition-all bg-blue-100 text-blue-800 hover:bg-blue-200"
+                onClick={() => toggleTag(tag)}
+              >
+                #{tag} <X className="ml-1 h-3 w-3" />
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Clear all filters (show only if some filters are active) */}
