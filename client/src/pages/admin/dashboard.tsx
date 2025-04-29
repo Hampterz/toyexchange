@@ -116,6 +116,28 @@ export default function AdminDashboard() {
     }
   });
 
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      await apiRequest("DELETE", `/api/admin/users/${userId}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "User deleted",
+        description: "The user has been successfully removed from the platform.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to delete user",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+
   // Use the actual data from the server API endpoints
   // We already have users, toys, reports and contactMessages data from the queries above
 
