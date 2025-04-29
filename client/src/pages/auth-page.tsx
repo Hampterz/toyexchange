@@ -442,6 +442,12 @@ export default function AuthPage() {
                         )}
                       />
                       
+                      <div className="flex justify-end mb-2">
+                        <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 underline">
+                          Forgot Password?
+                        </Link>
+                      </div>
+
                       <Button 
                         type="submit" 
                         className="w-full bg-blue-700 hover:bg-blue-800 btn-animated"
@@ -449,7 +455,6 @@ export default function AuthPage() {
                       >
                         {loginMutation.isPending ? "Signing in..." : "Sign In"}
                       </Button>
-
 
                     </form>
                   </Form>
