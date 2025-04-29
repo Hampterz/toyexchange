@@ -9,6 +9,7 @@ import AuthPage from "@/pages/auth-page";
 import ForgotPasswordPage from "@/pages/forgot-password";
 import ResetPasswordPage from "@/pages/reset-password";
 import ProfilePage from "@/pages/profile-page";
+import ProfileCustomizationPage from "@/pages/profile-customization-page";
 import UserProfilePage from "@/pages/user-profile-page";
 import FavoritesPage from "@/pages/favorites-page";
 import MessagesPage from "@/pages/messages-page";
@@ -109,6 +110,13 @@ const Router = () => {
         {() => (
           <Layout>
             <ProtectedRoute path="/profile" component={ProfilePage} />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/profile-customization">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/profile-customization" component={ProfileCustomizationPage} />
           </Layout>
         )}
       </Route>

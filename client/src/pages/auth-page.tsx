@@ -198,12 +198,11 @@ export default function AuthPage() {
             });
             
             // Redirect after a short delay so they can see the confetti
-            // If it's a new user (created within the last minute), send them to profile customization
             setTimeout(() => {
               setShowConfetti(false);
               
-              // Check if this appears to be a new user based on creation time
-              if (userData.createdAt && new Date(userData.createdAt).getTime() > Date.now() - 60000) {
+              // Check if this user needs profile customization (this flag is set by the server)
+              if (userData.needsProfileCustomization) {
                 console.log("New user detected, redirecting to profile customization");
                 // Force reload to ensure session is recognized properly
                 window.location.href = '/profile-customization';

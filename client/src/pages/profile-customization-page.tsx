@@ -1,265 +1,229 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from "@/components/ui/form";
+import { useAuth } from "@/hooks/use-auth";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
-import { Upload, User, MapPin, Check } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import Confetti from "react-confetti";
+
+// Profile customization schema
+const profileCustomizationSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters").max(30),
+  name: z.string().min(2, "Full name must be at least 2 characters").max(100),
+  location: z.string().min(5, "Please provide a complete address"),
+  bio: z.string().optional(),
+});
+
+type ProfileCustomizationData = z.infer<typeof profileCustomizationSchema>;
 
 export default function ProfileCustomizationPage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [_, navigate] = useLocation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [bio, setBio] = useState<string>("");
-  const [userLocation, setUserLocation] = useState<string>(user?.location || "");
-  const [profilePicture, setProfilePicture] = useState<string | null>(user?.profilePicture || null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Redirect to home if user is not logged in
   useEffect(() => {
-    // If user is not logged in, redirect to auth page
-    if (!user) {
-      window.location.href = "/auth";
-      return;
+    if (!isLoading && !user) {
+      navigate("/auth");
     }
-
-    // Handle window resize for confetti
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [user]);
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updatedData: any) => {
-      const res = await apiRequest("PATCH", `/api/users/${user?.id}`, updatedData);
-      return await res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000);
-      
-      toast({
-        title: "Profile Updated Successfully",
-        description: "Your profile has been customized!",
-      });
-      
-      // Navigate to home page after successful update
-      setTimeout(() => window.location.href = "/", 2500);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update your profile. Please try again.",
-        variant: "destructive",
-      });
+  }, [user, isLoading, navigate]);
+  
+  // Set up form with default values from user data
+  const form = useForm<ProfileCustomizationData>({
+    resolver: zodResolver(profileCustomizationSchema),
+    defaultValues: {
+      username: user?.username || "",
+      name: user?.name || "",
+      location: user?.location || "",
+      bio: user?.bio || "",
     },
   });
-
-  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Profile picture must be less than 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Check file type
-      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-        toast({
-          title: "Invalid file type",
-          description: "Only JPEG, PNG, and WebP images are allowed",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setImageFile(file);
-      
-      // Create a preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicture(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  
+  // Update form values when user data is loaded
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        username: user.username || "",
+        name: user.name || "",
+        location: user.location || "",
+        bio: user.bio || "",
+      });
     }
-  };
-
-  const handleSaveProfile = async () => {
+  }, [user, form]);
+  
+  const onSubmit = async (data: ProfileCustomizationData) => {
     if (!user) return;
     
-    setUploading(true);
     try {
-      // Prepare the profile data
-      const updatedData: any = {
-        bio,
-        location: userLocation,
-      };
+      setIsUpdating(true);
       
-      // If a new profile picture was selected, convert it to base64
-      if (imageFile) {
-        const reader = new FileReader();
-        const imageDataPromise = new Promise<string>((resolve) => {
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-          reader.readAsDataURL(imageFile);
-        });
-        
-        updatedData.profilePicture = await imageDataPromise;
+      const response = await apiRequest("PATCH", `/api/users/${user.id}`, data);
+      
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
       }
       
-      updateProfileMutation.mutate(updatedData);
-    } catch (error) {
+      const updatedUser = await response.json();
+      
+      // Update user data in cache
+      queryClient.setQueryData(["/api/user"], updatedUser);
+      
       toast({
-        title: "Error Processing Image",
-        description: "Failed to process the profile picture. Please try again.",
+        title: "Profile Updated",
+        description: "Your profile information has been updated successfully.",
+        variant: "default",
+      });
+      
+      // Redirect to profile page
+      navigate("/profile");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Update Failed",
+        description: error instanceof Error ? error.message : "An error occurred while updating your profile",
         variant: "destructive",
       });
     } finally {
-      setUploading(false);
+      setIsUpdating(false);
     }
   };
-
-  const handleSkip = () => {
-    window.location.href = "/";
-  };
-
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-700 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+  
   return (
-    <div className="container max-w-3xl py-8 px-4 md:py-12">
-      {showConfetti && (
-        <Confetti
-          width={windowSize.width}
-          height={windowSize.height}
-          recycle={false}
-          numberOfPieces={500}
-          gravity={0.2}
-        />
-      )}
-      
-      <Card className="shadow-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Customize Your Profile</CardTitle>
-          <CardDescription>
-            Add some details to personalize your ToyShare experience. This helps build 
-            trust with other parents in the community.
+    <div className="container max-w-2xl mx-auto py-8 px-4 sm:px-6">
+      <Card className="border-blue-100 shadow-md">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+          <CardTitle className="text-2xl font-bold">Complete Your Profile</CardTitle>
+          <CardDescription className="text-blue-100">
+            Welcome to ToyShare! Please provide some additional information to complete your profile.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col items-center space-y-4">
-            <div 
-              className="w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer relative"
-              onClick={() => document.getElementById('profile-picture-input')?.click()}
-            >
-              {profilePicture ? (
-                <img 
-                  src={profilePicture} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-muted-foreground">
-                  <User className="h-12 w-12 mb-1" />
-                  <span className="text-xs">Add Photo</span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <Upload className="text-white h-6 w-6" />
-              </div>
-            </div>
-            <input
-              id="profile-picture-input"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={handleProfilePictureChange}
-            />
-            <span className="text-sm text-muted-foreground">
-              Upload a profile picture (optional)
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bio">About Me</Label>
-            <Textarea
-              id="bio"
-              placeholder="Tell other families a bit about yourself and your family..."
-              rows={4}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              This will be visible on your public profile
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location">Your Location</Label>
-            <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
-              <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
-              <AddressAutocomplete
-                placeholder="Enter your general location"
-                className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
-                defaultValue={userLocation}
-                onAddressSelect={(address) => setUserLocation(address)}
+        
+        <CardContent className="p-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-blue-800">Username</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Choose a unique username" 
+                        className="border-blue-200 focus-visible:ring-blue-700" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <p className="text-xs text-blue-500 mt-1">
+                      This username will be visible to other users in the community.
+                    </p>
+                  </FormItem>
+                )}
               />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Your general location helps other families find toys nearby
-            </p>
-          </div>
+              
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-blue-800">Full Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Your full name" 
+                        className="border-blue-200 focus-visible:ring-blue-700" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-blue-800">Your Location</FormLabel>
+                    <FormControl>
+                      <AddressAutocomplete 
+                        placeholder="Enter your full address" 
+                        className="border-blue-200 focus-visible:ring-blue-700" 
+                        defaultValue={field.value}
+                        onAddressSelect={(address) => {
+                          field.onChange(address);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <p className="text-xs text-blue-500 mt-1">
+                      Your address helps us connect you with families nearby. It will only be shared when you agree to a toy exchange.
+                    </p>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-blue-800">About You (Optional)</FormLabel>
+                    <FormControl>
+                      <textarea 
+                        className="flex min-h-20 w-full rounded-md border border-blue-200 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                        placeholder="Tell us a bit about yourself and your family..." 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate("/")}
+                  className="border-blue-200"
+                >
+                  Skip For Now
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="bg-blue-700 hover:bg-blue-800"
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? 'Saving...' : 'Save Profile'}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handleSkip}
-          >
-            Skip for Now
-          </Button>
-          <Button
-            onClick={handleSaveProfile}
-            disabled={uploading || updateProfileMutation.isPending}
-            className="bg-blue-700 hover:bg-blue-800"
-          >
-            {uploading || updateProfileMutation.isPending ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Saving...
-              </span>
-            ) : (
-              <span className="flex items-center">
-                <Check className="mr-2 h-4 w-4" />
-                Save Profile
-              </span>
-            )}
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
