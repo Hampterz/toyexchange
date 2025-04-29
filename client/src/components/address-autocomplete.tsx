@@ -113,7 +113,22 @@ export function AddressAutocomplete({
             };
           }
           
+          // Make sure this callback is called with the selected place
+          console.log("Place selected:", place.formatted_address);
           onAddressSelect(place.formatted_address, coordinates, place.place_id);
+        } else if (place && place.name) {
+          // Sometimes place.formatted_address is missing but place.name exists
+          setInputValue(place.name);
+          
+          let coordinates;
+          if (place.geometry && place.geometry.location) {
+            coordinates = {
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng()
+            };
+          }
+          
+          onAddressSelect(place.name, coordinates, place.place_id);
         }
       });
     } catch (error) {
@@ -146,11 +161,9 @@ export function AddressAutocomplete({
         value={inputValue}
         onChange={handleChange}
         onKeyDown={(e) => {
+          // Prevent form submission on Enter key to allow selecting from dropdown
           if (e.key === 'Enter') {
             e.preventDefault();
-            if (inputValue) {
-              onAddressSelect(inputValue);
-            }
           }
         }}
         id={id}

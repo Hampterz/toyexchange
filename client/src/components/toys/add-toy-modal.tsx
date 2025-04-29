@@ -110,10 +110,29 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
   const addToyMutation = useMutation({
     mutationFn: async (toyData: any) => {
-      const res = await apiRequest("POST", "/api/toys", toyData);
-      return await res.json();
+      try {
+        const res = await fetch("/api/toys", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(toyData),
+          credentials: "include"
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to create toy");
+        }
+        
+        return await res.json();
+      } catch (error: any) {
+        console.error("Error posting toy:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
+      console.log("Toy added successfully:", data);
       // Instead of closing the modal, show the success page
       setAddedToy(data);
       setShowSuccessPage(true);
@@ -127,6 +146,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       reset();
     },
     onError: (error: any) => {
+      console.error("Error in mutation:", error);
       toast({
         title: "Failed to Add Toy",
         description: error.message || "Please try again later",
