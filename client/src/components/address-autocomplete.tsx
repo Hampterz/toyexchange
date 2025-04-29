@@ -25,7 +25,7 @@ export function AddressAutocomplete({
   required,
   autoFocus,
   disabled
-}: AddressAutocompleteProps) {
+}: AddressAutocompleteProps): JSX.Element {
   const [inputValue, setInputValue] = useState(defaultValue || "");
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
@@ -36,6 +36,63 @@ export function AddressAutocomplete({
     const value = e.target.value;
     setInputValue(value);
     onAddressSelect(value);
+  };
+
+  // Attach autocomplete to the input field
+  const setupAutocomplete = () => {
+    if (!inputRef.current || !window.google?.maps?.places) {
+      return;
+    }
+    
+    try {
+      // Clean up any existing autocomplete
+      if (autocompleteRef.current && window.google?.maps?.event) {
+        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+      }
+      
+      // Create a new autocomplete instance with specific options to improve clickability
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['address'],
+        fields: ['formatted_address', 'geometry', 'place_id']
+      });
+      
+      // Add listener for place selection
+      autocompleteRef.current.addListener('place_changed', () => {
+        const place = autocompleteRef.current.getPlace();
+        
+        if (place && place.formatted_address) {
+          setInputValue(place.formatted_address);
+          
+          let coordinates;
+          if (place.geometry && place.geometry.location) {
+            coordinates = {
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng()
+            };
+          }
+          
+          // Log the selected place and call the callback
+          console.log("Place selected:", place.formatted_address);
+          if (coordinates) console.log("Selected coordinates:", coordinates);
+          onAddressSelect(place.formatted_address, coordinates, place.place_id);
+        } else if (place && place.name) {
+          // Sometimes place.formatted_address is missing but place.name exists
+          setInputValue(place.name);
+          
+          let coordinates;
+          if (place.geometry && place.geometry.location) {
+            coordinates = {
+              latitude: place.geometry.location.lat(),
+              longitude: place.geometry.location.lng()
+            };
+          }
+          
+          onAddressSelect(place.name, coordinates, place.place_id);
+        }
+      });
+    } catch (error) {
+      console.error('Error setting up Google Maps Autocomplete:', error);
+    }
   };
 
   // Load Google Maps API once
@@ -80,62 +137,6 @@ export function AddressAutocomplete({
     };
   }, []);
   
-  // Attach autocomplete to the input field
-  const setupAutocomplete = () => {
-    if (!inputRef.current || !window.google?.maps?.places) {
-      return;
-    }
-    
-    try {
-      // Clean up any existing autocomplete
-      if (autocompleteRef.current && window.google?.maps?.event) {
-        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
-      }
-      
-      // Create a new autocomplete instance
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ['address'],
-        fields: ['formatted_address', 'geometry', 'place_id']
-      });
-      
-      // Add listener for place selection
-      autocompleteRef.current.addListener('place_changed', () => {
-        const place = autocompleteRef.current.getPlace();
-        
-        if (place && place.formatted_address) {
-          setInputValue(place.formatted_address);
-          
-          let coordinates;
-          if (place.geometry && place.geometry.location) {
-            coordinates = {
-              latitude: place.geometry.location.lat(),
-              longitude: place.geometry.location.lng()
-            };
-          }
-          
-          // Make sure this callback is called with the selected place
-          console.log("Place selected:", place.formatted_address);
-          onAddressSelect(place.formatted_address, coordinates, place.place_id);
-        } else if (place && place.name) {
-          // Sometimes place.formatted_address is missing but place.name exists
-          setInputValue(place.name);
-          
-          let coordinates;
-          if (place.geometry && place.geometry.location) {
-            coordinates = {
-              latitude: place.geometry.location.lat(),
-              longitude: place.geometry.location.lng()
-            };
-          }
-          
-          onAddressSelect(place.name, coordinates, place.place_id);
-        }
-      });
-    } catch (error) {
-      console.error('Error setting up Google Maps Autocomplete:', error);
-    }
-  };
-  
   // Initialize autocomplete when the input element is available
   useEffect(() => {
     if (window.google?.maps?.places && inputRef.current) {
@@ -151,6 +152,26 @@ export function AddressAutocomplete({
         autocompleteRef.current = null;
       }
     };
+  }, []);
+
+  // Update the Google Autocomplete styling to make it more clickable
+  useEffect(() => {
+    // Add a style tag to make Google's autocomplete dropdown more clickable
+    const styleId = "google-autocomplete-style";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.innerHTML = `
+        .pac-container {
+          z-index: 9999 !important;
+          pointer-events: auto !important;
+        }
+        .pac-item {
+          cursor: pointer !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }, []);
   
   return (

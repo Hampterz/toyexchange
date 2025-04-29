@@ -170,7 +170,7 @@ export default function HomePage() {
               <h3 className="text-xl sm:text-2xl font-bold font-heading mb-1 sm:mb-2 text-blue-700">
                 {communityMetrics?.familiesConnected || 0}
               </h3>
-              <p className="text-blue-800 text-sm sm:text-base">Families connected</p>
+              <p className="text-blue-800 text-sm sm:text-base">Members connected</p>
             </div>
 
             <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md text-center transform transition duration-300 hover:-translate-y-1">
@@ -191,7 +191,7 @@ export default function HomePage() {
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold font-heading mb-4 text-blue-800">What Our Community Says</h2>
           <p className="text-blue-700 max-w-2xl mx-auto">
-            Join hundreds of families who are already sharing toys and creating lasting connections.
+            Join hundreds of members who are already sharing toys and creating lasting connections.
           </p>
         </div>
         
@@ -214,7 +214,7 @@ export default function HomePage() {
             </div>
             <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">1. Share Your Toys</h3>
             <p className="text-blue-800 text-sm sm:text-base">
-              Take photos of toys your children no longer use and create a listing with details about condition and age range.
+              Take photos of toys you no longer need and create a listing with details about condition and age range.
             </p>
           </div>
 
