@@ -191,12 +191,12 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       {/* Confetti effect when marking a toy as sold */}
       {showConfetti && <ConfettiEffect duration={3000} numberOfPieces={300} />}
       <div 
-        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer touch-manipulation"
+        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer touch-manipulation h-full"
         onClick={() => setIsExpanded(true)}
         role="button"
         aria-label={`View details for ${toy.title}`}
       >
-        <div className="relative pb-[75%] bg-neutral-100">
+        <div className="relative pb-[70%] xs:pb-[75%] bg-neutral-100">
           {mainImage ? (
             <img 
               src={mainImage} 
@@ -208,11 +208,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             />
           ) : (
             <div className="absolute h-full w-full flex items-center justify-center text-neutral-400">
-              <i className="fas fa-image text-4xl"></i>
+              <i className="fas fa-image text-3xl xs:text-4xl"></i>
             </div>
           )}
           
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex space-x-1">
+          <div className="absolute top-1 right-1 xs:top-2 sm:top-3 xs:right-2 sm:right-3 flex space-x-1">
             {/* Share button */}
             <button 
               onClick={(e) => {
@@ -220,10 +220,10 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 // Open dialog to ensure sharing works
                 setIsExpanded(true);
               }}
-              className="h-8 w-8 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
+              className="h-6 w-6 xs:h-7 xs:w-7 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
               aria-label="Share this toy"
             >
-              <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-neutral-500 hover:text-primary" />
+              <Share2 className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 text-neutral-500 hover:text-primary" />
             </button>
             
             {/* Favorite button */}
@@ -232,42 +232,42 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 e.stopPropagation();
                 handleFavoriteClick();
               }}
-              className="h-8 w-8 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
+              className="h-6 w-6 xs:h-7 xs:w-7 sm:h-9 sm:w-9 bg-white bg-opacity-90 rounded-full flex items-center justify-center transition click-scale shadow-sm"
               aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
               disabled={toggleFavoriteMutation.isPending}
             >
-              <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-500 hover:text-primary"}`} />
+              <Heart className={`h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-500 hover:text-primary"}`} />
             </button>
           </div>
           
-          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 bg-primary text-white text-xs font-bold px-2 py-0.5 sm:py-1 rounded-full">
+          <div className="absolute bottom-1 left-1 xs:bottom-2 xs:left-2 sm:bottom-3 sm:left-3 bg-primary text-white text-[9px] xs:text-xs font-bold px-1.5 py-0.5 xs:px-2 sm:py-1 rounded-full">
             {toy.condition}
           </div>
         </div>
         
-        <div className="p-3 sm:p-4">
+        <div className="p-2 xs:p-3 sm:p-4 flex flex-col h-[calc(100%-70%)]">
           <div className="flex items-center justify-between mb-1 sm:mb-2">
-            <h3 className="font-bold font-heading text-sm sm:text-base truncate max-w-[70%]">
+            <h3 className="font-bold font-heading text-xs xs:text-sm sm:text-base truncate max-w-[70%]">
               {toy.title}
             </h3>
-            <span className="text-[10px] sm:text-xs bg-neutral-100 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-neutral-700 whitespace-nowrap">
+            <span className="text-[8px] xs:text-[10px] sm:text-xs bg-neutral-100 px-1 py-0.5 xs:px-1.5 sm:px-2 sm:py-1 rounded-full text-neutral-700 whitespace-nowrap">
               Ages {toy.ageRange}
             </span>
           </div>
           
-          <p className="text-neutral-600 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
+          <p className="text-neutral-600 text-[10px] xs:text-xs sm:text-sm mb-1 xs:mb-2 sm:mb-3 line-clamp-2">
             {toy.description}
           </p>
           
-          <div className="flex flex-col gap-1 sm:gap-2">
+          <div className="flex flex-col gap-1 sm:gap-2 mt-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <MapPin className="text-neutral-500 mr-1 h-3 w-3 flex-shrink-0" />
-                <span className="text-neutral-500 text-xs truncate max-w-[150px]">
+                <MapPin className="text-neutral-500 mr-0.5 xs:mr-1 h-2.5 w-2.5 xs:h-3 xs:w-3 flex-shrink-0" />
+                <span className="text-neutral-500 text-[9px] xs:text-xs truncate max-w-[120px] xs:max-w-[150px]">
                   {toy.location}
                   {toy.distance && (
-                    <span className="ml-1 text-blue-600 font-medium">
-                      ({Math.round(toy.distance * 10) / 10} miles)
+                    <span className="ml-0.5 xs:ml-1 text-blue-600 font-medium">
+                      ({Math.round(toy.distance * 10) / 10} mi)
                     </span>
                   )}
                 </span>
@@ -276,7 +276,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               {!isOwner && (
                 <Button 
                   variant="link" 
-                  className="text-primary font-medium text-xs sm:text-sm p-0 h-auto hover:underline click-scale"
+                  className="text-primary font-medium text-[10px] xs:text-xs sm:text-sm p-0 h-auto hover:underline click-scale"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRequestClick(toy);
@@ -287,19 +287,20 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               )}
               
               {isOwner && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-neutral-500 italic">Your listing</span>
+                <div className="flex items-center gap-1 xs:gap-2">
+                  <span className="text-[9px] xs:text-xs text-neutral-500 italic">Your listing</span>
                   {toy.status !== 'sold' && (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-6 px-2 py-0 text-xs"
+                      className="h-5 xs:h-6 px-1 xs:px-2 py-0 text-[9px] xs:text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         markAsSoldMutation.mutate();
                       }}
                     >
-                      Mark as Sold
+                      <span className="hidden xs:inline">Mark as Sold</span>
+                      <span className="xs:hidden">Sold</span>
                     </Button>
                   )}
                 </div>
