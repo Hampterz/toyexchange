@@ -83,7 +83,7 @@ export default function ExchangeGuide() {
                     <ul className="space-y-2">
                       <li className="flex items-start">
                         <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
-                        <span className="text-blue-600">Check the requester's profile to view their sustainability badge and history</span>
+                        <span className="text-blue-600">Check the requester's profile to view their history and exchange information</span>
                       </li>
                       <li className="flex items-start">
                         <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
@@ -197,7 +197,7 @@ export default function ExchangeGuide() {
                       </li>
                       <li className="flex items-start">
                         <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
-                        <span className="text-blue-600">Your sustainability score will automatically update, potentially earning you a new badge</span>
+                        <span className="text-blue-600">Your successful exchanges will be tracked in your profile statistics</span>
                       </li>
                     </ul>
                   </div>
@@ -271,7 +271,7 @@ export default function ExchangeGuide() {
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
-                      <span>Share multiple toys to build your sustainability badge</span>
+                      <span>Share multiple toys to build your reputation in the community</span>
                     </li>
                     <li className="flex items-start">
                       <Check className="h-5 w-5 mr-2 text-green-500 shrink-0 mt-0.5" />
@@ -373,7 +373,7 @@ export default function ExchangeGuide() {
                   <Award className="h-5 w-5 mr-2" /> Community Guidelines
                 </h3>
                 <p className="text-blue-700 mb-4">
-                  Our ToyShare community is built on mutual respect, generosity, and sustainability.
+                  Our ToyShare community is built on mutual respect, generosity, and community connection.
                   Following these guidelines ensures a positive experience for everyone:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -514,7 +514,7 @@ export default function ExchangeGuide() {
                       If multiple people request the same toy:
                     </p>
                     <ul className="list-disc pl-5 text-blue-600 text-sm space-y-1">
-                      <li>Consider the requester's sustainability badge and feedback history</li>
+                      <li>Consider the requester's profile and feedback history</li>
                       <li>First-come-first-served is a fair approach</li>
                       <li>Consider proximity for easier meetups</li>
                       <li>Let declined requesters know politely that the toy has been claimed</li>

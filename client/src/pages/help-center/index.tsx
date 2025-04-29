@@ -130,11 +130,11 @@ export default function HelpCenter() {
                 </AccordionItem>
                 
                 <AccordionItem value="item-4">
-                  <AccordionTrigger className="text-blue-700">What are sustainability badges?</AccordionTrigger>
+                  <AccordionTrigger className="text-blue-700">How do I track my exchanges?</AccordionTrigger>
                   <AccordionContent className="text-blue-600">
-                    Sustainability badges are earned by active members who regularly share toys and complete
-                    successful exchanges. They represent your contribution to reducing waste and building
-                    a more sustainable community. The more you share, the higher your badge level becomes!
+                    You can track all your exchanges in your profile dashboard. This includes toys you've shared, 
+                    your exchange history, and your contribution to the community. Your profile shows statistics 
+                    like the number of toys shared and successful exchanges completed.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

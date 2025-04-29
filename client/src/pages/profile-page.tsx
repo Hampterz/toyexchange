@@ -28,7 +28,7 @@ export default function ProfilePage() {
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
 
   // Get toy requests that user needs to respond to (as an owner)
-  const { data: receivedRequests, isLoading: isLoadingReceived } = useQuery({
+  const { data: receivedRequests = [], isLoading: isLoadingReceived } = useQuery<any[]>({
     queryKey: ["/api/requests/received"],
     enabled: !!user,
   });
