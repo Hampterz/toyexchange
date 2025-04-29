@@ -319,27 +319,40 @@ export function setupAuth(app: Express) {
         });
       }
       
-      // Generate a reset token and expiry (24 hours from now)
+      // Generate a reset token and expiry (1 hour from now)
       const resetToken = randomBytes(32).toString('hex');
-      const resetTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+      const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
       
       // Save token to database
       await storage.savePasswordResetToken(user.id, resetToken, resetTokenExpiry);
       
-      // Create reset URL
-      const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+      // Get base URL for email links
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
       
-      // For demo purposes, we'll just log the URL instead of sending an email
-      console.log('Password reset URL (would be emailed):', resetUrl);
+      // Import the email service
+      const { sendPasswordResetEmail } = await import('./email-service');
       
-      // TODO: Send email with reset link using SendGrid or another service
-      // This would be implemented once email credentials are configured
+      // Send the password reset email with the token
+      const emailSent = await sendPasswordResetEmail(
+        user.email, 
+        resetToken, 
+        baseUrl
+      );
+      
+      if (!emailSent) {
+        console.error(`Failed to send password reset email to ${user.email}`);
+      } else {
+        console.log(`Password reset email sent successfully to ${user.email}`);
+      }
       
       return res.json({ 
         success: true, 
         message: "If an account with that email exists, a password reset link has been sent.",
         // In development, return the token for testing
-        ...(process.env.NODE_ENV === 'development' ? { resetToken, resetUrl } : {})
+        ...(process.env.NODE_ENV === 'development' ? { 
+          resetToken, 
+          resetUrl: `${baseUrl}/reset-password?token=${resetToken}` 
+        } : {})
       });
     } catch (error) {
       console.error("Password reset request error:", error);
