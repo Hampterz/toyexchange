@@ -71,12 +71,12 @@ export default function FavoritesPage() {
             <div className="relative">
               <Input
                 type="text"
-                placeholder="Search your favorites..."
+                placeholder="Search favorites..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full md:w-64"
+                className="pl-8 pr-2 py-1 text-sm w-full md:w-56 lg:w-64"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 h-4 w-4" />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-neutral-500 h-3.5 w-3.5" />
             </div>
           </div>
         </div>

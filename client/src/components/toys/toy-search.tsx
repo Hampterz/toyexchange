@@ -39,11 +39,10 @@ export function ToySearch({ onSearch, initialValue = "" }: ToySearchProps) {
         />
         <Button 
           type="submit" 
-          className="rounded-l-none bg-blue-700 hover:bg-blue-800 shadow-sm px-3 sm:px-4"
+          className="rounded-l-none bg-blue-700 hover:bg-blue-800 shadow-sm px-3"
           aria-label="Search for toys"
         >
-          <Search className="h-4 w-4 sm:mr-2" />
-          <span className="hidden sm:inline">Search</span>
+          <Search className="h-4 w-4" />
         </Button>
       </form>
       {/* Removed the description text as requested */}

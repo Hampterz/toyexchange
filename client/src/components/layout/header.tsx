@@ -63,7 +63,7 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
           </div>
 
           {onSearchChange && !isMobile && (
-            <div className="hidden md:flex items-center mx-4 flex-1 max-w-md">
+            <div className="hidden md:flex items-center mx-2 lg:mx-4 flex-1 max-w-md">
               <ToySearch onSearch={handleSearch} initialValue={searchValue} />
             </div>
           )}
@@ -218,7 +218,7 @@ export function Header({ onSearchChange, searchValue = "" }: HeaderProps) {
               <Logo />
             </div>
             {onSearchChange && (
-              <div className="relative mt-3">
+              <div className="relative mt-3 mb-4">
                 <ToySearch onSearch={handleSearch} initialValue={searchValue} />
               </div>
             )}
