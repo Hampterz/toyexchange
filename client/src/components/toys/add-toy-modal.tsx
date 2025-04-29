@@ -309,14 +309,16 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      {/* We don't use onOpenChange={onClose} here to prevent closing when clicking outside */}
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-hidden p-0">
-        <div className="sticky top-0 bg-white border-b py-4 px-6 z-20 w-full">
+        <div className="sticky top-0 bg-white border-b py-4 px-6 z-20 w-full flex justify-between items-center">
           <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-8 w-8 p-0">
+            <X className="h-4 w-4" />
+          </Button>
         </div>
         
-        <div className="overflow-y-auto p-6">
+        <div className="overflow-y-auto p-6 max-h-[calc(90vh-80px)]">
           {!user ? (
             <div className="space-y-4">
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
