@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
+import ForgotPasswordPage from "@/pages/forgot-password";
+import ResetPasswordPage from "@/pages/reset-password";
 import ProfilePage from "@/pages/profile-page";
 import UserProfilePage from "@/pages/user-profile-page";
 import FavoritesPage from "@/pages/favorites-page";
@@ -93,6 +95,12 @@ const Router = () => {
       </Route>
       <Route path="/auth">
         {() => <Layout><AuthPage /></Layout>}
+      </Route>
+      <Route path="/forgot-password">
+        {() => <Layout><ForgotPasswordPage /></Layout>}
+      </Route>
+      <Route path="/reset-password/:token">
+        {() => <Layout><ResetPasswordPage /></Layout>}
       </Route>
       <Route path="/profile">
         {() => (
