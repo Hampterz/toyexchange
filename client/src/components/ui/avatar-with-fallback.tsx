@@ -18,7 +18,11 @@ export function AvatarWithFallback({ user, className }: AvatarWithFallbackProps)
     
   return (
     <Avatar className={className}>
-      <AvatarImage src={user?.profilePicture || ""} alt={user?.name || "User"} />
+      <AvatarImage 
+        src={user?.profilePicture || ""} 
+        alt={user?.name || "User"} 
+        loading="lazy" 
+      />
       <AvatarFallback>{fallbackText}</AvatarFallback>
     </Avatar>
   );

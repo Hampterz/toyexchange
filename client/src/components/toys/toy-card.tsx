@@ -203,6 +203,8 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               alt={toy.title} 
               className="absolute h-full w-full object-cover transition group-hover:scale-105" 
               loading="lazy"
+              width="300"
+              height="225"
             />
           ) : (
             <div className="absolute h-full w-full flex items-center justify-center text-neutral-400">
@@ -359,6 +361,9 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     src={toy.images[currentImageIndex]} 
                     alt={`${toy.title} - image ${currentImageIndex + 1}`} 
                     className="w-full h-full object-contain"
+                    loading="lazy"
+                    width="600"
+                    height="450"
                   />
                   
                   {toy.images.length > 1 && (
