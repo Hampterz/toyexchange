@@ -222,9 +222,9 @@ export default function HomePage() {
             <div className="h-14 w-14 sm:h-16 sm:w-16 md:h-20 md:w-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 border-3 sm:border-4 border-blue-300">
               <i className="fas fa-comments text-blue-700 text-xl sm:text-2xl md:text-3xl"></i>
             </div>
-            <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">2. Connect With Families</h3>
+            <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">2. Connect With Others</h3>
             <p className="text-blue-800 text-sm sm:text-base">
-              Receive requests and chat with interested families through our secure messaging system.
+              Receive requests and chat with interested members through our secure messaging system.
             </p>
           </div>
 
@@ -234,7 +234,7 @@ export default function HomePage() {
             </div>
             <h3 className="text-lg sm:text-xl font-bold font-heading mb-2 sm:mb-3 text-blue-800">3. Arrange a Handoff</h3>
             <p className="text-blue-800 text-sm sm:text-base">
-              Meet at a safe public location to exchange the toy and spread joy to another family.
+              Meet at a safe public location to exchange the toy and spread joy to another member.
             </p>
           </div>
         </div>
@@ -257,7 +257,7 @@ export default function HomePage() {
           <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold font-heading mb-3 text-blue-800">Your Safety is Our Priority</h2>
             <p className="text-blue-700 max-w-3xl mx-auto text-sm md:text-base">
-              ToyShare is built on a foundation of trust, safety, and community values to create a secure environment for families.
+              ToyShare is built on a foundation of trust, safety, and community values to create a secure environment for all members.
             </p>
           </div>
           

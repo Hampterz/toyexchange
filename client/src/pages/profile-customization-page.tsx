@@ -180,7 +180,7 @@ export default function ProfileCustomizationPage() {
                     </FormControl>
                     <FormMessage />
                     <p className="text-xs text-blue-500 mt-1">
-                      Your address helps us connect you with families nearby. It will only be shared when you agree to a toy exchange.
+                      Your address helps us connect you with other members nearby. It will only be shared when you agree to a toy exchange.
                     </p>
                   </FormItem>
                 )}
@@ -195,7 +195,7 @@ export default function ProfileCustomizationPage() {
                     <FormControl>
                       <textarea 
                         className="flex min-h-20 w-full rounded-md border border-blue-200 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                        placeholder="Tell us a bit about yourself and your family..." 
+                        placeholder="Tell us more about yourself, your interests, and what kinds of toys you're looking to share..." 
                         {...field} 
                       />
                     </FormControl>
