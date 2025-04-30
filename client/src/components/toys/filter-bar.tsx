@@ -158,8 +158,12 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   
                   // If we have coordinates, update the latitude and longitude
                   if (coordinates) {
-                    handleFilterChange("latitude", coordinates.latitude);
-                    handleFilterChange("longitude", coordinates.longitude);
+                    // Ensure coordinates are converted to numbers
+                    const lat = Number(coordinates.latitude);
+                    const lng = Number(coordinates.longitude);
+                    
+                    handleFilterChange("latitude", lat);
+                    handleFilterChange("longitude", lng);
                     
                     // Set a smaller default distance radius - 5 miles is more reasonable
                     // This will show only truly local results
@@ -169,8 +173,8 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     onFilterChange({
                       ...filters,
                       location: [address],
-                      latitude: coordinates.latitude,
-                      longitude: coordinates.longitude,
+                      latitude: lat,
+                      longitude: lng,
                       distance: 5
                     });
                   }
