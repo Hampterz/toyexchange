@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { Message, User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -82,6 +82,37 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
         variant: "destructive",
       });
     },
+  });
+
+  // Delete message mutation
+  const deleteMessageMutation = useMutation({
+    mutationFn: async (messageId: number) => {
+      try {
+        const res = await apiRequest("DELETE", `/api/messages/${messageId}`);
+        return res.ok;
+      } catch (error) {
+        console.error("Message delete error:", error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      // Refetch messages after deletion
+      refetch();
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      
+      toast({
+        title: "Message deleted",
+        description: "Your message has been removed",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to delete message",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    }
   });
 
   // Mark messages as read
@@ -193,12 +224,26 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
                   </div>
                 )}
                 <div 
-                  className={`max-w-[75%] ${
+                  className={`max-w-[75%] group relative ${
                     isSentByMe 
                       ? 'bg-primary text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
                       : 'bg-white text-gray-800 border border-gray-200 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
                   } px-4 py-2`}
                 >
+                  {/* Delete button for unread messages sent by current user */}
+                  {isSentByMe && !message.read && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to delete this message?")) {
+                          deleteMessageMutation.mutate(message.id);
+                        }
+                      }}
+                      className="absolute -right-3 -top-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Delete message"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
                   <p>{message.content}</p>
                   <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                     <div className="flex justify-between">
