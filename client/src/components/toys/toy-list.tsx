@@ -43,7 +43,11 @@ export function ToyList({ filters = {} }: ToyListProps) {
     .map(([key, value]) => {
       // Handle array values by creating multiple parameters with same key
       if (Array.isArray(value)) {
-        return value.map(v => `${key}[]=${encodeURIComponent(String(v))}`).join('&');
+        // For debugging location values
+        if (key === 'location') {
+          console.log(`Creating location filter query params for:`, value);
+        }
+        return value.map(v => `${key}=${encodeURIComponent(String(v))}`).join('&');
       }
       // Handle single values
       return `${key}=${encodeURIComponent(String(value))}`;
