@@ -104,6 +104,7 @@ export interface IStorage {
   getMessagesBetweenUsers(senderId: number, receiverId: number): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   updateMessageRead(id: number, read: boolean): Promise<Message | undefined>;
+  deleteMessage(id: number): Promise<boolean>;
 
   // ToyRequest CRUD
   getToyRequest(id: number): Promise<ToyRequest | undefined>;

@@ -270,6 +270,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete a message (only allows senders to delete their unread messages)
+  app.delete("/api/messages/:id", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const message = await storage.getMessage(id);
+      
+      if (!message) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+      
+      // Only sender can delete, and only if message hasn't been read
+      if (message.senderId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to delete this message" });
+      }
+      
+      if (message.read) {
+        return res.status(400).json({ message: "Cannot delete messages that have been read" });
+      }
+      
+      const success = await storage.deleteMessage(id);
+      
+      if (success) {
+        res.status(200).json({ success: true });
+      } else {
+        res.status(500).json({ message: "Failed to delete message" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete message" });
+    }
+  });
+
   // TOY REQUESTS ROUTES
   // Get toy requests for a toy
   app.get("/api/toys/:toyId/requests", ensureAuthenticated, async (req, res) => {
