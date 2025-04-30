@@ -163,8 +163,20 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
   const onSubmit = async (data: FormValues) => {
     if (!user) return;
+    
+    // Check if we have image files
+    if (!data.imageFiles || data.imageFiles.length === 0) {
+      toast({
+        title: "Image Required",
+        description: "Please upload at least one image of your toy.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsUploading(true);
     console.log("Submitting form data:", data);
+    console.log("Form errors:", form.formState.errors);
     console.log("Selected tags:", selectedTags);
 
     try {
@@ -205,7 +217,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         title: data.title,
         description: data.description,
         ageRange: data.ageRanges.join(", "), // Use the multi-select age ranges and join them
-        condition: data.condition,
+        condition: data.condition || "Like New", // Use default if not set
         category: "Other", // Default to Other as category is hidden
         location: data.location,
         images: images,
@@ -214,8 +226,10 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         tags: selectedTags,
       };
 
+      console.log("Submitting toy data:", toyData);
       addToyMutation.mutate(toyData);
     } catch (error) {
+      console.error("Error processing form submission:", error);
       toast({
         title: "Media Processing Failed",
         description: "Failed to process images or video. Please try again.",
@@ -461,6 +475,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                   ? [...(field.value || []), age]
                                   : (field.value || []).filter((a) => a !== age);
                                 field.onChange(updated);
+                                // Also update form value directly to ensure it's properly updated
+                                form.setValue('ageRanges', updated, { shouldValidate: true });
                               }}
                               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
                             />
@@ -469,6 +485,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                         ))}
                       </div>
                     </FormControl>
+                    <FormDescription className="text-xs text-blue-600">
+                      Please select at least one age range
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
