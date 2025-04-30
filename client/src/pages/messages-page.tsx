@@ -128,13 +128,31 @@ export default function MessagesPage() {
   // Delete conversation mutation
   const deleteConversationMutation = useMutation({
     mutationFn: async (otherUserId: number) => {
-      // This would typically call an API endpoint
-      // For now, we'll simulate deletion by filtering locally
-      toast({
-        title: "Conversation deleted",
-        description: "This conversation has been removed",
-      });
-      return otherUserId;
+      try {
+        const response = await fetch(`/api/conversations/${otherUserId}`, {
+          method: "DELETE",
+          credentials: "include"
+        });
+        
+        if (!response.ok) {
+          throw new Error("Failed to delete conversation");
+        }
+        
+        toast({
+          title: "Conversation deleted",
+          description: "This conversation has been removed",
+        });
+        
+        return otherUserId;
+      } catch (error) {
+        console.error("Error deleting conversation:", error);
+        toast({
+          title: "Failed to delete conversation",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        throw error;
+      }
     },
     onSuccess: (otherUserId) => {
       // Update the local state or refetch data
