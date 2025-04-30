@@ -716,8 +716,9 @@ export default function AdminDashboard() {
         <Dialog 
           open={selectedReportId !== null} 
           onOpenChange={(open) => !open && setSelectedReportId(null)}
+          className="overflow-y-auto"
         >
-          <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Report Details</DialogTitle>
               <DialogDescription>
@@ -731,136 +732,138 @@ export default function AdminDashboard() {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="flex-1 overflow-hidden flex flex-col">
-              {contextLoading ? (
-                <div className="flex items-center justify-center py-10">
-                  <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-                </div>
-              ) : reportContext ? (
-                <>
-                  <div className="bg-blue-50 p-4 rounded-md mb-4">
-                    <h3 className="font-medium text-blue-800 mb-2">Report Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-blue-700">Reported By:</span>
-                        <span className="text-sm">User #{reportContext.report.reporterId}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-blue-700">Date Reported:</span>
-                        <span className="text-sm">
-                          {reportContext.report.createdAt ? 
-                            new Date(reportContext.report.createdAt instanceof Date ? 
-                              reportContext.report.createdAt : 
-                              String(reportContext.report.createdAt)
-                            ).toLocaleString() : 
-                            'Unknown'
-                          }
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-blue-700">Reason:</span>
-                        <span className="text-sm">{reportContext.report.reason}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-blue-700">Status:</span>
-                        <span className="text-sm flex items-center">
-                          <Badge variant={reportContext.report.status === "resolved" ? "outline" : "destructive"}>
-                            {reportContext.report.status}
-                          </Badge>
-                        </span>
-                      </div>
-                      {reportContext.report.details && (
-                        <div className="flex flex-col col-span-2">
-                          <span className="text-sm font-medium text-blue-700">Additional Details:</span>
-                          <p className="text-sm">{reportContext.report.details}</p>
-                        </div>
-                      )}
-                    </div>
+            <ScrollArea className="flex-1 max-h-[calc(90vh-180px)]">
+              <div className="flex-1 flex flex-col px-1 pb-4">
+                {contextLoading ? (
+                  <div className="flex items-center justify-center py-10">
+                    <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
                   </div>
-                  
-                  <h3 className="font-medium text-blue-800 mb-2">Message Context</h3>
-                  <ScrollArea className="h-[350px] rounded-md border p-4">
-                    <div className="space-y-4">
-                      {reportContext.contextMessages.map((message, idx) => {
-                        const isReportedMessage = idx === reportContext.targetIndex;
-                        const isSender = message.senderId === reportContext.sender?.id;
-                        
-                        return (
-                          <div 
-                            key={message.id} 
-                            className={`flex ${isSender ? 'justify-start' : 'justify-end'}`}
-                          >
-                            <div className={`
-                              flex items-start gap-2 max-w-[80%] group
-                              ${isReportedMessage ? 'relative' : ''}
-                            `}>
-                              {isSender && (
-                                <Avatar className="h-8 w-8 mt-1">
-                                  <AvatarFallback className="bg-blue-100 text-blue-800">
-                                    {reportContext.sender?.name?.charAt(0) || reportContext.sender?.username?.charAt(0) || '?'}
-                                  </AvatarFallback>
-                                </Avatar>
-                              )}
-                              
-                              <div>
+                ) : reportContext ? (
+                  <>
+                    <div className="bg-blue-50 p-4 rounded-md mb-4">
+                      <h3 className="font-medium text-blue-800 mb-2">Report Information</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-blue-700">Reported By:</span>
+                          <span className="text-sm">User #{reportContext.report.reporterId}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-blue-700">Date Reported:</span>
+                          <span className="text-sm">
+                            {reportContext.report.createdAt ? 
+                              new Date(reportContext.report.createdAt instanceof Date ? 
+                                reportContext.report.createdAt : 
+                                String(reportContext.report.createdAt)
+                              ).toLocaleString() : 
+                              'Unknown'
+                            }
+                          </span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-blue-700">Reason:</span>
+                          <span className="text-sm">{reportContext.report.reason}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-blue-700">Status:</span>
+                          <span className="text-sm flex items-center">
+                            <Badge variant={reportContext.report.status === "resolved" ? "outline" : "destructive"}>
+                              {reportContext.report.status}
+                            </Badge>
+                          </span>
+                        </div>
+                        {reportContext.report.details && (
+                          <div className="flex flex-col col-span-2">
+                            <span className="text-sm font-medium text-blue-700">Additional Details:</span>
+                            <p className="text-sm">{reportContext.report.details}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <h3 className="font-medium text-blue-800 mb-2">Message Context</h3>
+                    <div className="rounded-md border p-4 bg-white min-h-[450px]">
+                      <div className="space-y-4">
+                        {reportContext.contextMessages.map((message, idx) => {
+                          const isReportedMessage = idx === reportContext.targetIndex;
+                          const isSender = message.senderId === reportContext.sender?.id;
+                          
+                          return (
+                            <div 
+                              key={message.id} 
+                              className={`flex ${isSender ? 'justify-start' : 'justify-end'}`}
+                            >
+                              <div className={`
+                                flex items-start gap-2 max-w-[80%] group
+                                ${isReportedMessage ? 'relative' : ''}
+                              `}>
                                 {isSender && (
-                                  <p className="text-xs text-blue-600 ml-1 mb-1">
-                                    {reportContext.sender?.name || reportContext.sender?.username}
-                                  </p>
+                                  <Avatar className="h-8 w-8 mt-1">
+                                    <AvatarFallback className="bg-blue-100 text-blue-800">
+                                      {reportContext.sender?.name?.charAt(0) || reportContext.sender?.username?.charAt(0) || '?'}
+                                    </AvatarFallback>
+                                  </Avatar>
                                 )}
                                 
-                                <div className={`
-                                  rounded-lg px-3 py-2 text-sm
-                                  ${isSender 
-                                    ? 'bg-blue-100 text-blue-800' 
-                                    : 'bg-blue-500 text-white'
-                                  }
-                                  ${isReportedMessage 
-                                    ? 'ring-2 ring-red-500 dark:ring-red-400' 
-                                    : ''
-                                  }
-                                `}>
-                                  {message.content}
-                                  <div className="text-xs opacity-70 mt-1 text-right">
-                                    {message.createdAt ? 
-                                      new Date(message.createdAt instanceof Date ? 
-                                        message.createdAt : 
-                                        String(message.createdAt)
-                                      ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
-                                      ''
+                                <div>
+                                  {isSender && (
+                                    <p className="text-xs text-blue-600 ml-1 mb-1">
+                                      {reportContext.sender?.name || reportContext.sender?.username}
+                                    </p>
+                                  )}
+                                  
+                                  <div className={`
+                                    rounded-lg px-3 py-2 text-sm
+                                    ${isSender 
+                                      ? 'bg-blue-100 text-blue-800' 
+                                      : 'bg-blue-500 text-white'
                                     }
+                                    ${isReportedMessage 
+                                      ? 'ring-2 ring-red-500 dark:ring-red-400' 
+                                      : ''
+                                    }
+                                  `}>
+                                    {message.content}
+                                    <div className="text-xs opacity-70 mt-1 text-right">
+                                      {message.createdAt ? 
+                                        new Date(message.createdAt instanceof Date ? 
+                                          message.createdAt : 
+                                          String(message.createdAt)
+                                        ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
+                                        ''
+                                      }
+                                    </div>
                                   </div>
+                                  
+                                  {isReportedMessage && (
+                                    <div className="mt-1 text-xs text-red-500 font-medium ml-1">
+                                      ↑ Reported message
+                                    </div>
+                                  )}
                                 </div>
                                 
-                                {isReportedMessage && (
-                                  <div className="mt-1 text-xs text-red-500 font-medium ml-1">
-                                    ↑ Reported message
-                                  </div>
+                                {!isSender && (
+                                  <Avatar className="h-8 w-8 mt-1">
+                                    <AvatarFallback className="bg-blue-300 text-blue-800">
+                                      {reportContext.receiver?.name?.charAt(0) || reportContext.receiver?.username?.charAt(0) || '?'}
+                                    </AvatarFallback>
+                                  </Avatar>
                                 )}
                               </div>
-                              
-                              {!isSender && (
-                                <Avatar className="h-8 w-8 mt-1">
-                                  <AvatarFallback className="bg-blue-300 text-blue-800">
-                                    {reportContext.receiver?.name?.charAt(0) || reportContext.receiver?.username?.charAt(0) || '?'}
-                                  </AvatarFallback>
-                                </Avatar>
-                              )}
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </ScrollArea>
-                </>
-              ) : (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800">
-                  <p>Could not load message context. The report might not be a message report, or the message may have been deleted.</p>
-                </div>
-              )}
-            </div>
+                  </>
+                ) : (
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800">
+                    <p>Could not load message context. The report might not be a message report, or the message may have been deleted.</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
             
-            <DialogFooter className="flex justify-between">
+            <DialogFooter className="flex justify-between mt-4">
               <Button variant="outline" onClick={() => setSelectedReportId(null)}>
                 Close
               </Button>
