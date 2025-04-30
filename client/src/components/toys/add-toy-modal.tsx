@@ -158,6 +158,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const onSubmit = async (data: FormValues) => {
     if (!user) return;
     setIsUploading(true);
+    console.log("Submitting form data:", data);
+    console.log("Selected tags:", selectedTags);
 
     try {
       // Convert the uploaded image files to base64 strings
@@ -388,7 +390,20 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             </div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(
+                (data) => {
+                  console.log("Form submission passing validation:", data);
+                  onSubmit(data);
+                }, 
+                (errors) => {
+                  console.error("Form validation errors:", errors);
+                  toast({
+                    title: "Form validation failed",
+                    description: "Please check the form for errors and try again.",
+                    variant: "destructive"
+                  });
+                }
+              )} className="space-y-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -461,7 +476,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                     <FormLabel>Condition</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                      defaultValue={field.value || ""}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -476,6 +491,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormDescription className="text-xs mt-1">
+                      Like New = No visible wear / Gently Used = Minor wear / Used = Some visible wear / Well Loved = Significant wear but functional
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
