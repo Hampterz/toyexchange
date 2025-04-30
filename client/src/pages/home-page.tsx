@@ -28,9 +28,20 @@ export default function HomePage() {
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
   
-  // Get user's location on page load to apply distance filtering
+  // Set user's location from their profile or try to get current location
   useEffect(() => {
-    if ("geolocation" in navigator) {
+    // If user is logged in, use their stored address from profile
+    if (user && user.latitude && user.longitude) {
+      setFilters(prev => ({
+        ...prev,
+        latitude: typeof user.latitude === 'string' ? parseFloat(user.latitude) : user.latitude,
+        longitude: typeof user.longitude === 'string' ? parseFloat(user.longitude) : user.longitude,
+        distance: prev.distance || 10, // Ensure a default value
+        location: user.location ? [user.location] : []
+      }));
+    } 
+    // Otherwise try to get their current location
+    else if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setFilters(prev => ({
@@ -46,7 +57,7 @@ export default function HomePage() {
         }
       );
     }
-  }, []);
+  }, [user]);
   
   // Query for community metrics
   const { data: communityMetrics } = useQuery<{ 

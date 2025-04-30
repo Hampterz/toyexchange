@@ -347,9 +347,12 @@ export class DatabaseStorage implements IStorage {
         typeof filters.distance === 'number' && 
         filters.distance > 0) {
       
+      console.log(`Filtering by distance: ${filters.distance} miles from lat:${filters.latitude}, lng:${filters.longitude}`);
+      
       // Add distance property to each toy and filter by distance
       const toysWithDistance = result.map(toy => {
         if (!toy.latitude || !toy.longitude) {
+          console.log(`Toy ${toy.id} (${toy.title}) has no coordinates, skipping distance calculation`);
           return { ...toy, distance: null };
         }
         
@@ -361,14 +364,27 @@ export class DatabaseStorage implements IStorage {
           parseFloat(toy.longitude)
         );
         
+        console.log(`Toy ${toy.id} (${toy.title}) is ${distance.toFixed(2)} miles from the reference point`);
+        
         // Add the distance to the toy object
         return { ...toy, distance };
       });
       
       // Filter by distance
       result = toysWithDistance.filter(toy => {
-        if (toy.distance === null) return false;
-        return toy.distance <= filters.distance;
+        if (toy.distance === null) {
+          console.log(`Toy ${toy.id} (${toy.title}) excluded due to missing coordinates`);
+          return false;
+        }
+        
+        const withinRange = toy.distance <= filters.distance;
+        if (!withinRange) {
+          console.log(`Toy ${toy.id} (${toy.title}) excluded: ${toy.distance.toFixed(2)} miles > ${filters.distance} miles limit`);
+        } else {
+          console.log(`Toy ${toy.id} (${toy.title}) included: ${toy.distance.toFixed(2)} miles <= ${filters.distance} miles limit`);
+        }
+        
+        return withinRange;
       });
     }
     
