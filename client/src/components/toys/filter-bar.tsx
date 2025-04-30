@@ -22,6 +22,7 @@ import { TOY_CATEGORIES, COMMON_ATTRIBUTES } from "@shared/schema";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { Slider } from "@/components/ui/slider";
+import { useAuth } from "@/hooks/use-auth";
 
 type FilterBarProps = {
   onFilterChange: (filters: FilterOptions) => void;
@@ -41,6 +42,9 @@ export type FilterOptions = {
 };
 
 export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
+  // Get user info for location
+  const { user } = useAuth();
+  
   const [filters, setFilters] = useState<FilterOptions>({
     location: initialFilters?.location || [],
     ageRange: initialFilters?.ageRange || [],
@@ -48,12 +52,31 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
-    distance: initialFilters?.distance || 10, // Default to 10 miles
-    latitude: initialFilters?.latitude,
-    longitude: initialFilters?.longitude,
+    distance: initialFilters?.distance || 5, // Default to 5 miles
+    latitude: initialFilters?.latitude || (user?.latitude || undefined),
+    longitude: initialFilters?.longitude || (user?.longitude || undefined),
   });
   
   const [searchValue, setSearchValue] = useState(initialFilters?.search || "");
+  
+  // Automatically populate user location when component loads
+  useEffect(() => {
+    if (user?.location && !filters.location.length && !initialFilters?.location?.length) {
+      // User has a location but no location filter is applied yet
+      const newFilters = { 
+        ...filters, 
+        location: [user.location],
+        latitude: user.latitude || undefined,
+        longitude: user.longitude || undefined
+      };
+      setFilters(newFilters);
+      
+      // Only automatically apply filter if we have coordinates
+      if (user.latitude && user.longitude) {
+        onFilterChange(newFilters);
+      }
+    }
+  }, [user]);
   
   // Check if we're on mobile
   const isMobile = useMediaQuery("(max-width: 768px)");

@@ -58,6 +58,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const [showTagSelector, setShowTagSelector] = useState(false);
   const [addedToy, setAddedToy] = useState<Toy | null>(null);
   const [showSuccessPage, setShowSuccessPage] = useState(false);
+  const [locationCoordinates, setLocationCoordinates] = useState<{latitude: number, longitude: number} | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -191,6 +192,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         condition: data.condition || "Like New", // Use default if not set
         category: "Other", // Default to Other as category is hidden
         location: data.location,
+        // Include coordinates when available
+        latitude: locationCoordinates?.latitude || null,
+        longitude: locationCoordinates?.longitude || null,
         images: images,
         videos: videos,
         isAvailable: true,
@@ -529,8 +533,11 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                             
                             // Update coordinates in the database when available
                             if (coordinates) {
-                              // Store latitude and longitude with the toy in the future
+                              // Store latitude and longitude with the toy
                               console.log("Selected coordinates:", coordinates);
+                              setLocationCoordinates(coordinates);
+                            } else {
+                              setLocationCoordinates(null);
                             }
                           }}
                         />
