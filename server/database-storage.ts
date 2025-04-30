@@ -350,7 +350,7 @@ export class DatabaseStorage implements IStorage {
       console.log(`Filtering by distance: ${filters.distance} miles from lat:${filters.latitude}, lng:${filters.longitude}`);
       
       // Add distance property to each toy and filter by distance
-      const toysWithDistance = result.map(toy => {
+      const toysWithDistance = result.map((toy: any) => {
         if (!toy.latitude || !toy.longitude) {
           console.log(`Toy ${toy.id} (${toy.title}) has no coordinates, skipping distance calculation`);
           return { ...toy, distance: null };
@@ -371,7 +371,7 @@ export class DatabaseStorage implements IStorage {
       });
       
       // Filter by distance
-      result = toysWithDistance.filter(toy => {
+      result = toysWithDistance.filter((toy: any) => {
         if (toy.distance === null) {
           console.log(`Toy ${toy.id} (${toy.title}) excluded due to missing coordinates`);
           return false;
@@ -393,6 +393,11 @@ export class DatabaseStorage implements IStorage {
   
   // Helper function to calculate distance between two points using the Haversine formula
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    if (isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+      console.error("Invalid coordinate values:", { lat1, lon1, lat2, lon2 });
+      return Number.MAX_VALUE; // Return a very large distance so this toy won't be included in distance filters
+    }
+    
     const R = 3963.0; // Radius of the Earth in miles
     const dLat = this.deg2rad(lat2 - lat1);
     const dLon = this.deg2rad(lon2 - lon1);
@@ -402,6 +407,13 @@ export class DatabaseStorage implements IStorage {
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     const distance = R * c; // Distance in miles
+    
+    // A sanity check in case the calculation somehow produces NaN or Infinity
+    if (isNaN(distance) || !isFinite(distance)) {
+      console.error("Distance calculation failed:", { lat1, lon1, lat2, lon2, result: distance });
+      return Number.MAX_VALUE;
+    }
+    
     return distance;
   }
   

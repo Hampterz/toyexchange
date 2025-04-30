@@ -128,17 +128,26 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
                 // or if it has coordinates (both ensure a complete address was selected)
                 if (address && !filters.location.includes(address) && (placeId || coordinates)) {
-                  handleMultiSelectChange("location", address);
+                  // Clear any previous locations (we're setting a new primary location)
+                  handleFilterChange("location", [address]);
                   
                   // If we have coordinates, update the latitude and longitude
                   if (coordinates) {
                     handleFilterChange("latitude", coordinates.latitude);
                     handleFilterChange("longitude", coordinates.longitude);
                     
-                    // If distance isn't set yet, set a default
-                    if (!filters.distance) {
-                      handleFilterChange("distance", 75);
-                    }
+                    // Set a smaller default distance radius - 10 miles is more reasonable
+                    // This will show only truly local results
+                    handleFilterChange("distance", 10);
+                    
+                    // Apply filter immediately when user selects a location
+                    onFilterChange({
+                      ...filters,
+                      location: [address],
+                      latitude: coordinates.latitude,
+                      longitude: coordinates.longitude,
+                      distance: 10
+                    });
                   }
                 }
               }}

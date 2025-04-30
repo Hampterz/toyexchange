@@ -32,6 +32,11 @@ export function ToyList({ filters = {} }: ToyListProps) {
       if (Array.isArray(value) && value.length === 0) {
         return false;
       }
+      
+      // Skip undefined and null values
+      if (value === undefined || value === null) {
+        return false;
+      }
 
       return true;
     })
@@ -44,6 +49,10 @@ export function ToyList({ filters = {} }: ToyListProps) {
       return `${key}=${encodeURIComponent(String(value))}`;
     })
     .join("&");
+    
+  // For debugging
+  console.log("Applying toy filters:", combinedFilters);
+  console.log("Query params:", queryParams);
   
   // Query toys from API
   const { data: toys, isLoading, error } = useQuery<ToyWithDistance[]>({
