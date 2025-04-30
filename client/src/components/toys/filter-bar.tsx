@@ -147,14 +147,20 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
             <AddressAutocomplete
               placeholder="Search for location..."
-              defaultValue={filters.location.length > 0 ? filters.location[0] : ""}
+              defaultValue=""
               className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
               onAddressSelect={(address, coordinates, placeId) => {
                 // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
                 // or if it has coordinates (both ensure a complete address was selected)
                 if (address && (placeId || coordinates)) {
-                  // Clear any previous locations (we're setting a new primary location)
-                  handleFilterChange("location", [address]);
+                  // Add to the existing locations array instead of replacing
+                  const newLocations = [...filters.location];
+                  
+                  // Only add if it's not already in the list
+                  if (!newLocations.includes(address)) {
+                    newLocations.push(address);
+                    handleFilterChange("location", newLocations);
+                  }
                   
                   // If we have coordinates, update the latitude and longitude
                   if (coordinates) {
@@ -172,11 +178,17 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     // Apply filter immediately when user selects a location
                     onFilterChange({
                       ...filters,
-                      location: [address],
+                      location: newLocations,
                       latitude: lat,
                       longitude: lng,
                       distance: 5
                     });
+                    
+                    // Clear the input field after selection for better UX
+                    const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
+                    if (inputEl) {
+                      inputEl.value = '';
+                    }
                   }
                 }
               }}
@@ -438,58 +450,75 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mb-3">
           <AddressAutocomplete
             placeholder="Search for location..."
-            defaultValue={filters.location.length > 0 ? filters.location[0] : ""}
+            defaultValue=""
             className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
             onAddressSelect={(address, coordinates, placeId) => {
               // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
               // or if it has coordinates (both ensure a complete address was selected)
               if (address && (placeId || coordinates)) {
-                // Replace previous location with this one (we're setting a new primary location)
-                handleFilterChange("location", [address]);
+                // Add to existing locations instead of replacing
+                const newLocations = [...filters.location];
+                
+                // Only add if not already in the list
+                if (!newLocations.includes(address)) {
+                  newLocations.push(address);
+                  handleFilterChange("location", newLocations);
+                }
                 
                 // If we have coordinates, update the latitude and longitude
                 if (coordinates) {
-                  handleFilterChange("latitude", coordinates.latitude);
-                  handleFilterChange("longitude", coordinates.longitude);
+                  // Ensure coordinates are converted to numbers
+                  const lat = Number(coordinates.latitude);
+                  const lng = Number(coordinates.longitude);
                   
-                  // If distance isn't set yet, set a default
-                  if (!filters.distance) {
-                    handleFilterChange("distance", 5);
+                  handleFilterChange("latitude", lat);
+                  handleFilterChange("longitude", lng);
+                  
+                  // Set a reasonable default distance
+                  handleFilterChange("distance", 5);
+                  
+                  // Apply filter immediately when user selects a location
+                  onFilterChange({
+                    ...filters,
+                    location: newLocations,
+                    latitude: lat,
+                    longitude: lng,
+                    distance: 5
+                  });
+                  
+                  // Clear the input field after selection for better UX
+                  const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
+                  if (inputEl) {
+                    inputEl.value = '';
                   }
                 }
               }
             }}
           />
           
-          {/* Selected custom locations */}
+          {/* Selected locations */}
           {filters.location.length > 0 && (
             <div className="mt-2">
               <div className="flex flex-wrap gap-1">
-                {filters.location.map(location => {
-                  // Only show badge for custom locations (not in LOCATIONS array)
-                  if (!LOCATIONS.includes(location)) {
-                    return (
-                      <Badge 
-                        key={location} 
-                        variant="secondary"
-                        className="flex items-center gap-1 py-1 bg-blue-50 mb-1"
-                      >
-                        <span className="text-xs max-w-[200px] truncate">{location}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const newLocations = filters.location.filter(l => l !== location);
-                            handleFilterChange("location", newLocations);
-                          }}
-                          className="text-blue-500 hover:text-blue-700 ml-1"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    );
-                  }
-                  return null;
-                })}
+                {filters.location.map(location => (
+                  <Badge 
+                    key={location} 
+                    variant="secondary"
+                    className="flex items-center gap-1 py-1 bg-blue-50 mb-1"
+                  >
+                    <span className="text-xs max-w-[200px] truncate">{location}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newLocations = filters.location.filter(l => l !== location);
+                        handleFilterChange("location", newLocations);
+                      }}
+                      className="text-blue-500 hover:text-blue-700 ml-1"
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                ))}
               </div>
             </div>
           )}

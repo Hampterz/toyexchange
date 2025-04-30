@@ -77,10 +77,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filters: Record<string, any> = {};
       
       // Parse query parameters
-      if (req.query.location) filters.location = req.query.location as string;
-      if (req.query.ageRange) filters.ageRange = req.query.ageRange as string;
-      if (req.query.category) filters.category = req.query.category as string;
-      if (req.query.condition) filters.condition = req.query.condition as string;
+      // Handle arrays for filters that can have multiple values
+      if (req.query.location) {
+        // If it's an array, use it as is
+        if (Array.isArray(req.query.location)) {
+          filters.location = req.query.location;
+        } 
+        // If it's a string, convert to array
+        else {
+          filters.location = [req.query.location as string];
+        }
+      }
+      
+      if (req.query.ageRange) {
+        if (Array.isArray(req.query.ageRange)) {
+          filters.ageRange = req.query.ageRange;
+        } else {
+          filters.ageRange = [req.query.ageRange as string];
+        }
+      }
+      
+      if (req.query.category) {
+        if (Array.isArray(req.query.category)) {
+          filters.category = req.query.category;
+        } else {
+          filters.category = [req.query.category as string];
+        }
+      }
+      
+      if (req.query.condition) {
+        if (Array.isArray(req.query.condition)) {
+          filters.condition = req.query.condition;
+        } else {
+          filters.condition = [req.query.condition as string];
+        }
+      }
       if (req.query.search) filters.search = req.query.search as string;
       if (req.query.isAvailable) filters.isAvailable = req.query.isAvailable === "true";
       

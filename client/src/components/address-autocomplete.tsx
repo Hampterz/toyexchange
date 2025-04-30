@@ -207,7 +207,7 @@ export function AddressAutocomplete({
         }}
         id={id}
         placeholder={placeholder}
-        className={cn("w-full outline-none bg-transparent text-sm", className)}
+        className={cn("w-full outline-none bg-transparent text-sm address-autocomplete-input", className)}
         autoComplete="off"
         spellCheck="false"
         aria-label="Enter your address"
