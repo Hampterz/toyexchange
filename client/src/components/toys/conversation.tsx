@@ -201,7 +201,16 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
                 >
                   <p>{message.content}</p>
                   <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                    {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                    <div className="flex justify-between">
+                      <span>
+                        {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                      </span>
+                      {isSentByMe && (
+                        <span className="text-[10px] pl-2">
+                          {message.read ? "Read" : "Delivered"}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,6 +226,15 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
             placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              // Send message on Enter without Shift key
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (newMessage.trim() && !sendMessageMutation.isPending) {
+                  handleSendMessage(e);
+                }
+              }
+            }}
             className="flex-1 min-h-[50px] max-h-[100px] border-gray-200 focus-visible:ring-primary resize-none"
           />
           <Button 

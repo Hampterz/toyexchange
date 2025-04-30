@@ -560,6 +560,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                                 badgeName={toyOwner.currentBadge} 
                                 className="text-lg" 
                                 showTooltip={true}
+                                iconOnly={true}
                               />
                             )}
                           </div>
