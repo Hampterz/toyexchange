@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete a message (only allows senders to delete their unread messages)
+  // Delete a message (allows both senders and receivers to delete messages)
   app.delete("/api/messages/:id", ensureAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -280,13 +280,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Message not found" });
       }
       
-      // Only sender can delete, and only if message hasn't been read
-      if (message.senderId !== req.user!.id) {
-        return res.status(403).json({ message: "Not authorized to delete this message" });
-      }
-      
-      if (message.read) {
-        return res.status(400).json({ message: "Cannot delete messages that have been read" });
+      // Verify the user is either the sender or receiver of the message
+      if (message.senderId !== req.user!.id && message.receiverId !== req.user!.id) {
+        return res.status(403).json({ message: "Cannot delete messages that belong to other people" });
       }
       
       const success = await storage.deleteMessage(id);
@@ -297,6 +293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(500).json({ message: "Failed to delete message" });
       }
     } catch (error) {
+      console.error("Error deleting message:", error);
       res.status(500).json({ message: "Failed to delete message" });
     }
   });
