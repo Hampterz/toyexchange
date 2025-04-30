@@ -168,14 +168,16 @@ export default function AdminDashboard() {
     totalUsers: users.length,
     totalToys: toys.length,
     newUsersThisWeek: users.filter((u: AdminUser) => {
+      if (!u.createdAt) return false;
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      return new Date(u.createdAt as string) > oneWeekAgo;
+      return new Date(u.createdAt instanceof Date ? u.createdAt : String(u.createdAt)) > oneWeekAgo;
     }).length,
     newToysThisWeek: toys.filter((t: AdminToy) => {
+      if (!t.createdAt) return false;
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      return new Date(t.createdAt as string) > oneWeekAgo;
+      return new Date(t.createdAt instanceof Date ? t.createdAt : String(t.createdAt)) > oneWeekAgo;
     }).length,
     // Only count toys marked as not available as truly exchanged
     toysExchanged: toys.filter((t: AdminToy) => !t.isAvailable).length
@@ -305,15 +307,15 @@ export default function AdminDashboard() {
                         {users.slice(0, 3).map((user, index) => (
                           <TableRow key={`user-${user.id}`}>
                             <TableCell className="font-medium">New User Registered</TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                            <TableCell>{user.name || user.username}</TableCell>
+                            <TableCell>{user.createdAt ? new Date(user.createdAt instanceof Date ? user.createdAt : String(user.createdAt)).toLocaleString() : 'Unknown'}</TableCell>
                           </TableRow>
                         ))}
                         {toys.slice(0, 3).map((toy, index) => (
                           <TableRow key={`toy-${toy.id}`}>
                             <TableCell className="font-medium">New Toy Listed</TableCell>
-                            <TableCell>{users.find(u => u.id === toy.userId)?.name || 'Unknown User'}</TableCell>
-                            <TableCell>{new Date(toy.createdAt).toLocaleString()}</TableCell>
+                            <TableCell>{users.find(u => u.id === toy.userId)?.name || `User #${toy.userId}`}</TableCell>
+                            <TableCell>{toy.createdAt ? new Date(toy.createdAt instanceof Date ? toy.createdAt : String(toy.createdAt)).toLocaleString() : 'Unknown'}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -399,7 +401,7 @@ export default function AdminDashboard() {
                       <div className="flex justify-between">
                         <h4 className="font-medium text-blue-700">{message.subject}</h4>
                         <Badge variant="outline" className="text-xs">
-                          {new Date(message.createdAt).toLocaleDateString()}
+                          {message.createdAt ? new Date(message.createdAt instanceof Date ? message.createdAt : String(message.createdAt)).toLocaleDateString() : 'Unknown'}
                         </Badge>
                       </div>
                       <p className="text-sm text-blue-600 mt-1 line-clamp-2">{message.message}</p>
@@ -488,7 +490,7 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
-                            {new Date(user.createdAt).toLocaleDateString()}
+                            {user.createdAt ? new Date(user.createdAt instanceof Date ? user.createdAt : String(user.createdAt)).toLocaleDateString() : 'Unknown'}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end space-x-1">
@@ -598,7 +600,7 @@ export default function AdminDashboard() {
                           <TableCell>Item #{report.targetId}</TableCell>
                           <TableCell className="hidden md:table-cell">User #{report.reporterId}</TableCell>
                           <TableCell className="hidden md:table-cell">
-                            {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown'}
+                            {report.createdAt ? new Date(report.createdAt instanceof Date ? report.createdAt : String(report.createdAt)).toLocaleDateString() : 'Unknown'}
                           </TableCell>
                           <TableCell>
                             <Badge variant={report.status === "resolved" ? "outline" : "destructive"}>
