@@ -491,6 +491,29 @@ export class DatabaseStorage implements IStorage {
       return false;
     }
   }
+  
+  async deleteConversation(userId: number, otherUserId: number): Promise<boolean> {
+    try {
+      await db.delete(messages)
+        .where(
+          or(
+            and(
+              eq(messages.senderId, userId),
+              eq(messages.receiverId, otherUserId)
+            ),
+            and(
+              eq(messages.senderId, otherUserId),
+              eq(messages.receiverId, userId)
+            )
+          )
+        );
+      
+      return true;
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      return false;
+    }
+  }
 
   // ==================== ToyRequest CRUD Methods ====================
   async getToyRequest(id: number): Promise<ToyRequest | undefined> {

@@ -105,6 +105,7 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   updateMessageRead(id: number, read: boolean): Promise<Message | undefined>;
   deleteMessage(id: number): Promise<boolean>;
+  deleteConversation(userId: number, otherUserId: number): Promise<boolean>;
 
   // ToyRequest CRUD
   getToyRequest(id: number): Promise<ToyRequest | undefined>;
@@ -522,6 +523,29 @@ export class MemStorage implements IStorage {
       return true;
     }
     return false;
+  }
+  
+  async deleteConversation(userId: number, otherUserId: number): Promise<boolean> {
+    try {
+      const messages = Array.from(this.messagesMap.values());
+      
+      // Find all messages between these two users
+      const conversationMessages = messages.filter(
+        message => 
+          (message.senderId === userId && message.receiverId === otherUserId) ||
+          (message.senderId === otherUserId && message.receiverId === userId)
+      );
+      
+      // Delete each message
+      for (const message of conversationMessages) {
+        this.messagesMap.delete(message.id);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      return false;
+    }
   }
 
   // ToyRequest CRUD methods

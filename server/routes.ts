@@ -300,6 +300,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete message" });
     }
   });
+  
+  // Delete entire conversation with another user
+  app.delete("/api/conversations/:otherUserId", ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const otherUserId = parseInt(req.params.otherUserId);
+      
+      if (isNaN(otherUserId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const success = await storage.deleteConversation(userId, otherUserId);
+      
+      if (success) {
+        res.status(200).json({ success: true });
+      } else {
+        res.status(500).json({ message: "Failed to delete conversation" });
+      }
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      res.status(500).json({ message: "Failed to delete conversation" });
+    }
+  });
 
   // TOY REQUESTS ROUTES
   // Get toy requests for a toy
