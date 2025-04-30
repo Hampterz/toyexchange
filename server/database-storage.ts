@@ -347,7 +347,7 @@ export class DatabaseStorage implements IStorage {
         typeof filters.distance === 'number' && 
         filters.distance > 0) {
       
-      console.log(`Filtering by distance: ${filters.distance} miles from lat:${filters.latitude}, lng:${filters.longitude}`);
+      console.log(`Filtering by distance: ${filters.distance} miles from lat:${filters.latitude}, lng:${filters.longitude}`, { numToys: result.length });
       
       // Add distance property to each toy and filter by distance
       const toysWithDistance = result.map((toy: any) => {
@@ -393,9 +393,18 @@ export class DatabaseStorage implements IStorage {
   
   // Helper function to calculate distance between two points using the Haversine formula
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    if (isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+    // Check for null, undefined or NaN values
+    if (lat1 === null || lon1 === null || lat2 === null || lon2 === null ||
+        lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined ||
+        isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
       console.error("Invalid coordinate values:", { lat1, lon1, lat2, lon2 });
       return Number.MAX_VALUE; // Return a very large distance so this toy won't be included in distance filters
+    }
+    
+    // Validate coordinates are in reasonable ranges
+    if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180) {
+      console.error("Coordinate values out of range:", { lat1, lon1, lat2, lon2 });
+      return Number.MAX_VALUE;
     }
     
     const R = 3963.0; // Radius of the Earth in miles
