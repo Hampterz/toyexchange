@@ -56,15 +56,6 @@ export function Footer() {
                 <i className="fab fa-pinterest"></i>
               </Link>
             </div>
-            <p className="text-neutral-400 text-sm">
-              Subscribe to our newsletter for community updates
-            </p>
-            <div className="mt-2 flex">
-              <Input type="email" placeholder="Your email" className="rounded-r-none bg-neutral-700 border-0 focus:ring-2 focus:ring-primary text-sm w-full" />
-              <Button className="rounded-l-none bg-primary hover:bg-primary/90 text-white">
-                Subscribe
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -78,15 +69,9 @@ export function Footer() {
             </div>
             
             <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
-              <CheckCircle className="h-8 w-8 text-green-400 mb-2" />
-              <h5 className="font-medium text-sm mb-1">Safety Verified</h5>
-              <p className="text-neutral-400 text-xs">All toy listings reviewed for safety standards</p>
-            </div>
-            
-            <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
               <Globe className="h-8 w-8 text-blue-400 mb-2" />
-              <h5 className="font-medium text-sm mb-1">Community Driven</h5>
-              <p className="text-neutral-400 text-xs">Built by parents, for families worldwide</p>
+              <h5 className="font-medium text-sm mb-1">Student Project</h5>
+              <p className="text-neutral-400 text-xs">Built by a high school student</p>
             </div>
             
             <div className="bg-neutral-700 p-4 rounded-lg flex flex-col items-center text-center">
