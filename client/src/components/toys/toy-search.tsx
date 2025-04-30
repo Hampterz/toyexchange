@@ -29,7 +29,7 @@ export function ToySearch({ onSearch, initialValue = "" }: ToySearchProps) {
       >
         <Input
           type="text"
-          placeholder=""
+          placeholder="Search for toys..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="rounded-r-none border-r-0 focus-visible:ring-blue-500 pl-4 py-2 shadow-sm text-sm"
