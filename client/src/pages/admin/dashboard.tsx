@@ -546,7 +546,12 @@ export default function AdminDashboard() {
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => deleteToyMutation.mutate(toy.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm(`Are you sure you want to delete "${toy.title || 'this toy'}"? This action cannot be undone.`)) {
+                                    deleteToyMutation.mutate(toy.id);
+                                  }
+                                }}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
