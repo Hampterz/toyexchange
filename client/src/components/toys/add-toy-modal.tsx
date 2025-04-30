@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -53,6 +54,7 @@ const formSchema = insertToySchema
     videoFiles: z
       .instanceof(FileList, { message: "Please insert a valid video file" })
       .optional()
+      .nullable()
       .refine(
         (files) => !files || files.length <= 1,
         "Maximum of 1 video allowed"
@@ -93,10 +95,14 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       description: "",
       ageRange: "",
       ageRanges: [],
-      condition: "",
+      condition: "Like New", // Set default condition
       location: user?.location || "",
       tags: [],
+      // These will be set when files are uploaded
+      imageFiles: undefined,
+      videoFiles: undefined
     },
+    mode: "onSubmit" // Only validate on submit
   });
   
   // Toggle a tag selection
@@ -660,13 +666,58 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                     </FormLabel>
                     <FormControl>
                       <div className="p-1">
-                        <TagSelector 
-                          availableTags={COMMON_ATTRIBUTES}
-                          selectedTags={selectedTags}
-                          onTagsChange={setSelectedTags}
-                          placeholder="Select tags to describe your toy"
-                          allowCustomTags={false}
-                        />
+                        {/* New Tag Selector based on filter-bar implementation */}
+                        <div className="mb-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between text-left font-normal"
+                              >
+                                <div className="flex items-center">
+                                  <Tag className="mr-2 h-4 w-4 shrink-0" />
+                                  <span>Select Tags ({selectedTags.length || 0})</span>
+                                </div>
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
+                              <div className="max-h-60 overflow-auto p-2">
+                                {COMMON_ATTRIBUTES.map(tag => (
+                                  <div 
+                                    key={tag}
+                                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                    onClick={() => toggleTag(tag)}
+                                  >
+                                    <input 
+                                      type="checkbox" 
+                                      checked={selectedTags.includes(tag)}
+                                      readOnly
+                                      className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
+                                    />
+                                    <span>{tag}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                          
+                          {/* Show selected tags and allow removal */}
+                          {selectedTags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {selectedTags.map(tag => (
+                                <Badge 
+                                  key={tag} 
+                                  variant="default"
+                                  className="cursor-pointer py-1 px-3 transition-all bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                  onClick={() => toggleTag(tag)}
+                                >
+                                  #{tag} <X className="ml-1 h-3 w-3" />
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                         <FormDescription className="mt-2 text-xs text-blue-600">
                           Tags help other parents find your toy more easily
                         </FormDescription>
