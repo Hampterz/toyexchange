@@ -1,8 +1,10 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { User } from '@shared/schema';
 
 interface AvatarWithFallbackProps {
+  user?: User;
   src?: string | null;
   alt?: string;
   className?: string;
@@ -19,26 +21,32 @@ const sizeClasses = {
 };
 
 export function AvatarWithFallback({
+  user,
   src,
   alt = '',
   className,
   fallbackClassName,
   size = 'md',
 }: AvatarWithFallbackProps) {
+  // If user is provided, use its properties
+  const avatarSrc = user?.profilePicture || src || '';
+  const avatarAlt = user?.name || alt;
+
   // Generate fallback letters from name
   const getFallbackLetters = () => {
-    if (!alt) return '?';
+    const name = avatarAlt;
+    if (!name) return '?';
     
-    const parts = alt.trim().split(' ');
+    const parts = name.trim().split(' ');
     if (parts.length > 1) {
       return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
     }
-    return alt.substring(0, 2).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   };
 
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
-      <AvatarImage src={src || ''} alt={alt} />
+      <AvatarImage src={avatarSrc} alt={avatarAlt} />
       <AvatarFallback 
         className={cn('bg-primary text-primary-foreground', fallbackClassName)}
       >

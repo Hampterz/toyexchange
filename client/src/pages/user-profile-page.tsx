@@ -42,13 +42,31 @@ const UserProfilePage: React.FC = () => {
     enabled: !!userId,
   });
 
-  const { data: toys, isLoading: toysLoading } = useQuery<Toy[]>({
+  const { data: toys = [], isLoading: toysLoading } = useQuery<Toy[]>({
     queryKey: [`/api/users/${userId}/toys`],
+    queryFn: async () => {
+      const response = await fetch(`/api/users/${userId}/toys`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user's toys");
+      }
+      return response.json();
+    },
     enabled: !!userId,
   });
   
-  const { data: wishes, isLoading: wishesLoading } = useQuery<Wish[]>({
+  const { data: wishes = [], isLoading: wishesLoading } = useQuery<Wish[]>({
     queryKey: [`/api/users/${userId}/wishes`],
+    queryFn: async () => {
+      const response = await fetch(`/api/users/${userId}/wishes`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user's wishes");
+      }
+      return response.json();
+    },
     enabled: !!userId,
   });
   
