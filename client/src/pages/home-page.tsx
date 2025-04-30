@@ -77,6 +77,11 @@ export default function HomePage() {
   });
 
   const handleFilterChange = (newFilters: FilterOptions) => {
+    console.log('Applying filters:', newFilters);
+    // Log specifically about locations since that's what we're debugging
+    if (newFilters.location && newFilters.location.length > 0) {
+      console.log('Location filters:', newFilters.location);
+    }
     setFilters(newFilters);
   };
 

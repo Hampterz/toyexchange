@@ -235,11 +235,13 @@ export class DatabaseStorage implements IStorage {
     if (filters) {
       // Location filter with array support
       if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
-        // If there are multiple locations, we use the "in" operator
+        console.log(`Filtering toys by multiple locations:`, filters.location);
+        // If there are multiple locations, we use the "in" operator which matches ANY locations in the array
         query = query.where(
           inArray(toys.location, filters.location)
         );
       } else if (filters.location && typeof filters.location === 'string' && filters.location !== "any") {
+        console.log(`Filtering toys by single location:`, filters.location);
         // For backwards compatibility with single string values
         query = query.where(eq(toys.location, filters.location));
       }
