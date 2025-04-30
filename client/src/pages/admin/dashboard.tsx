@@ -25,6 +25,17 @@ import {
 } from "@/components/ui/alert-dialog"
 import { getQueryFn, queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { User, Toy, Report, ContactMessage } from "@shared/schema";
+
+// Define interfaces for structured data
+interface AdminUser extends User {
+  totalToys?: number;
+  joinDate?: string;
+}
+
+interface AdminToy extends Toy {
+  userName?: string;
+}
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -69,36 +80,36 @@ export default function AdminDashboard() {
   }, [user, navigate]);
 
   const { 
-    data: users = [], 
+    data: users = [] as AdminUser[], 
     isLoading: usersLoading 
-  } = useQuery({
+  } = useQuery<AdminUser[]>({
     queryKey: ["/api/admin/users"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!user && user.username === "adminsreyas",
   });
 
   const { 
-    data: toys = [], 
+    data: toys = [] as AdminToy[], 
     isLoading: toysLoading 
-  } = useQuery({
+  } = useQuery<AdminToy[]>({
     queryKey: ["/api/admin/toys"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!user && user.username === "adminsreyas",
   });
 
   const { 
-    data: reports = [], 
+    data: reports = [] as Report[], 
     isLoading: reportsLoading 
-  } = useQuery({
+  } = useQuery<Report[]>({
     queryKey: ["/api/admin/reports"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!user && user.username === "adminsreyas",
   });
 
   const { 
-    data: contactMessages = [], 
+    data: contactMessages = [] as ContactMessage[], 
     isLoading: contactLoading 
-  } = useQuery({
+  } = useQuery<ContactMessage[]>({
     queryKey: ["/api/admin/contact-messages"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!user && user.username === "adminsreyas",
@@ -157,22 +168,22 @@ export default function AdminDashboard() {
     totalUsers: users.length,
     totalToys: toys.length,
     activeExchanges: 0, // Would need to implement in the future
-    completedExchanges: users.reduce((total, user) => total + (user.successfulExchanges || 0), 0),
+    completedExchanges: users.reduce((total: number, user: AdminUser) => total + (user.successfulExchanges || 0), 0),
     averageRating: 0, // Would need to implement in the future
-    newUsersThisWeek: users.filter(u => {
+    newUsersThisWeek: users.filter((u: AdminUser) => {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      return new Date(u.createdAt) > oneWeekAgo;
+      return new Date(u.createdAt as string) > oneWeekAgo;
     }).length,
-    newToysThisWeek: toys.filter(t => {
+    newToysThisWeek: toys.filter((t: AdminToy) => {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      return new Date(t.createdAt) > oneWeekAgo;
+      return new Date(t.createdAt as string) > oneWeekAgo;
     }).length,
     sustainabilityImpact: {
-      toysReused: toys.filter(t => !t.isAvailable).length,
-      estimatedWasteSaved: `${toys.filter(t => !t.isAvailable).length * 2} kg`, // Assuming each toy saves ~2kg
-      co2Reduced: `${Math.round(toys.filter(t => !t.isAvailable).length * 1.5)} kg` // Assuming each toy saves ~1.5kg CO2
+      toysReused: toys.filter((t: AdminToy) => !t.isAvailable).length,
+      estimatedWasteSaved: `${toys.filter((t: AdminToy) => !t.isAvailable).length * 2} kg`, // Assuming each toy saves ~2kg
+      co2Reduced: `${Math.round(toys.filter((t: AdminToy) => !t.isAvailable).length * 1.5)} kg` // Assuming each toy saves ~1.5kg CO2
     }
   };
 
