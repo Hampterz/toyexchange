@@ -333,8 +333,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
     setAddedToy(null);
     onClose();
     
-    // Reload the page to refresh all data
-    window.location.reload();
+    // Use queryClient to invalidate and refetch only the toys data
+    queryClient.invalidateQueries({ queryKey: ['/api/toys'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/community-metrics'] });
   };
   
   // Show success page if a toy was just added

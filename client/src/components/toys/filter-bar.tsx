@@ -415,7 +415,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   
                   // If distance isn't set yet, set a default
                   if (!filters.distance) {
-                    handleFilterChange("distance", 75);
+                    handleFilterChange("distance", 10);
                   }
                 }
               }
