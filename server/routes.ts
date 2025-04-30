@@ -1,7 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import * as fs from "fs";
+import * as path from "path";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+import multer from "multer";
 import { 
   insertToySchema,
   insertMessageSchema,

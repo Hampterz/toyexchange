@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,9 +11,9 @@ import { ProfileToys } from "@/components/profile/profile-toys";
 import { ProfileRequests } from "@/components/profile/profile-requests";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, UploadCloud, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AddToyModal } from "@/components/toys/add-toy-modal";
 
 export default function ProfilePage() {
@@ -21,11 +21,14 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     location: user?.location || "",
     email: user?.email || "",
     locationPrivacy: user?.locationPrivacy || "city_only",
+    profilePicture: user?.profilePicture || "",
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
 
@@ -77,6 +80,78 @@ export default function ProfilePage() {
       locationPrivacy: value,
     }));
   };
+  
+  // Handle profile picture upload
+  const handleProfilePictureClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+  
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    // Check file size and type
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        title: "File Too Large",
+        description: "Please select an image less than 5MB in size.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please select a valid image file (JPEG, PNG, etc.).",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsImageUploading(true);
+    
+    try {
+      // Create FormData
+      const formData = new FormData();
+      formData.append('profilePicture', file);
+      
+      // Upload image
+      const response = await fetch(`/api/users/${user.id}/profile-picture`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) throw new Error('Failed to upload image');
+      
+      const data = await response.json();
+      
+      // Update profile data with new image URL
+      setProfileData(prev => ({
+        ...prev,
+        profilePicture: data.profilePicture
+      }));
+      
+      // Invalidate user data in cache to update avatar in header
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
+      toast({
+        title: "Profile Picture Updated",
+        description: "Your profile picture has been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload profile picture. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImageUploading(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -106,7 +181,30 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col items-center mb-6">
-                  <AvatarWithFallback user={user} className="h-24 w-24 mb-4" />
+                  <div className="relative group">
+                    <div 
+                      onClick={handleProfilePictureClick}
+                      className={`cursor-pointer relative ${isEditing ? 'hover:opacity-80' : ''}`}
+                    >
+                      <AvatarWithFallback user={user} className="h-24 w-24 mb-4" />
+                      {isEditing && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                          {isImageUploading ? (
+                            <Loader2 className="h-8 w-8 animate-spin text-white" />
+                          ) : (
+                            <Camera className="h-8 w-8 text-white" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </div>
                   {!isEditing ? (
                     <h2 className="text-xl font-bold">{user.name}</h2>
                   ) : (
@@ -119,6 +217,9 @@ export default function ProfilePage() {
                         onChange={handleInputChange}
                         className="mt-1"
                       />
+                      <p className="text-xs text-blue-500 mt-1">
+                        Click on your profile picture to change it
+                      </p>
                     </div>
                   )}
                 </div>
