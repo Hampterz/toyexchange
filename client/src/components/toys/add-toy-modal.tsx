@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Upload, AlertCircle, Tag, MapPin, Image as ImageIcon } from "lucide-react";
+import { X, Upload, AlertCircle, Tag, MapPin, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,14 +33,14 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/mov", "video/quicktime"];
 
 // Base schema from shared schema.ts, but with adjusted validation for form use
-// Greatly simplified schema with minimal validation for the form
+// Comprehensive validation to ensure all required fields are provided
 const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  ageRanges: z.array(z.string()).default([]),
-  condition: z.string().default("Like New"),
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  description: z.string().min(1, "Description is required").max(2000, "Description is too long"),
+  ageRanges: z.array(z.string()).min(1, "At least one age range is required"),
+  condition: z.string().min(1, "Condition is required"),
   location: z.string().min(1, "Location is required"),
-  imageFiles: z.any(),
+  imageFiles: z.any().refine(files => files && files.length > 0, "At least one image is required"),
   videoFiles: z.any().optional(),
   tags: z.array(z.string()).default([])
 });
@@ -392,36 +392,19 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             </div>
           ) : (
             <Form {...form}>
-              <form onSubmit={(e) => {
-                // Prevent default form submission
-                e.preventDefault();
+              <form onSubmit={form.handleSubmit((data) => {
+                // This will only run if validation passes on all fields
+                console.log("Form validation passed with data:", data);
                 
-                // Direct manual submission without any validation
+                // Include selected tags in the form data
                 const formData = {
-                  title: form.getValues().title || "Untitled Toy",
-                  description: form.getValues().description || "No description provided",
-                  ageRanges: form.getValues().ageRanges || ["0-12 months"],
-                  condition: form.getValues().condition || "Like New",
-                  location: form.getValues().location || user?.location || "Location not specified",
-                  imageFiles: form.getValues().imageFiles,
-                  videoFiles: form.getValues().videoFiles,
+                  ...data,
                   tags: selectedTags
                 };
                 
-                // Bypass form validation and submit directly 
-                if (!formData.imageFiles || (formData.imageFiles as any).length === 0) {
-                  toast({
-                    title: "Image Required",
-                    description: "Please upload at least one image of your toy.",
-                    variant: "destructive",
-                  });
-                  return;
-                }
-                
-                console.log("Manual form submission:", formData);
-                onSubmit(formData as FormValues);
-                
-              }} className="space-y-4">
+                // Now proceed with submission
+                onSubmit(formData);
+              })} className="space-y-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -752,6 +735,22 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 )}
               />
 
+              {/* Display form validation error summary if submit was attempted */}
+              {form.formState.submitCount > 0 && Object.keys(form.formState.errors).length > 0 && (
+                <div className="bg-red-50 text-red-800 p-3 rounded-md mb-4 border border-red-200">
+                  <h4 className="font-medium mb-1">Please fix the following issues:</h4>
+                  <ul className="list-disc pl-5 text-sm">
+                    {Object.entries(form.formState.errors).map(([field, error]) => (
+                      <li key={field}>
+                        {field === 'ageRanges' ? 'Age Range' : 
+                         field === 'imageFiles' ? 'Images' : 
+                         field.charAt(0).toUpperCase() + field.slice(1)}: {error?.message as string}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
               <div className="flex space-x-3 pt-2">
                 <Button 
                   type="button" 
@@ -765,17 +764,14 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   type="submit" 
                   className="flex-1 bg-blue-700 hover:bg-blue-800" 
                   disabled={isUploading || addToyMutation.isPending}
-                  onClick={(e) => {
-                    if (isUploading || addToyMutation.isPending) return;
-                    
-                    // Submit form
-                    const formElement = e.currentTarget.closest('form');
-                    if (formElement) {
-                      formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                    }
-                  }}
                 >
-                  {isUploading || addToyMutation.isPending ? "Uploading..." : "Share Toy"}
+                  {isUploading || addToyMutation.isPending ? 
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Uploading...
+                    </> : 
+                    "Share Toy"
+                  }
                 </Button>
               </div>
             </form>

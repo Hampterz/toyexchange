@@ -66,8 +66,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       const newFilters = { 
         ...filters, 
         location: [user.location],
-        latitude: user.latitude || undefined,
-        longitude: user.longitude || undefined
+        // Ensure latitude and longitude are converted to numbers
+        latitude: user.latitude ? Number(user.latitude) : undefined,
+        longitude: user.longitude ? Number(user.longitude) : undefined
       };
       setFilters(newFilters);
       
