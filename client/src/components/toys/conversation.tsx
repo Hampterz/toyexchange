@@ -34,7 +34,7 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
       }
       return res.json();
     },
-    refetchInterval: 5000, // Auto-refetch every 5 seconds to get new messages
+    refetchInterval: 1000, // Auto-refetch every 1 second to get new messages
   });
 
   // Send a new message
@@ -68,11 +68,10 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
     onSuccess: () => {
       setNewMessage("");
       // Immediately refetch the messages to show the new message
-      setTimeout(() => {
-        refetch();
-        queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
-        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      }, 300);
+      // No delay needed anymore since we've reduced the polling interval
+      refetch();
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onError: (error) => {
       console.error("Message send error:", error);
@@ -129,11 +128,9 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
       }
     },
     onSuccess: () => {
-      // Small delay to ensure DB operation completes before refetching
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
-        queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
-      }, 300);
+      // No delay needed - immediately update the UI
+      queryClient.invalidateQueries({ queryKey: [`/api/messages/${otherUserId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
     },
     onError: (error) => {
       console.error("Mark as read error:", error);
@@ -158,7 +155,7 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
             } catch (error) {
               console.error(`Failed to mark message ${message.id} as read:`, error);
             }
-          }, index * 200); // Stagger requests with 200ms delay between them
+          }, index * 50); // Reduced delay to 50ms between requests
         });
       }
     }
