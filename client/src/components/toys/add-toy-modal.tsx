@@ -483,36 +483,29 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="condition"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Condition</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select condition" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {CONDITIONS.map((condition) => (
-                          <SelectItem key={condition} value={condition}>
-                            {condition}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription className="text-xs mt-1">
-                      Like New = No visible wear / Gently Used = Minor wear / Used = Some visible wear / Well Loved = Significant wear but functional
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel>Condition</FormLabel>
+                <div className="relative">
+                  <select
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={form.getValues().condition || "Like New"}
+                    onChange={(e) => {
+                      form.setValue("condition", e.target.value);
+                    }}
+                  >
+                    <option value="" disabled>Select condition</option>
+                    {CONDITIONS.map((condition) => (
+                      <option key={condition} value={condition}>
+                        {condition}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <FormDescription className="text-xs mt-1">
+                  Like New = No visible wear / Gently Used = Minor wear / Used = Some visible wear / Well Loved = Significant wear but functional
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
 
               <FormField
                 control={form.control}
