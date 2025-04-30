@@ -716,24 +716,23 @@ export default function AdminDashboard() {
         <Dialog 
           open={selectedReportId !== null} 
           onOpenChange={(open) => !open && setSelectedReportId(null)}
-          className="overflow-y-auto"
         >
-          <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Report Details</DialogTitle>
-              <DialogDescription>
-                {contextLoading ? (
-                  "Loading report context..."
-                ) : reportContext ? (
-                  `Viewing context for reported message from ${reportContext.sender?.name || reportContext.sender?.username || "Unknown"} to ${reportContext.receiver?.name || reportContext.receiver?.username || "Unknown"}`
-                ) : (
-                  "Could not load report context"
-                )}
-              </DialogDescription>
-            </DialogHeader>
-            
-            <ScrollArea className="flex-1 max-h-[calc(90vh-180px)]">
-              <div className="flex-1 flex flex-col px-1 pb-4">
+          <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto p-6">
+            <div className="flex flex-col h-full">
+              <DialogHeader className="mb-4">
+                <DialogTitle>Report Details</DialogTitle>
+                <DialogDescription>
+                  {contextLoading ? (
+                    "Loading report context..."
+                  ) : reportContext ? (
+                    `Viewing context for reported message from ${reportContext.sender?.name || reportContext.sender?.username || "Unknown"} to ${reportContext.receiver?.name || reportContext.receiver?.username || "Unknown"}`
+                  ) : (
+                    "Could not load report context"
+                  )}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="flex-1 flex flex-col overflow-auto">
                 {contextLoading ? (
                   <div className="flex items-center justify-center py-10">
                     <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
@@ -781,7 +780,7 @@ export default function AdminDashboard() {
                     </div>
                     
                     <h3 className="font-medium text-blue-800 mb-2">Message Context</h3>
-                    <div className="rounded-md border p-4 bg-white min-h-[450px]">
+                    <div className="rounded-md border p-4 bg-white flex-1 overflow-auto">
                       <div className="space-y-4">
                         {reportContext.contextMessages.map((message, idx) => {
                           const isReportedMessage = idx === reportContext.targetIndex;
@@ -861,24 +860,24 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </div>
-            </ScrollArea>
-            
-            <DialogFooter className="flex justify-between mt-4">
-              <Button variant="outline" onClick={() => setSelectedReportId(null)}>
-                Close
-              </Button>
-              {reportContext && reportContext.report.status === "pending" && (
-                <Button
-                  onClick={() => {
-                    resolveReportMutation.mutate(reportContext.report.id);
-                    setSelectedReportId(null);
-                  }}
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                >
-                  Mark as Resolved
+              
+              <DialogFooter className="flex justify-between mt-4 pt-4 border-t">
+                <Button variant="outline" onClick={() => setSelectedReportId(null)}>
+                  Close
                 </Button>
-              )}
-            </DialogFooter>
+                {reportContext && reportContext.report.status === "pending" && (
+                  <Button
+                    onClick={() => {
+                      resolveReportMutation.mutate(reportContext.report.id);
+                      setSelectedReportId(null);
+                    }}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Mark as Resolved
+                  </Button>
+                )}
+              </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
