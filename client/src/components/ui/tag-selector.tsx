@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { COMMON_ATTRIBUTES } from "@shared/schema";
 
 interface TagSelectorProps {
   availableTags: string[];
@@ -88,7 +89,7 @@ export function TagSelector({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className="w-full max-w-[400px] p-0" align="start">
           <Command>
             <CommandInput 
               placeholder="Search tags..." 
@@ -96,7 +97,7 @@ export function TagSelector({
               onValueChange={updateFilteredTags}
               onKeyDown={handleInputKeyDown}
             />
-            <CommandList>
+            <CommandList className="max-h-[300px] overflow-auto">
               <CommandEmpty>
                 {allowCustomTags && inputValue.trim() !== "" ? (
                   <Button
@@ -116,26 +117,225 @@ export function TagSelector({
                   "No tags found."
                 )}
               </CommandEmpty>
-              <CommandGroup>
-                {filteredTags.map(tag => (
-                  <CommandItem
-                    key={tag}
-                    value={tag}
-                    onSelect={() => {
-                      toggleTag(tag);
-                      setInputValue("");
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {tag}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              
+              {/* If we're searching, show flat list of filtered tags */}
+              {inputValue.trim() !== "" ? (
+                <CommandGroup heading="Matching Tags">
+                  {filteredTags.map(tag => (
+                    <CommandItem
+                      key={tag}
+                      value={tag}
+                      onSelect={() => {
+                        toggleTag(tag);
+                        setInputValue("");
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {tag}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : (
+                // When not searching, show categories
+                <>
+                  {/* Educational Group */}
+                  <CommandGroup heading="Educational">
+                    {COMMON_ATTRIBUTES.filter(tag => 
+                      ["Educational", "STEM", "Science Kit", "Math Skills", "Reading", 
+                       "Language Development", "Geography", "History", "Coding", 
+                       "Problem Solving", "Memory Skills", "Learning Tools", 
+                       "Flash Cards", "Educational Games"].includes(tag) &&
+                      !selectedTags.includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+
+                  {/* Activities Group */}
+                  <CommandGroup heading="Activities">
+                    {COMMON_ATTRIBUTES.filter(tag => 
+                      ["Outdoor", "Indoor", "Creative", "Sports", "Active Play",
+                       "Quiet Play", "Pretend Play", "Dress Up", "Imaginative Play",
+                       "Cooperative Play", "Dramatic Play", "Solo Play", 
+                       "Group Activity", "Travel Friendly", "Water Play", 
+                       "Sand Play", "Bath Toys", "Camping"].includes(tag) &&
+                      !selectedTags.includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+
+                  {/* Materials Group */}
+                  <CommandGroup heading="Materials">
+                    {COMMON_ATTRIBUTES.filter(tag => 
+                      ["Wooden", "Plastic", "Plush", "Fabric", "Metal", 
+                       "Eco-Friendly", "Natural Materials", "Magnetic", 
+                       "Foam", "Silicone"].includes(tag) &&
+                      !selectedTags.includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+
+                  {/* Electronics Group */}
+                  <CommandGroup heading="Electronics">
+                    {COMMON_ATTRIBUTES.filter(tag => 
+                      ["Electronic", "Battery Operated", "Rechargeable", 
+                       "Lights", "Sounds", "Music", "Interactive", 
+                       "Talking", "Remote Control", "Digital", 
+                       "Screen-Free"].includes(tag) &&
+                      !selectedTags.includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+
+                  {/* Arts Group */}
+                  <CommandGroup heading="Arts & Crafts">
+                    {COMMON_ATTRIBUTES.filter(tag => 
+                      ["Musical", "Art", "Crafts", "Drawing", "Painting", 
+                       "Coloring", "Musical Instruments", "Clay Modeling", 
+                       "Beading", "Jewelry Making", "Knitting", "Sewing"].includes(tag) &&
+                      !selectedTags.includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+
+                  {/* Toy Types Group */}
+                  <CommandGroup heading="Toy Types">
+                    {COMMON_ATTRIBUTES.filter(tag => 
+                      ["Dolls", "Action Figures", "Vehicles", "Cars", "Trucks",
+                       "Trains", "Airplanes", "Building", "Blocks", "Construction",
+                       "Lego Compatible", "Puzzles", "Games", "Board Games",
+                       "Card Games", "Strategy Games"].includes(tag) &&
+                      !selectedTags.includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  
+                  {/* Other tags that don't fit into the above categories */}
+                  <CommandGroup heading="Other Tags">
+                    {availableTags.filter(tag => 
+                      !selectedTags.includes(tag) &&
+                      ![...COMMON_ATTRIBUTES].includes(tag)
+                    ).map(tag => (
+                      <CommandItem
+                        key={tag}
+                        value={tag}
+                        onSelect={() => {
+                          toggleTag(tag);
+                          setInputValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </>
+              )}
             </CommandList>
           </Command>
         </PopoverContent>
