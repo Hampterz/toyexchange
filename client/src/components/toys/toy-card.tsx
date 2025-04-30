@@ -322,6 +322,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                           badgeName={toyOwner.currentBadge} 
                           className="ml-1 text-sm" 
                           showTooltip={true}
+                          iconOnly={true}
                         />
                       )}
                     </div>

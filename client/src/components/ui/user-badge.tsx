@@ -14,6 +14,7 @@ interface UserBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   showTooltip?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  iconOnly?: boolean;
 }
 
 const badgeConfig: Record<string, {
@@ -73,6 +74,7 @@ export function UserBadge({
   showTooltip = false,
   size = 'md',
   className,
+  iconOnly = false,
   ...props
 }: UserBadgeProps) {
   const badgeInfo = badgeConfig[badgeName] || {
@@ -98,13 +100,14 @@ export function UserBadge({
       className={cn(
         badgeInfo.color,
         'font-medium border-transparent flex items-center gap-1',
+        iconOnly && 'px-1 py-1 rounded-full',
         sizeClasses[size],
         className
       )}
       {...props}
     >
       {badgeInfo.icon}
-      <span>{formattedBadgeName}</span>
+      {!iconOnly && <span>{formattedBadgeName}</span>}
     </Badge>
   );
 
