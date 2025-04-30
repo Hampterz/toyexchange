@@ -4,10 +4,32 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
-import { Send, Loader2, Trash2 } from "lucide-react";
+import { Send, Loader2, Trash2, Flag } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { Message, User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ConversationProps {
   userId: number;
@@ -20,6 +42,9 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
   const queryClient = useQueryClient();
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [reportReason, setReportReason] = useState<string>("");
+  const [messageToReport, setMessageToReport] = useState<number | null>(null);
   
   // Get messages between the two users
   const { data: messages, isLoading, refetch } = useQuery<Message[]>({
@@ -137,6 +162,41 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
       // We'll handle the error silently to prevent disrupting the user experience
     }
   });
+  
+  // Report message mutation
+  const reportMessageMutation = useMutation({
+    mutationFn: async ({ messageId, reason }: { messageId: number; reason: string }) => {
+      try {
+        const res = await apiRequest("POST", `/api/reports`, {
+          targetId: messageId,
+          targetType: "message",
+          reason,
+          details: `Reported message from user ${otherUserId}`
+        });
+        return await res.json();
+      } catch (error) {
+        console.error("Report message error:", error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      setIsReportDialogOpen(false);
+      setMessageToReport(null);
+      setReportReason("");
+      
+      toast({
+        title: "Message reported",
+        description: "Thank you for helping to keep our community safe",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to report message",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    }
+  });
 
   // Mark unread messages as read when conversation is opened
   useEffect(() => {
@@ -181,11 +241,27 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
     );
   }
 
+  // Handle opening the report dialog
+  const handleReportMessage = (messageId: number) => {
+    setMessageToReport(messageId);
+    setIsReportDialogOpen(true);
+  };
+
+  // Handle submitting the report
+  const handleSubmitReport = () => {
+    if (!messageToReport || !reportReason) return;
+    
+    reportMessageMutation.mutate({
+      messageId: messageToReport,
+      reason: reportReason
+    });
+  };
+
   return (
     <Card className="h-[600px] flex flex-col shadow-none border-none">
       <CardHeader className="border-b px-4 py-3 flex-shrink-0 bg-white">
         <div className="flex items-center space-x-3">
-          <AvatarWithFallback user={otherUser ?? null} className="border-2 border-blue-100" />
+          <AvatarWithFallback user={otherUser || undefined} className="border-2 border-blue-100" />
           <div>
             <h3 className="font-medium">{otherUser?.name || "User"}</h3>
             {otherUser?.locationPrivacy === 'exact_location' && (
@@ -217,44 +293,72 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
               >
                 {!isSentByMe && (
                   <div className="mr-2 self-end mb-1">
-                    <AvatarWithFallback user={otherUser ?? null} className="h-6 w-6" />
+                    <AvatarWithFallback user={otherUser || undefined} className="h-6 w-6" />
                   </div>
                 )}
-                <div 
-                  className={`max-w-[75%] group relative ${
-                    isSentByMe 
-                      ? 'bg-primary text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
-                      : 'bg-white text-gray-800 border border-gray-200 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
-                  } px-4 py-2`}
-                >
-                  {/* Delete button for unread messages sent by current user */}
-                  {isSentByMe && !message.read && (
-                    <button
-                      onClick={() => {
-                        if (window.confirm("Are you sure you want to delete this message?")) {
-                          deleteMessageMutation.mutate(message.id);
-                        }
-                      }}
-                      className="absolute -right-3 -top-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Delete message"
+                
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <div 
+                      className={`max-w-[75%] group relative ${
+                        isSentByMe 
+                          ? 'bg-primary text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
+                          : 'bg-white text-gray-800 border border-gray-200 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
+                      } px-4 py-2`}
                     >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  )}
-                  <p>{message.content}</p>
-                  <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                    <div className="flex justify-between">
-                      <span>
-                        {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                      </span>
-                      {isSentByMe && (
-                        <span className="text-[10px] pl-2">
-                          {message.read ? "Read" : "Delivered"}
-                        </span>
+                      {/* Delete button for unread messages sent by current user */}
+                      {isSentByMe && !message.read && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this message?")) {
+                              deleteMessageMutation.mutate(message.id);
+                            }
+                          }}
+                          className="absolute -right-3 -top-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Delete message"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
                       )}
+                      <p>{message.content}</p>
+                      <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                        <div className="flex justify-between">
+                          <span>
+                            {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                          </span>
+                          {isSentByMe && (
+                            <span className="text-[10px] pl-2">
+                              {message.read ? "Read" : "Delivered"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    {isSentByMe ? (
+                      <ContextMenuItem 
+                        onClick={() => {
+                          if (window.confirm("Are you sure you want to delete this message?")) {
+                            deleteMessageMutation.mutate(message.id);
+                          }
+                        }}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Message
+                      </ContextMenuItem>
+                    ) : (
+                      <ContextMenuItem 
+                        onClick={() => handleReportMessage(message.id)} 
+                        className="text-amber-600"
+                      >
+                        <Flag className="h-4 w-4 mr-2" />
+                        Report Message
+                      </ContextMenuItem>
+                    )}
+                  </ContextMenuContent>
+                </ContextMenu>
               </div>
             );
           })
@@ -292,6 +396,54 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
           </Button>
         </form>
       </CardFooter>
+
+      {/* Report Message Dialog */}
+      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Report Message</DialogTitle>
+            <DialogDescription>
+              Please select a reason for reporting this message. This will be reviewed by our moderation team.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 space-y-4">
+            <Select 
+              value={reportReason} 
+              onValueChange={setReportReason}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a reason" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="inappropriate_content">Inappropriate Content</SelectItem>
+                <SelectItem value="harassment">Harassment</SelectItem>
+                <SelectItem value="spam">Spam</SelectItem>
+                <SelectItem value="scam">Scam/Fraud</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setIsReportDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmitReport}
+              disabled={!reportReason || reportMessageMutation.isPending}
+              className="ml-2"
+            >
+              {reportMessageMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                "Submit Report"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
