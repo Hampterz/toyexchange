@@ -163,13 +163,10 @@ export default function AdminDashboard() {
   // Use the actual data from the server API endpoints
   // We already have users, toys, reports and contactMessages data from the queries above
 
-  // Platform statistics based on real data
+  // Platform statistics from real API data - no fake numbers or calculations
   const stats = {
     totalUsers: users.length,
     totalToys: toys.length,
-    activeExchanges: 0, // Would need to implement in the future
-    completedExchanges: users.reduce((total: number, user: AdminUser) => total + (user.successfulExchanges || 0), 0),
-    averageRating: 0, // Would need to implement in the future
     newUsersThisWeek: users.filter((u: AdminUser) => {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -180,11 +177,8 @@ export default function AdminDashboard() {
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       return new Date(t.createdAt as string) > oneWeekAgo;
     }).length,
-    sustainabilityImpact: {
-      toysReused: toys.filter((t: AdminToy) => !t.isAvailable).length,
-      estimatedWasteSaved: `${toys.filter((t: AdminToy) => !t.isAvailable).length * 2} kg`, // Assuming each toy saves ~2kg
-      co2Reduced: `${Math.round(toys.filter((t: AdminToy) => !t.isAvailable).length * 1.5)} kg` // Assuming each toy saves ~1.5kg CO2
-    }
+    // Only count toys marked as not available as truly exchanged
+    toysExchanged: toys.filter((t: AdminToy) => !t.isAvailable).length
   };
 
   if (!user || usersLoading) {
@@ -264,24 +258,24 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-blue-700 text-lg flex items-center">
-                    <TrendingUp className="mr-2 h-5 w-5" /> Exchanges
+                    <TrendingUp className="mr-2 h-5 w-5" /> Exchanged Toys
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-800">{stats.completedExchanges}</div>
-                  <p className="text-sm text-blue-600 mt-1">{stats.activeExchanges} active</p>
+                  <div className="text-3xl font-bold text-blue-800">{stats.toysExchanged}</div>
+                  <p className="text-sm text-blue-600 mt-1">Toys marked as unavailable</p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-blue-700 text-lg flex items-center">
-                    <BarChart3 className="mr-2 h-5 w-5" /> Rating
+                    <BarChart3 className="mr-2 h-5 w-5" /> Total Reports
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-800">{stats.averageRating}/5</div>
-                  <p className="text-sm text-blue-600 mt-1">Average community rating</p>
+                  <div className="text-3xl font-bold text-blue-800">{reports.length}</div>
+                  <p className="text-sm text-blue-600 mt-1">{reports.filter(r => r.status === "pending").length} pending</p>
                 </CardContent>
               </Card>
             </div>
@@ -336,15 +330,15 @@ export default function AdminDashboard() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-blue-700">Toys Reused</span>
-                    <span className="font-bold text-blue-800">{stats.sustainabilityImpact.toysReused}</span>
+                    <span className="font-bold text-blue-800">{stats.toysExchanged}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-700">Waste Saved</span>
-                    <span className="font-bold text-blue-800">{stats.sustainabilityImpact.estimatedWasteSaved}</span>
+                    <span className="text-blue-700">User Engagement</span>
+                    <span className="font-bold text-blue-800">{users.length > 0 ? Math.round((toys.length / users.length) * 10) / 10 : 0} toys/user</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-700">CO2 Reduction</span>
-                    <span className="font-bold text-blue-800">{stats.sustainabilityImpact.co2Reduced}</span>
+                    <span className="text-blue-700">Community Size</span>
+                    <span className="font-bold text-blue-800">{users.length} users</span>
                   </div>
                   
                   <div className="mt-6 pt-6 border-t border-blue-100">
@@ -435,13 +429,13 @@ export default function AdminDashboard() {
                   {reports && reports.filter(r => r.status === "pending").slice(0, 3).map((report) => (
                     <div key={report.id} className="mb-4 pb-4 border-b border-blue-100 last:border-0 last:mb-0 last:pb-0">
                       <div className="flex justify-between">
-                        <h4 className="font-medium text-blue-700">{report.reportType}</h4>
+                        <h4 className="font-medium text-blue-700">{report.targetType}</h4>
                         <Badge variant="destructive" className="text-xs">
                           {report.status}
                         </Badge>
                       </div>
-                      <p className="text-sm text-blue-600 mt-1">{report.reportedItem.name}</p>
-                      <p className="text-xs text-blue-500 mt-1">Reported by: {report.reportedBy.name}</p>
+                      <p className="text-sm text-blue-600 mt-1">{report.reason}</p>
+                      <p className="text-xs text-blue-500 mt-1">Reported by: User #{report.reporterId}</p>
                     </div>
                   ))}
                   <Button 
@@ -600,11 +594,11 @@ export default function AdminDashboard() {
                     <TableBody>
                       {reports && reports.map((report) => (
                         <TableRow key={report.id}>
-                          <TableCell className="font-medium">{report.reportType || "User Report"}</TableCell>
-                          <TableCell>Item #{report.reportedItemId}</TableCell>
-                          <TableCell className="hidden md:table-cell">User #{report.reportedById}</TableCell>
+                          <TableCell className="font-medium">{report.targetType || "User Report"}</TableCell>
+                          <TableCell>Item #{report.targetId}</TableCell>
+                          <TableCell className="hidden md:table-cell">User #{report.reporterId}</TableCell>
                           <TableCell className="hidden md:table-cell">
-                            {new Date(report.createdAt).toLocaleDateString()}
+                            {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown'}
                           </TableCell>
                           <TableCell>
                             <Badge variant={report.status === "resolved" ? "outline" : "destructive"}>
