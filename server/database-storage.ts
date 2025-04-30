@@ -479,6 +479,18 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updatedMessage;
   }
+  
+  async deleteMessage(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(messages)
+        .where(eq(messages.id, id));
+      
+      return true;
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      return false;
+    }
+  }
 
   // ==================== ToyRequest CRUD Methods ====================
   async getToyRequest(id: number): Promise<ToyRequest | undefined> {

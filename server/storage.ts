@@ -514,6 +514,15 @@ export class MemStorage implements IStorage {
     this.messagesMap.set(id, updatedMessage);
     return updatedMessage;
   }
+  
+  async deleteMessage(id: number): Promise<boolean> {
+    const messageExists = this.messagesMap.has(id);
+    if (messageExists) {
+      this.messagesMap.delete(id);
+      return true;
+    }
+    return false;
+  }
 
   // ToyRequest CRUD methods
   async getToyRequest(id: number): Promise<ToyRequest | undefined> {
