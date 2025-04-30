@@ -562,7 +562,40 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                               name={name}
                               onBlur={onBlur}
                               onChange={(e) => {
-                                onChange(e.target.files);
+                                if (e.target.files && e.target.files.length > 0) {
+                                  // Create a DataTransfer object to build a new FileList
+                                  const dataTransfer = new DataTransfer();
+                                  
+                                  // Add existing URLs to the list for preview
+                                  const newImageUrls = [...imageUrls];
+                                  
+                                  // Add new files
+                                  Array.from(e.target.files).forEach(file => {
+                                    dataTransfer.items.add(file);
+                                    
+                                    // Create URL for preview
+                                    const url = URL.createObjectURL(file);
+                                    if (!newImageUrls.includes(url)) {
+                                      newImageUrls.push(url);
+                                    }
+                                  });
+                                  
+                                  // Ensure we don't exceed 4 images maximum
+                                  while (dataTransfer.files.length > 4) {
+                                    dataTransfer.items.remove(dataTransfer.items.length - 1);
+                                    if (newImageUrls.length > 4) {
+                                      newImageUrls.pop();
+                                    }
+                                  }
+                                  
+                                  // Update image previews
+                                  setImageUrls(newImageUrls.slice(0, 4));
+                                  
+                                  // Update the form with the combined files
+                                  onChange(dataTransfer.files);
+                                } else {
+                                  onChange(e.target.files);
+                                }
                               }}
                             />
                           </FormControl>
