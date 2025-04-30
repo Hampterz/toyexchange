@@ -669,6 +669,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get message context for a reported message (admin only)
+  app.get("/api/admin/reports/:id/context", ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const report = await storage.getReport(reportId);
+      
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      
+      // Only handle message reports
+      if (report.targetType !== "message") {
+        return res.status(400).json({ message: "Only message reports support context viewing" });
+      }
+      
+      const targetMessageId = report.targetId;
+      const targetMessage = await storage.getMessage(targetMessageId);
+      
+      if (!targetMessage) {
+        return res.status(404).json({ message: "Reported message not found" });
+      }
+      
+      // Get messages between these users to establish context
+      const messages = await storage.getMessagesBetweenUsers(
+        targetMessage.senderId, 
+        targetMessage.receiverId
+      );
+      
+      // Find the index of the reported message
+      const targetIndex = messages.findIndex(msg => msg.id === targetMessageId);
+      
+      if (targetIndex === -1) {
+        return res.json({ targetMessage, contextMessages: [] });
+      }
+      
+      // Get context (4 messages before and 4 after)
+      const startIndex = Math.max(0, targetIndex - 4);
+      const endIndex = Math.min(messages.length - 1, targetIndex + 4);
+      const contextMessages = messages.slice(startIndex, endIndex + 1);
+      
+      // Get user info for sender and receiver
+      const sender = await storage.getUser(targetMessage.senderId);
+      const receiver = await storage.getUser(targetMessage.receiverId);
+      
+      res.json({
+        targetMessage,
+        contextMessages,
+        targetIndex: targetIndex - startIndex, // Adjusted index in the context array
+        sender: sender ? { id: sender.id, name: sender.name || sender.username, username: sender.username } : null,
+        receiver: receiver ? { id: receiver.id, name: receiver.name || receiver.username, username: receiver.username } : null,
+        report
+      });
+    } catch (error) {
+      console.error("Error fetching report context:", error);
+      res.status(500).json({ message: "Failed to fetch report context" });
+    }
+  });
+  
   // Delete toy (admin only)
   app.delete("/api/admin/toys/:id", ensureAuthenticated, ensureAdmin, async (req, res) => {
     try {

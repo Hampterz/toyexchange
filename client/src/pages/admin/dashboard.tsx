@@ -22,10 +22,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getQueryFn, queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { User, Toy, Report, ContactMessage } from "@shared/schema";
+import { User, Toy, Report, ContactMessage, Message } from "@shared/schema";
 
 // Define interfaces for structured data
 interface AdminUser extends User {
@@ -37,12 +47,23 @@ interface AdminToy extends Toy {
   userName?: string;
 }
 
+// Message context interface for report details dialog
+interface MessageContext {
+  targetMessage: Message;
+  contextMessages: Message[];
+  targetIndex: number;
+  sender: { id: number; name: string; username: string } | null;
+  receiver: { id: number; name: string; username: string } | null;
+  report: Report;
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
   
   // Resolve report mutation
   const resolveReportMutation = useMutation({
@@ -113,6 +134,20 @@ export default function AdminDashboard() {
     queryKey: ["/api/admin/contact-messages"],
     queryFn: getQueryFn({ on401: "throw" }),
     enabled: !!user && user.username === "adminsreyas",
+  });
+  
+  // Fetch report context for selected report
+  const {
+    data: reportContext,
+    isLoading: contextLoading
+  } = useQuery<MessageContext>({
+    queryKey: ["/api/admin/reports", selectedReportId, "context"],
+    queryFn: async () => {
+      if (!selectedReportId) throw new Error("No report selected");
+      const res = await apiRequest("GET", `/api/admin/reports/${selectedReportId}/context`);
+      return res.json();
+    },
+    enabled: !!selectedReportId && !!user && user.username === "adminsreyas",
   });
 
   // Admin mutations
@@ -609,7 +644,14 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 mr-2">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 mr-2"
+                                onClick={() => setSelectedReportId(report.id)}
+                                disabled={report.targetType !== "message"}
+                                title={report.targetType !== "message" ? "Only message reports show context" : "View report context"}
+                              >
                                 <Eye className="h-4 w-4" />
                               </Button>
                               {report.status === "pending" ? (
@@ -669,6 +711,173 @@ export default function AdminDashboard() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Report Detail Dialog for showing message context */}
+        <Dialog 
+          open={selectedReportId !== null} 
+          onOpenChange={(open) => !open && setSelectedReportId(null)}
+        >
+          <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+            <DialogHeader>
+              <DialogTitle>Report Details</DialogTitle>
+              <DialogDescription>
+                {contextLoading ? (
+                  "Loading report context..."
+                ) : reportContext ? (
+                  `Viewing context for reported message from ${reportContext.sender?.name || reportContext.sender?.username || "Unknown"} to ${reportContext.receiver?.name || reportContext.receiver?.username || "Unknown"}`
+                ) : (
+                  "Could not load report context"
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 overflow-hidden flex flex-col">
+              {contextLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+                </div>
+              ) : reportContext ? (
+                <>
+                  <div className="bg-blue-50 p-4 rounded-md mb-4">
+                    <h3 className="font-medium text-blue-800 mb-2">Report Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-blue-700">Reported By:</span>
+                        <span className="text-sm">User #{reportContext.report.reporterId}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-blue-700">Date Reported:</span>
+                        <span className="text-sm">
+                          {reportContext.report.createdAt ? 
+                            new Date(reportContext.report.createdAt instanceof Date ? 
+                              reportContext.report.createdAt : 
+                              String(reportContext.report.createdAt)
+                            ).toLocaleString() : 
+                            'Unknown'
+                          }
+                        </span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-blue-700">Reason:</span>
+                        <span className="text-sm">{reportContext.report.reason}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-blue-700">Status:</span>
+                        <span className="text-sm flex items-center">
+                          <Badge variant={reportContext.report.status === "resolved" ? "outline" : "destructive"}>
+                            {reportContext.report.status}
+                          </Badge>
+                        </span>
+                      </div>
+                      {reportContext.report.details && (
+                        <div className="flex flex-col col-span-2">
+                          <span className="text-sm font-medium text-blue-700">Additional Details:</span>
+                          <p className="text-sm">{reportContext.report.details}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <h3 className="font-medium text-blue-800 mb-2">Message Context</h3>
+                  <ScrollArea className="h-[350px] rounded-md border p-4">
+                    <div className="space-y-4">
+                      {reportContext.contextMessages.map((message, idx) => {
+                        const isReportedMessage = idx === reportContext.targetIndex;
+                        const isSender = message.senderId === reportContext.sender?.id;
+                        
+                        return (
+                          <div 
+                            key={message.id} 
+                            className={`flex ${isSender ? 'justify-start' : 'justify-end'}`}
+                          >
+                            <div className={`
+                              flex items-start gap-2 max-w-[80%] group
+                              ${isReportedMessage ? 'relative' : ''}
+                            `}>
+                              {isSender && (
+                                <Avatar className="h-8 w-8 mt-1">
+                                  <AvatarFallback className="bg-blue-100 text-blue-800">
+                                    {reportContext.sender?.name?.charAt(0) || reportContext.sender?.username?.charAt(0) || '?'}
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                              
+                              <div>
+                                {isSender && (
+                                  <p className="text-xs text-blue-600 ml-1 mb-1">
+                                    {reportContext.sender?.name || reportContext.sender?.username}
+                                  </p>
+                                )}
+                                
+                                <div className={`
+                                  rounded-lg px-3 py-2 text-sm
+                                  ${isSender 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-blue-500 text-white'
+                                  }
+                                  ${isReportedMessage 
+                                    ? 'ring-2 ring-red-500 dark:ring-red-400' 
+                                    : ''
+                                  }
+                                `}>
+                                  {message.content}
+                                  <div className="text-xs opacity-70 mt-1 text-right">
+                                    {message.createdAt ? 
+                                      new Date(message.createdAt instanceof Date ? 
+                                        message.createdAt : 
+                                        String(message.createdAt)
+                                      ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
+                                      ''
+                                    }
+                                  </div>
+                                </div>
+                                
+                                {isReportedMessage && (
+                                  <div className="mt-1 text-xs text-red-500 font-medium ml-1">
+                                    ↑ Reported message
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {!isSender && (
+                                <Avatar className="h-8 w-8 mt-1">
+                                  <AvatarFallback className="bg-blue-300 text-blue-800">
+                                    {reportContext.receiver?.name?.charAt(0) || reportContext.receiver?.username?.charAt(0) || '?'}
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
+                </>
+              ) : (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800">
+                  <p>Could not load message context. The report might not be a message report, or the message may have been deleted.</p>
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setSelectedReportId(null)}>
+                Close
+              </Button>
+              {reportContext && reportContext.report.status === "pending" && (
+                <Button
+                  onClick={() => {
+                    resolveReportMutation.mutate(reportContext.report.id);
+                    setSelectedReportId(null);
+                  }}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  Mark as Resolved
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
