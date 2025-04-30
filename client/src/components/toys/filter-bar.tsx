@@ -128,7 +128,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               onAddressSelect={(address, coordinates, placeId) => {
                 // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
                 // or if it has coordinates (both ensure a complete address was selected)
-                if (address && !filters.location.includes(address) && (placeId || coordinates)) {
+                if (address && (placeId || coordinates)) {
                   // Clear any previous locations (we're setting a new primary location)
                   handleFilterChange("location", [address]);
                   
@@ -137,9 +137,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     handleFilterChange("latitude", coordinates.latitude);
                     handleFilterChange("longitude", coordinates.longitude);
                     
-                    // Set a smaller default distance radius - 10 miles is more reasonable
+                    // Set a smaller default distance radius - 5 miles is more reasonable
                     // This will show only truly local results
-                    handleFilterChange("distance", 10);
+                    handleFilterChange("distance", 5);
                     
                     // Apply filter immediately when user selects a location
                     onFilterChange({
@@ -147,7 +147,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                       location: [address],
                       latitude: coordinates.latitude,
                       longitude: coordinates.longitude,
-                      distance: 10
+                      distance: 5
                     });
                   }
                 }
@@ -159,10 +159,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <div className="mt-3 mb-3 px-1">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-medium text-blue-700">Radius</h4>
-              <span className="text-xs font-medium text-blue-700">{filters.distance || 10} miles</span>
+              <span className="text-xs font-medium text-blue-700">{filters.distance || 5} miles</span>
             </div>
             <Slider
-              value={[filters.distance || 10]}
+              value={[filters.distance || 5]}
               min={1}
               max={100}
               step={1}
@@ -426,7 +426,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   
                   // If distance isn't set yet, set a default
                   if (!filters.distance) {
-                    handleFilterChange("distance", 10);
+                    handleFilterChange("distance", 5);
                   }
                 }
               }
@@ -471,12 +471,12 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mt-4 mb-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-medium text-blue-700">Radius</h4>
-            <span className="text-sm font-medium text-blue-700">{filters.distance || 10} miles</span>
+            <span className="text-sm font-medium text-blue-700">{filters.distance || 5} miles</span>
           </div>
           <div className="flex items-center gap-2">
             <Ruler className="h-4 w-4 text-blue-600" />
             <Slider
-              value={[filters.distance || 10]}
+              value={[filters.distance || 5]}
               min={1}
               max={100}
               step={1}
