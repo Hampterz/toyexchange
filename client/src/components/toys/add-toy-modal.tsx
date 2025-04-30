@@ -332,6 +332,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
     setShowSuccessPage(false);
     setAddedToy(null);
     onClose();
+    
+    // Reload the page to refresh all data
+    window.location.reload();
   };
   
   // Show success page if a toy was just added
@@ -690,25 +693,31 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                             
                             {/* Dropdown for tag selection */}
                             {showTagSelector && (
-                              <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
-                                <div className="max-h-60 overflow-auto p-2">
-                                  {COMMON_ATTRIBUTES.map(tag => (
-                                    <div 
-                                      key={tag}
-                                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                                      onClick={() => toggleTag(tag)}
-                                    >
-                                      <input 
-                                        type="checkbox" 
-                                        checked={selectedTags.includes(tag)}
-                                        readOnly
-                                        className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
-                                      />
-                                      <span>{tag}</span>
-                                    </div>
-                                  ))}
+                              <>
+                                <div 
+                                  className="fixed inset-0 z-0"
+                                  onClick={() => setShowTagSelector(false)}
+                                ></div>
+                                <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
+                                  <div className="max-h-60 overflow-auto p-2">
+                                    {COMMON_ATTRIBUTES.map(tag => (
+                                      <div 
+                                        key={tag}
+                                        className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                        onClick={() => toggleTag(tag)}
+                                      >
+                                        <input 
+                                          type="checkbox" 
+                                          checked={selectedTags.includes(tag)}
+                                          readOnly
+                                          className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
+                                        />
+                                        <span>{tag}</span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
+                              </>
                             )}
                           </div>
                           

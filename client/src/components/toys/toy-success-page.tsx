@@ -175,26 +175,14 @@ export function ToySuccessPage({ isOpen, onClose, toy }: ToySuccessPageProps) {
             </div>
           </div>
 
-          <div className="flex justify-between pt-3">
+          <div className="flex justify-center pt-3">
             <Button 
-              variant="ghost" 
+              variant="default" 
               onClick={onClose}
-              className="flex items-center"
+              className="flex items-center bg-blue-700 hover:bg-blue-800"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
-            </Button>
-            <Button
-              className="bg-blue-700 hover:bg-blue-800"
-              onClick={() => {
-                onClose();
-                if (toy?.id) {
-                  setLocation(`/toy/${toy.id}`);
-                }
-              }}
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              View Listing
             </Button>
           </div>
         </div>

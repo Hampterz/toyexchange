@@ -48,7 +48,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
-    distance: initialFilters?.distance || 75, // Default to 75 miles
+    distance: initialFilters?.distance || 10, // Default to 10 miles
     latitude: initialFilters?.latitude,
     longitude: initialFilters?.longitude,
   });
