@@ -333,9 +333,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
     setAddedToy(null);
     onClose();
     
-    // Use queryClient to invalidate and refetch only the toys data
+    // Use queryClient to invalidate and refetch all relevant queries
     queryClient.invalidateQueries({ queryKey: ['/api/toys'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/toys/by-user'] });
     queryClient.invalidateQueries({ queryKey: ['/api/community-metrics'] });
+    // Also invalidate any queries that might include our location/distance parameters
+    queryClient.invalidateQueries({ queryKey: ['/api/toys?'] });
   };
   
   // Show success page if a toy was just added

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { FilterBar, FilterOptions } from "@/components/toys/filter-bar";
 import { ToyList } from "@/components/toys/toy-list";
@@ -24,8 +24,29 @@ export default function HomePage() {
     condition: [],
     tags: [],
     search: "",
+    distance: 10, // Default distance of 10 miles
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
+  
+  // Get user's location on page load to apply distance filtering
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setFilters(prev => ({
+            ...prev,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            distance: prev.distance || 10 // Ensure a default value
+          }));
+        },
+        (error) => {
+          console.log("Unable to get location: ", error.message);
+          // Don't show error to user, just silently fail and show all toys
+        }
+      );
+    }
+  }, []);
   
   // Query for community metrics
   const { data: communityMetrics } = useQuery<{ 
