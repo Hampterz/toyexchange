@@ -123,6 +123,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
             <AddressAutocomplete
               placeholder="Search for location..."
+              defaultValue={filters.location.length > 0 ? filters.location[0] : ""}
               className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
               onAddressSelect={(address, coordinates, placeId) => {
                 // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
@@ -409,13 +410,14 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mb-3">
           <AddressAutocomplete
             placeholder="Search for location..."
+            defaultValue={filters.location.length > 0 ? filters.location[0] : ""}
             className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
             onAddressSelect={(address, coordinates, placeId) => {
               // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
               // or if it has coordinates (both ensure a complete address was selected)
-              if (address && !filters.location.includes(address) && (placeId || coordinates)) {
-                const newLocations = [...filters.location, address];
-                handleFilterChange("location", newLocations);
+              if (address && (placeId || coordinates)) {
+                // Replace previous location with this one (we're setting a new primary location)
+                handleFilterChange("location", [address]);
                 
                 // If we have coordinates, update the latitude and longitude
                 if (coordinates) {
