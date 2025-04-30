@@ -196,11 +196,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/toys/by-user", ensureAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
+      console.log("Fetching toys for user ID:", userId);
       const toys = await storage.getToysByUser(userId);
+      console.log("Retrieved toys:", toys);
       res.json(toys);
     } catch (error) {
       console.error("Error fetching toys by user:", error);
-      res.status(500).json({ message: "Failed to fetch toy" });
+      res.status(500).json({ message: "Failed to fetch toys", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
