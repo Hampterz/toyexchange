@@ -48,7 +48,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
-    distance: initialFilters?.distance || 10, // Default to 10 miles
+    distance: initialFilters?.distance || 75, // Default to 75 miles
     latitude: initialFilters?.latitude,
     longitude: initialFilters?.longitude,
   });
@@ -122,7 +122,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2 shadow-sm">
             <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
             <AddressAutocomplete
-              placeholder="Location..."
+              placeholder="Search for location..."
               className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
               onAddressSelect={(address, coordinates, placeId) => {
                 // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
@@ -137,7 +137,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     
                     // If distance isn't set yet, set a default
                     if (!filters.distance) {
-                      handleFilterChange("distance", 10);
+                      handleFilterChange("distance", 75);
                     }
                   }
                 }
@@ -149,10 +149,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <div className="mt-3 mb-3 px-1">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-medium text-blue-700">Radius</h4>
-              <span className="text-xs font-medium text-blue-700">{filters.distance || 10} miles</span>
+              <span className="text-xs font-medium text-blue-700">{filters.distance || 75} miles</span>
             </div>
             <Slider
-              value={[filters.distance || 10]}
+              value={[filters.distance || 75]}
               min={1}
               max={100}
               step={1}
@@ -399,7 +399,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         {/* Google Maps Address Autocomplete */}
         <div className="mb-3">
           <AddressAutocomplete
-            placeholder="Location..."
+            placeholder="Search for location..."
             className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
             onAddressSelect={(address, coordinates, placeId) => {
               // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
@@ -415,7 +415,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   
                   // If distance isn't set yet, set a default
                   if (!filters.distance) {
-                    handleFilterChange("distance", 10);
+                    handleFilterChange("distance", 75);
                   }
                 }
               }
@@ -460,12 +460,12 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mt-4 mb-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-medium text-blue-700">Radius</h4>
-            <span className="text-sm font-medium text-blue-700">{filters.distance || 10} miles</span>
+            <span className="text-sm font-medium text-blue-700">{filters.distance || 75} miles</span>
           </div>
           <div className="flex items-center gap-2">
             <Ruler className="h-4 w-4 text-blue-600" />
             <Slider
-              value={[filters.distance || 10]}
+              value={[filters.distance || 75]}
               min={1}
               max={100}
               step={1}
