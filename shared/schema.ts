@@ -286,7 +286,6 @@ export const insertToySchema = createInsertSchema(toys).pick({
   tags: true,
   isAvailable: true,
   status: true,
-  soldDate: true,
   recommendedAges: true,
   safetyNotes: true,
   videos: true,

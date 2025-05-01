@@ -65,7 +65,6 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
     defaultValues: {
       title: "",
       description: "",
-      ageRange: "",
       ageRanges: [],
       condition: "Like New", // Set default condition
       location: user?.location || "",
@@ -199,6 +198,8 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         videos: videos,
         isAvailable: true,
         tags: selectedTags,
+        status: "active", // Set active status explicitly
+        // Don't send soldDate for new toys
       };
 
       console.log("Submitting toy data:", toyData);
