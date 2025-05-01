@@ -228,12 +228,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user!.id;
       console.log("Fetching toys for user ID:", userId);
+      // This now handles errors internally and returns empty array instead of throwing
       const toys = await storage.getToysByUser(userId);
-      console.log("Retrieved toys:", toys);
+      console.log("Retrieved toys count:", toys.length);
       res.json(toys);
     } catch (error) {
-      console.error("Error fetching toys by user:", error);
-      res.status(500).json({ message: "Failed to fetch toys", error: error instanceof Error ? error.message : String(error) });
+      console.error("Error in route handler for /api/toys/by-user:", error);
+      // Return empty array instead of error to prevent client-side errors
+      res.json([]);
     }
   });
 

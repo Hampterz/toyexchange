@@ -1,10 +1,13 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { User } from '@shared/schema';
+import type { User } from '@shared/schema';
+
+// Use Omit to make a version of User without requiring the password field
+type UserProfile = Omit<User, 'password'>;
 
 interface AvatarWithFallbackProps {
-  user?: User;
+  user?: UserProfile;
   src?: string | null;
   alt?: string;
   className?: string;

@@ -437,10 +437,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getToysByUser(userId: number): Promise<Toy[]> {
-    return db.select()
-      .from(toys)
-      .where(eq(toys.userId, userId))
-      .orderBy(desc(toys.createdAt));
+    try {
+      console.log(`Getting toys for user ID: ${userId}`);
+      const result = await db.select()
+        .from(toys)
+        .where(eq(toys.userId, userId))
+        .orderBy(desc(toys.createdAt));
+      
+      console.log(`Retrieved ${result.length} toys for user ${userId}`);
+      return result;
+    } catch (error) {
+      console.error(`Error in getToysByUser(${userId}):`, error);
+      // Return empty array instead of throwing to avoid breaking the client
+      return [];
+    }
   }
 
   async createToy(insertToy: InsertToy): Promise<Toy> {

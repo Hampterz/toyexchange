@@ -10,6 +10,7 @@ import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { ProfileToys } from "@/components/profile/profile-toys";
 import { ProfileRequests } from "@/components/profile/profile-requests";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { AddressAutocomplete } from "@/components/address-autocomplete";
 
 import { Loader2, Save, UploadCloud, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -257,13 +258,27 @@ export default function ProfilePage() {
                       </div>
                       <div>
                         <Label htmlFor="location">Location</Label>
-                        <Input
-                          id="location"
-                          name="location"
-                          value={profileData.location}
-                          onChange={handleInputChange}
-                          className="mt-1"
-                        />
+                        <div className="mt-1">
+                          <AddressAutocomplete
+                            id="location"
+                            placeholder="Enter your address..."
+                            defaultValue={profileData.location}
+                            className="w-full border border-gray-300 rounded-md py-2 px-3"
+                            onAddressSelect={(
+                              address: string, 
+                              coordinates?: { latitude: number; longitude: number }
+                            ) => {
+                              setProfileData(prev => ({
+                                ...prev,
+                                location: address,
+                                ...(coordinates ? {
+                                  latitude: coordinates.latitude,
+                                  longitude: coordinates.longitude
+                                } : {})
+                              }));
+                            }}
+                          />
+                        </div>
                       </div>
                       <div className="mt-4">
                         <Label>Location Privacy</Label>
