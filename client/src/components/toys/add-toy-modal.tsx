@@ -191,9 +191,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         condition: data.condition || "Like New", // Use default if not set
         category: "Other", // Default to Other as category is hidden
         location: data.location,
-        // Include coordinates when available
-        latitude: locationCoordinates?.latitude || null,
-        longitude: locationCoordinates?.longitude || null,
+        // Include coordinates when available - convert to string to match schema
+        latitude: locationCoordinates?.latitude?.toString() || null,
+        longitude: locationCoordinates?.longitude?.toString() || null,
         images: images,
         videos: videos,
         isAvailable: true,

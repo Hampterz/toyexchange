@@ -234,7 +234,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get toys by current logged-in user
   app.get("/api/toys/by-user", ensureAuthenticated, async (req, res) => {
     try {
-      const userId = req.user!.id;
+      // Validate the user ID
+      if (!req.user || !req.user.id) {
+        console.error("Invalid user in request");
+        return res.status(200).json([]);
+      }
+      
+      const userId = req.user.id;
       console.log("Fetching toys for user ID:", userId);
       // This now handles errors internally and returns empty array instead of throwing
       const toys = await storage.getToysByUser(userId);
