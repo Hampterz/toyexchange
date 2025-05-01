@@ -152,7 +152,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
     try {
       // Convert the uploaded image files to base64 strings
-      const imagePromises = Array.from(data.imageFiles).map((file) => {
+      const imagePromises = Array.from(data.imageFiles as FileList).map((file: File) => {
         return new Promise<string>((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => {
@@ -168,7 +168,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       // Convert the uploaded video file to base64 string if exists
       let videos: string[] = [];
       if (data.videoFiles && data.videoFiles.length > 0) {
-        const videoPromises = Array.from(data.videoFiles).map((file) => {
+        const videoPromises = Array.from(data.videoFiles as FileList).map((file: File) => {
           return new Promise<string>((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -268,7 +268,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   )}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {Array.from(imageFiles).map((file, index) => (
+                  {Array.from(imageFiles as FileList).map((file: File, index) => (
                     <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-24">
                       <img
                         src={URL.createObjectURL(file)}
@@ -307,7 +307,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   </Button>
                 </div>
                 <div className="border rounded-md overflow-hidden">
-                  {Array.from(videoFiles).map((file, index) => (
+                  {Array.from(videoFiles as FileList).map((file: File, index) => (
                     <div key={`vid-${index}`} className="relative h-32 bg-gray-100 flex items-center justify-center">
                       <video
                         src={URL.createObjectURL(file)}

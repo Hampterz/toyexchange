@@ -272,6 +272,7 @@ export const toys = pgTable("toys", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Create schema with soldDate explicitly excluded to fix validation issues
 export const insertToySchema = createInsertSchema(toys).pick({
   userId: true,
   title: true,
