@@ -455,9 +455,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createToy(insertToy: InsertToy): Promise<Toy> {
+    // Remove any potential soldDate field since it's causing validation issues
+    const { soldDate, ...cleanToyData } = insertToy as any;
+
+    // Ensure coordinates are stored as strings
+    if (cleanToyData.latitude !== null && typeof cleanToyData.latitude !== 'string') {
+      cleanToyData.latitude = String(cleanToyData.latitude);
+    }
+    if (cleanToyData.longitude !== null && typeof cleanToyData.longitude !== 'string') {
+      cleanToyData.longitude = String(cleanToyData.longitude);
+    }
+    
+    console.log("Creating toy with data:", cleanToyData);
+    
     const [toy] = await db.insert(toys)
       .values({
-        ...insertToy,
+        ...cleanToyData,
         createdAt: new Date(),
       })
       .returning();
