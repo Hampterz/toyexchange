@@ -123,10 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Default distance is 10 miles if not specified
         filters.distance = req.query.distance ? 
           parseFloat(req.query.distance as string) : 
-          5;
-        
-        // Always strictly filter by location if coordinates are provided
-        filters.strictLocationFilter = true;
+          10;
       }
       
       const toys = await storage.getToys(filters);

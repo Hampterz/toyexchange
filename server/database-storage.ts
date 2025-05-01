@@ -375,12 +375,13 @@ export class DatabaseStorage implements IStorage {
       // Filter by distance
       result = toysWithDistance.filter((toy: any) => {
         // Since the toy database is new, many toys might not have coordinates yet
-        // Include toys with null coordinates but make a note of it in the logs
+        // Since strict location filtering is required, toys without coordinates
+        // should be excluded from location-based results
         if (toy.distance === null) {
-          console.log(`Toy ${toy.id} (${toy.title}) has missing coordinates, but including since database is new`);
+          console.log(`Toy ${toy.id} (${toy.title}) has missing coordinates and will be excluded from location-based results`);
           
-          // Temporary fix to show existing toys while users build up location data
-          return !filters.strictLocationFilter; // Show toys without coords by default
+          // Never include toys without coordinates when filtering by location
+          return false;
         }
         
         const withinRange = toy.distance <= filters.distance;
