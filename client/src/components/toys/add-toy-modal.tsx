@@ -244,32 +244,32 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             {/* Images Preview */}
             {imageFiles && imageFiles.length > 0 && (
               <div>
-                <div className="flex justify-between items-center mb-3">
-                  <p className="text-sm font-medium text-blue-800">Photos ({imageFiles.length}/4)</p>
+                <div className="flex justify-between items-center mb-2 sm:mb-3">
+                  <p className="text-xs sm:text-sm font-medium text-blue-800">Photos ({imageFiles.length}/4)</p>
                   {imageFiles.length < 4 && (
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm"
-                      className="text-blue-700 border-blue-200 py-1 h-8 text-xs flex items-center"
+                      className="text-blue-700 border-blue-200 py-0.5 sm:py-1 h-7 sm:h-8 text-[10px] xs:text-xs flex items-center"
                       onClick={(e) => {
                         e.stopPropagation();
                         document.getElementById('image-upload')?.click();
                       }}
                     >
-                      <PlusCircle className="h-4 w-4 mr-1" /> Add More
+                      <PlusCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" /> Add More
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   {Array.from(imageFiles as FileList).map((file: File, index) => (
-                    <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-32 group">
+                    <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-24 xs:h-28 sm:h-32 group">
                       <img
                         src={URL.createObjectURL(file)}
                         alt={`Preview ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black bg-opacity-40 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-opacity flex items-center justify-center">
                         <button
                           type="button"
                           className="p-1 bg-white bg-opacity-90 rounded-full text-red-600 hover:text-red-800 hover:bg-white"
@@ -291,7 +291,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                             }
                           }}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </button>
                       </div>
                     </div>
@@ -310,24 +310,24 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             {/* Video Preview */}
             {videoFiles && videoFiles.length > 0 && (
               <div>
-                <div className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-1.5 sm:mb-2">
                   <p className="text-xs text-blue-700">Video</p>
                   <Button 
                     type="button" 
                     variant="outline" 
                     size="sm"
-                    className="text-red-700 border-red-200 py-0 h-6 text-xs"
+                    className="text-red-700 border-red-200 py-0 h-6 text-[10px] xs:text-xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       form.setValue("videoFiles", undefined);
                     }}
                   >
-                    Remove Video
+                    <X className="h-3 w-3 mr-0.5 sm:mr-1" /> Remove
                   </Button>
                 </div>
                 <div className="border rounded-md overflow-hidden">
                   {Array.from(videoFiles as FileList).map((file: File, index) => (
-                    <div key={`vid-${index}`} className="relative h-32 bg-gray-100 flex items-center justify-center">
+                    <div key={`vid-${index}`} className="relative h-24 xs:h-28 sm:h-32 bg-gray-100 flex items-center justify-center">
                       <video
                         src={URL.createObjectURL(file)}
                         controls
