@@ -207,8 +207,8 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               alt={toy.title} 
               className="absolute h-full w-full object-cover transition group-hover:scale-105" 
               loading="lazy"
-              width="300"
-              height="300"
+              width="400"
+              height="400"
             />
           ) : (
             <div className="absolute h-full w-full flex items-center justify-center text-neutral-400">
