@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Upload, AlertCircle, Tag, MapPin, Image as ImageIcon, Loader2 } from "lucide-react";
+import { X, Upload, AlertCircle, Tag, MapPin, Image as ImageIcon, Loader2, PlusCircle, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -250,31 +250,56 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
             {/* Images Preview */}
             {imageFiles && imageFiles.length > 0 && (
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs text-blue-700">Photos ({imageFiles.length}/4)</p>
+                <div className="flex justify-between items-center mb-3">
+                  <p className="text-sm font-medium text-blue-800">Photos ({imageFiles.length}/4)</p>
                   {imageFiles.length < 4 && (
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm"
-                      className="text-blue-700 border-blue-200 py-0 h-6 text-xs"
+                      className="text-blue-700 border-blue-200 py-1 h-8 text-xs flex items-center"
                       onClick={(e) => {
                         e.stopPropagation();
                         document.getElementById('image-upload')?.click();
                       }}
                     >
-                      Add More Images
+                      <PlusCircle className="h-4 w-4 mr-1" /> Add More
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {Array.from(imageFiles as FileList).map((file: File, index) => (
-                    <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-24">
+                    <div key={`img-${index}`} className="relative border rounded-md overflow-hidden h-32 group">
                       <img
                         src={URL.createObjectURL(file)}
                         alt={`Preview ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
+                      <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button
+                          type="button"
+                          className="p-1 bg-white bg-opacity-90 rounded-full text-red-600 hover:text-red-800 hover:bg-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            
+                            // Remove this specific image
+                            const files = form.getValues().imageFiles;
+                            if (files && files.length > 0) {
+                              const dataTransfer = new DataTransfer();
+                              
+                              Array.from(files).forEach((f, i) => {
+                                if (i !== index) {
+                                  dataTransfer.items.add(f);
+                                }
+                              });
+                              
+                              form.setValue("imageFiles", dataTransfer.files);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -591,10 +616,21 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                   // Create a DataTransfer object to build a new FileList
                                   const dataTransfer = new DataTransfer();
                                   
+                                  // First, add any existing files from the form
+                                  const existingFiles = form.getValues().imageFiles;
+                                  if (existingFiles && existingFiles.length > 0) {
+                                    Array.from(existingFiles).forEach(file => {
+                                      // Ensure it's a File object before adding
+                                      if (file instanceof File) {
+                                        dataTransfer.items.add(file);
+                                      }
+                                    });
+                                  }
+                                  
                                   // Add existing URLs to the list for preview
                                   const newImageUrls = [...imageUrls];
                                   
-                                  // Add new files
+                                  // Then add the newly selected files
                                   Array.from(e.target.files).forEach(file => {
                                     dataTransfer.items.add(file);
                                     
@@ -618,6 +654,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                   
                                   // Update the form with the combined files
                                   onChange(dataTransfer.files);
+                                  console.log(`Total files after adding: ${dataTransfer.files.length}`);
                                 } else {
                                   onChange(e.target.files);
                                 }
