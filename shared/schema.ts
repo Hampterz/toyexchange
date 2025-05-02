@@ -257,7 +257,6 @@ export const toys = pgTable("toys", {
   description: text("description").notNull(),
   ageRange: text("age_range").notNull(),
   condition: text("condition").notNull(),
-  category: text("category").notNull(),
   images: jsonb("images").notNull().$type<string[]>(),
   location: text("location").notNull(),
   latitude: text("latitude"),
@@ -279,7 +278,6 @@ export const insertToySchema = createInsertSchema(toys).pick({
   description: true,
   ageRange: true,
   condition: true,
-  category: true,
   images: true,
   location: true,
   latitude: true,
@@ -561,7 +559,6 @@ export type CommunityMetrics = {
 export type FilterOptions = {
   location: string[];
   ageRange: string[];
-  category: string[];
   condition: string[];
   tags: string[];
   search?: string;

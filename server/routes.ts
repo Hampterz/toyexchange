@@ -97,13 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      if (req.query.category) {
-        if (Array.isArray(req.query.category)) {
-          filters.category = req.query.category;
-        } else {
-          filters.category = [req.query.category as string];
-        }
-      }
+
       
       if (req.query.condition) {
         if (Array.isArray(req.query.condition)) {

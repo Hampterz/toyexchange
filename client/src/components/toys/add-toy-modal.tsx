@@ -189,7 +189,6 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
         description: data.description,
         ageRange: data.ageRanges.join(", "), // Use the multi-select age ranges and join them
         condition: data.condition || "Like New", // Use default if not set
-        category: "Other", // Default to Other as category is hidden
         location: data.location,
         // Include coordinates when available - convert to string to match schema
         latitude: locationCoordinates?.latitude?.toString() || null,
