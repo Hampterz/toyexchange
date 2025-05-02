@@ -342,7 +342,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             {toyOwner && !isOwner && (
               <div className="flex items-center justify-between">
                 <HoverCard>
-                  <HoverCardTrigger>
+                  <HoverCardTrigger asChild>
                     <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-neutral-600 cursor-pointer">
                       <span className="text-[10px] sm:text-xs">Shared by:</span>
                       <Link href={`/user-profile/${toyOwner.id}`}>
@@ -589,7 +589,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     <h3 className="text-sm font-semibold">Shared by</h3>
                     {toyOwner && (
                       <HoverCard>
-                        <HoverCardTrigger className="inline-block mt-1">
+                        <HoverCardTrigger asChild className="inline-block mt-1">
                           <Link href={`/user-profile/${toyOwner.id}`}>
                             <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
                               <span className="font-medium">{toyOwner.name}</span>
