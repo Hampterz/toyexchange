@@ -31,24 +31,37 @@ export default function HomePage() {
   useEffect(() => {
     // If user is logged in, use their stored address from profile
     if (user && user.latitude && user.longitude) {
-      setFilters(prev => ({
-        ...prev,
+      const updatedFilters = {
+        ...filters,
         latitude: typeof user.latitude === 'string' ? parseFloat(user.latitude) : user.latitude,
         longitude: typeof user.longitude === 'string' ? parseFloat(user.longitude) : user.longitude,
-        distance: prev.distance || 10, // Ensure a default value
+        distance: filters.distance || 10, // Ensure a default value
         location: user.location ? [user.location] : []
-      }));
+      };
+      setFilters(updatedFilters);
+      
+      // Immediately apply the filter with the user's location
+      if (updatedFilters.latitude && updatedFilters.longitude) {
+        handleFilterChange(updatedFilters);
+        console.log("Auto-applied location filter from user profile:", user.location);
+      }
     } 
     // Otherwise try to get their current location
     else if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setFilters(prev => ({
-            ...prev,
+          // Get coordinates but we don't have an address to display
+          const updatedFilters = {
+            ...filters,
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            distance: prev.distance || 10 // Ensure a default value
-          }));
+            distance: filters.distance || 10, // Ensure a default value
+          };
+          setFilters(updatedFilters);
+          
+          // Immediately apply the filter
+          handleFilterChange(updatedFilters);
+          console.log("Auto-applied location filter from browser geolocation");
         },
         (error) => {
           console.log("Unable to get location: ", error.message);

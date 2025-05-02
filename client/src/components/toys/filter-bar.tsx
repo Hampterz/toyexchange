@@ -71,7 +71,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       };
       setFilters(newFilters);
       
-      // Only automatically apply filter if we have coordinates
+      // Always apply filter when we have user location
       if (user.latitude && user.longitude) {
         onFilterChange(newFilters);
       }
