@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SocialShareButtons } from "@/components/social/social-share-buttons";
 import ConfettiEffect from "@/components/ui/confetti-effect";
 import { UserBadge } from "@/components/ui/user-badge";
@@ -368,10 +368,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
 
       {/* Expanded Toy Detail Dialog */}
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto sm:overflow-y-hidden">
+        <DialogContent className="max-w-5xl w-[95vw] p-0 overflow-hidden mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto sm:overflow-y-hidden">
+          <div className="sr-only">Toy Details</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Image/Video Gallery */}
-            <div className="relative bg-black h-[250px] sm:h-[300px] md:h-full min-h-[250px] sm:min-h-[300px]">
+            <div className="relative bg-black h-[300px] sm:h-[400px] md:h-full min-h-[300px] sm:min-h-[400px]">
               {!viewingVideos && toy.images && toy.images.length > 0 ? (
                 <div className="w-full h-full relative">
                   <img 
@@ -522,22 +523,19 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 </div>
               </div>
               
-              {toy.tags && toy.tags.length > 0 && (
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold mb-1">Tags</h3>
-                  <div className="flex flex-wrap gap-1">
-                    {toy.tags.map((tag, i) => (
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold mb-1">Tags</h3>
+                <div className="flex flex-wrap gap-1">
+                  {toy.tags && toy.tags.length > 0 ? (
+                    toy.tags.map((tag, i) => (
                       <Badge key={i} variant="secondary" className="text-xs bg-neutral-100 text-neutral-700">
                         {tag}
                       </Badge>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <span className="text-sm text-neutral-500">No tags</span>
+                  )}
                 </div>
-              )}
-              
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold mb-1">Category</h3>
-                <Badge variant="outline">{toy.category}</Badge>
               </div>
               
               <div className="mt-4">
