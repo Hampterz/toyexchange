@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   Plus, Search, Gift, BookOpen, Shield, MessageSquare, 
-  Users, Award, RefreshCw, Smartphone
+  Users, Award, RefreshCw, Smartphone, MapPin, X
 } from "lucide-react";
 import { ToySearch } from "@/components/toys/toy-search";
 import { NewsletterSignup } from "@/components/layout/newsletter-signup";
 import { Testimonials } from "@/components/layout/testimonials";
 import { useQuery } from "@tanstack/react-query";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -27,10 +28,13 @@ export default function HomePage() {
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
   
+  // State for location access popup
+  const [showLocationDeniedAlert, setShowLocationDeniedAlert] = useState(false);
+
   // Set user's location from their profile or try to get current location
   useEffect(() => {
     // If user is logged in, use their stored address from profile
-    if (user && user.latitude && user.longitude) {
+    if (user && user.latitude && user.longitude && user.location) {
       const updatedFilters = {
         ...filters,
         latitude: typeof user.latitude === 'string' ? parseFloat(user.latitude) : user.latitude,
@@ -49,23 +53,54 @@ export default function HomePage() {
     // Otherwise try to get their current location
     else if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Get coordinates but we don't have an address to display
-          const updatedFilters = {
-            ...filters,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            distance: filters.distance || 10, // Ensure a default value
-          };
-          setFilters(updatedFilters);
-          
-          // Immediately apply the filter
-          handleFilterChange(updatedFilters);
-          console.log("Auto-applied location filter from browser geolocation");
+        async (position) => {
+          try {
+            // Get coordinates
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            // Try to get a readable address using Google Maps Geocoding API
+            const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`);
+            const data = await response.json();
+            
+            let formattedAddress = '';
+            if (data.results && data.results.length > 0) {
+              // Get a human-readable address
+              formattedAddress = data.results[0].formatted_address;
+              console.log("Geocoded address:", formattedAddress);
+            }
+            
+            // Update filters with location information
+            const updatedFilters = {
+              ...filters,
+              latitude: lat,
+              longitude: lng,
+              distance: filters.distance || 10, // Ensure a default value
+              location: formattedAddress ? [formattedAddress] : []
+            };
+            
+            setFilters(updatedFilters);
+            
+            // Immediately apply the filter
+            handleFilterChange(updatedFilters);
+            console.log("Auto-applied location filter from browser geolocation with address:", formattedAddress);
+          } catch (error) {
+            console.error("Error geocoding address:", error);
+            // Still use the coordinates even if we couldn't get an address
+            const updatedFilters = {
+              ...filters,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              distance: filters.distance || 10
+            };
+            setFilters(updatedFilters);
+            handleFilterChange(updatedFilters);
+          }
         },
         (error) => {
           console.log("Unable to get location: ", error.message);
-          // Don't show error to user, just silently fail and show all toys
+          // Show error to user through a toast notification
+          setShowLocationDeniedAlert(true);
         }
       );
     }
@@ -107,6 +142,26 @@ export default function HomePage() {
 
   return (
     <div className="page-transition">
+      {/* Location access denied alert */}
+      {showLocationDeniedAlert && (
+        <div className="fixed top-4 left-0 right-0 mx-auto z-50 max-w-md px-4">
+          <Alert className="bg-white border border-amber-300 shadow-lg relative">
+            <MapPin className="h-4 w-4 text-amber-500" />
+            <AlertTitle className="text-amber-700">Location access required</AlertTitle>
+            <AlertDescription className="text-amber-600">
+              To see toys near you, please allow location access. This helps us show toys within your preferred distance.
+            </AlertDescription>
+            <button 
+              onClick={() => setShowLocationDeniedAlert(false)}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </Alert>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-700 to-blue-900 py-10 md:py-14 mb-4 md:mb-6 rounded-b-3xl shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -60,21 +60,33 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   
   // Automatically populate user location when component loads
   useEffect(() => {
-    if (user?.location && !filters.location.length && !initialFilters?.location?.length) {
+    // If user is logged in, has location info, and no location filter is already set
+    if (user?.location && user?.latitude && user?.longitude && 
+        !filters.location.length && !initialFilters?.location?.length) {
+      
+      console.log("Setting user location from profile:", user.location);
+      
       // User has a location but no location filter is applied yet
       const newFilters = { 
         ...filters, 
         location: [user.location],
         // Ensure latitude and longitude are converted to numbers
-        latitude: user.latitude ? Number(user.latitude) : undefined,
-        longitude: user.longitude ? Number(user.longitude) : undefined
+        latitude: typeof user.latitude === 'string' ? parseFloat(user.latitude) : user.latitude,
+        longitude: typeof user.longitude === 'string' ? parseFloat(user.longitude) : user.longitude,
+        distance: filters.distance || 10 // Default to 10 miles
       };
+      
       setFilters(newFilters);
       
       // Always apply filter when we have user location
-      if (user.latitude && user.longitude) {
-        onFilterChange(newFilters);
-      }
+      onFilterChange(newFilters);
+      console.log(`Applied user location with coordinates [${newFilters.latitude}, ${newFilters.longitude}]`);
+    }
+    // If initialFilters already has location info, ensure coordinates are properly set
+    else if (initialFilters?.location?.length && initialFilters.latitude && initialFilters.longitude) {
+      // Already has location in initialFilters, just ensure it's properly formatted
+      console.log("Using initial location filters:", initialFilters.location);
+      console.log(`With coordinates [${initialFilters.latitude}, ${initialFilters.longitude}]`);
     }
   }, [user]);
   
