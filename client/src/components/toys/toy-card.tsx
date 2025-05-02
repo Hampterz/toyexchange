@@ -279,25 +279,25 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
           </div>
         </div>
         
-        <div className="p-2 xs:p-2.5 sm:p-3 flex flex-col h-[calc(100%-95%)]">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-bold font-heading text-xs xs:text-sm sm:text-base truncate max-w-[70%]">
+        <div className="p-1.5 xs:p-2 sm:p-2.5 md:p-3 flex flex-col h-[calc(100%-95%)]">
+          <div className="flex items-center justify-between mb-0.5 xs:mb-1">
+            <h3 className="font-bold font-heading text-[11px] xs:text-xs sm:text-sm md:text-base truncate max-w-[68%] xs:max-w-[70%]">
               {toy.title}
             </h3>
-            <span className="text-[8px] xs:text-[10px] sm:text-xs bg-neutral-100 px-1 py-0.5 xs:px-1.5 sm:px-2 sm:py-1 rounded-full text-neutral-700 whitespace-nowrap">
+            <span className="text-[7px] xs:text-[8px] sm:text-[10px] md:text-xs bg-neutral-100 px-1 py-0.5 xs:px-1.5 sm:px-2 sm:py-1 rounded-full text-neutral-700 whitespace-nowrap">
               Ages {toy.ageRange}
             </span>
           </div>
           
-          <p className="text-neutral-600 text-[10px] xs:text-xs sm:text-sm line-clamp-2">
+          <p className="text-neutral-600 text-[8px] xs:text-[10px] sm:text-xs md:text-sm line-clamp-2 mb-0.5 xs:mb-1">
             {toy.description}
           </p>
           
-          <div className="flex flex-col gap-1 sm:gap-1 mt-1">
+          <div className="flex flex-col gap-0.5 xs:gap-1 sm:gap-1 mt-0.5 xs:mt-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <MapPin className="text-neutral-500 mr-0.5 xs:mr-1 h-2.5 w-2.5 xs:h-3 xs:w-3 flex-shrink-0" />
-                <span className="text-neutral-500 text-[9px] xs:text-xs truncate max-w-[120px] xs:max-w-[150px]">
+                <MapPin className="text-neutral-500 mr-0.5 h-2 w-2 xs:h-2.5 xs:w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
+                <span className="text-neutral-500 text-[7px] xs:text-[9px] sm:text-xs truncate max-w-[90px] xs:max-w-[120px] sm:max-w-[150px]">
                   {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
                    toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
                    toy.location.split(',')[0]}
@@ -307,7 +307,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               {!isOwner && (
                 <Button 
                   variant="link" 
-                  className="text-primary font-medium text-[10px] xs:text-xs sm:text-sm p-0 h-auto hover:underline click-scale"
+                  className="text-primary font-medium text-[8px] xs:text-[10px] sm:text-xs md:text-sm p-0 h-auto hover:underline click-scale"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRequestClick(toy);
@@ -318,20 +318,20 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               )}
               
               {isOwner && (
-                <div className="flex items-center gap-1 xs:gap-2">
-                  <span className="text-[9px] xs:text-xs text-neutral-500 italic">Your listing</span>
+                <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-2">
+                  <span className="text-[7px] xs:text-[9px] sm:text-xs text-neutral-500 italic">Your listing</span>
                   {toy.status !== 'sold' && (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-5 xs:h-6 px-1 xs:px-2 py-0 text-[9px] xs:text-xs"
+                      className="h-4 xs:h-5 sm:h-6 px-1 xs:px-1.5 sm:px-2 py-0 text-[7px] xs:text-[9px] sm:text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         markAsSoldMutation.mutate();
                       }}
                     >
-                      <span className="hidden xs:inline">Mark as Sold</span>
-                      <span className="xs:hidden">Sold</span>
+                      <span className="hidden sm:inline">Mark as Sold</span>
+                      <span className="sm:hidden">Sold</span>
                     </Button>
                   )}
                 </div>
@@ -343,15 +343,15 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
               <div className="flex items-center justify-between">
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-neutral-600 cursor-pointer">
-                      <span className="text-[10px] sm:text-xs">Shared by:</span>
+                    <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5 text-[8px] xs:text-[9px] sm:text-xs text-neutral-600 cursor-pointer">
+                      <span className="text-[7px] xs:text-[8px] sm:text-[10px] md:text-xs">Shared by:</span>
                       <Link href={`/users/${toyOwner.id}`}>
-                        <span className="font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[150px] hover:text-primary">{toyOwner.name}</span>
+                        <span className="font-medium text-[7px] xs:text-[9px] sm:text-xs truncate max-w-[70px] xs:max-w-[100px] sm:max-w-[150px] hover:text-primary">{toyOwner.name}</span>
                       </Link>
                       {toyOwner.currentBadge && (
                         <UserBadge 
                           badgeName={toyOwner.currentBadge} 
-                          className="ml-1 text-sm" 
+                          className="ml-0.5 xs:ml-1 text-xs sm:text-sm" 
                           showTooltip={true}
                           iconOnly={true}
                         />
@@ -398,11 +398,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
 
       {/* Expanded Toy Detail Dialog */}
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="max-w-5xl w-[95vw] p-0 overflow-hidden mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl w-[95vw] p-0 overflow-hidden mx-auto max-h-[95vh] overflow-y-auto">
           <div className="sr-only">Toy Details</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Image/Video Gallery */}
-            <div className="relative bg-black h-[250px] xs:h-[300px] sm:h-[400px] md:h-full min-h-[250px] xs:min-h-[300px] sm:min-h-[400px]">
+            <div className="relative bg-black h-[200px] xs:h-[250px] sm:h-[350px] md:h-full min-h-[200px] xs:min-h-[250px] sm:min-h-[350px]">
               {!viewingVideos && toy.images && toy.images.length > 0 ? (
                 <div className="w-full h-full relative">
                   <img 
@@ -421,9 +421,9 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                           e.stopPropagation();
                           prevImage();
                         }}
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 h-8 w-8 bg-white bg-opacity-70 rounded-full flex items-center justify-center"
+                        className="absolute left-1 xs:left-2 top-1/2 transform -translate-y-1/2 h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 bg-white bg-opacity-70 rounded-full flex items-center justify-center shadow-sm touch-manipulation"
                       >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
                       </button>
                       
                       <button 
@@ -431,9 +431,9 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                           e.stopPropagation();
                           nextImage();
                         }}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 bg-white bg-opacity-70 rounded-full flex items-center justify-center"
+                        className="absolute right-1 xs:right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 xs:h-7 xs:w-7 sm:h-8 sm:w-8 bg-white bg-opacity-70 rounded-full flex items-center justify-center shadow-sm touch-manipulation"
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
                       </button>
                       
                       <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
