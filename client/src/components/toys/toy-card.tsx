@@ -123,7 +123,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       // This ensures immediate UI update even before refetching
       toy.status = "sold";
       toy.isAvailable = false;
-      toy.soldDate = new Date().toISOString();
+      // Note: the actual soldDate will be handled by the server
       
       // Invalidate the toy queries to refresh data
       queryClient.invalidateQueries({ queryKey: [`/api/toys/${toy.id}`] });

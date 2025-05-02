@@ -74,7 +74,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all toys with optional filters
   app.get("/api/toys", async (req, res) => {
     try {
-      const filters: Record<string, any> = {};
+      const filters: Record<string, any> = {
+        // By default, only show active (not sold) toys
+        status: ["active"]
+      };
+      
+      // Allow overriding the status filter if explicitly provided
+      if (req.query.status) {
+        if (Array.isArray(req.query.status)) {
+          filters.status = req.query.status;
+        } else {
+          filters.status = [req.query.status as string];
+        }
+      }
       
       // Parse query parameters
       // Handle arrays for filters that can have multiple values
@@ -97,8 +109,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-
-      
       if (req.query.condition) {
         if (Array.isArray(req.query.condition)) {
           filters.condition = req.query.condition;
@@ -117,7 +127,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (req.query.search) filters.search = req.query.search as string;
-      if (req.query.isAvailable) filters.isAvailable = req.query.isAvailable === "true";
+      
+      // By default, only show available toys
+      filters.isAvailable = true;
+      // Allow overriding if explicitly provided
+      if (req.query.isAvailable !== undefined) {
+        filters.isAvailable = req.query.isAvailable === "true";
+      }
       
       // Handle location-based distance filtering
       if (req.query.latitude && req.query.longitude) {
@@ -127,13 +143,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Default distance is 10 miles if not specified
         filters.distance = req.query.distance ? 
           parseFloat(req.query.distance as string) : 
-          5;
+          10;
         
         // Always strictly filter by location if coordinates are provided
         filters.strictLocationFilter = true;
       }
       
+      console.log("Fetching toys with filters:", filters);
       const toys = await storage.getToys(filters);
+      console.log(`Found ${toys.length} toys matching filters`);
       res.json(toys);
     } catch (error) {
       console.error("Error fetching toys:", error);
