@@ -47,6 +47,9 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   const [editedToyDescription, setEditedToyDescription] = useState<string>("");
   const [editedToyAgeRange, setEditedToyAgeRange] = useState<string>("");
   const [editedToyCondition, setEditedToyCondition] = useState<string>("");
+  const [editedToyImages, setEditedToyImages] = useState<string[]>([]);
+  const [newImageFiles, setNewImageFiles] = useState<FileList | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("active");
 
   // Query user's toys
@@ -173,20 +176,63 @@ export function ProfileToys({ userId }: ProfileToysProps) {
     setEditedToyDescription(toy.description || "");
     setEditedToyAgeRange(toy.ageRange || "");
     setEditedToyCondition(toy.condition || "");
+    setEditedToyImages(toy.images || []);
+    setNewImageFiles(null);
   };
   
-  const handleSaveEditedToy = () => {
+  const handleSaveEditedToy = async () => {
     if (!toyToEdit) return;
     
-    editToyMutation.mutate({
-      toyId: toyToEdit.id,
-      updates: {
+    setIsUploading(true);
+    
+    try {
+      // Prepare updates object with basic text fields
+      const updates: Partial<Toy> = {
         title: editedToyTitle,
         description: editedToyDescription,
         ageRange: editedToyAgeRange,
         condition: editedToyCondition
+      };
+      
+      // Process new image uploads if any
+      if (newImageFiles && newImageFiles.length > 0) {
+        const imagePromises = Array.from(newImageFiles).map(file => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+          });
+        });
+        
+        const newImages = await Promise.all(imagePromises);
+        
+        // Combine existing images with new ones
+        updates.images = [...editedToyImages, ...newImages];
+      } else if (editedToyImages.length > 0) {
+        // Keep current images if no new ones uploaded
+        updates.images = editedToyImages;
       }
-    });
+      
+      editToyMutation.mutate({
+        toyId: toyToEdit.id,
+        updates
+      });
+    } catch (error) {
+      console.error("Error processing images:", error);
+      toast({
+        title: "Image Processing Failed",
+        description: "Failed to process images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  
+  const handleRemoveImage = (index: number) => {
+    setEditedToyImages(current => current.filter((_, i) => i !== index));
   };
 
   if (isLoading) {
