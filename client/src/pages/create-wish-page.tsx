@@ -28,7 +28,7 @@ const createWishSchema = insertWishSchema.extend({
   description: z.string().min(20, "Description must be at least 20 characters").max(1000, "Description must be less than 1000 characters"),
   location: z.string().min(1, "Location is required"),
   ageRange: z.string().min(1, "Age range is required"),
-  category: z.string().min(1, "Category is required"),
+  // Category field removed
   images: z.array(z.string()).optional(),
   tags: z.array(z.string()).min(1, "Please add at least one tag"),
 });
@@ -51,7 +51,6 @@ function CreateWishPageContent() {
       description: "",
       location: "",
       ageRange: "",
-      category: "",
       tags: [],
       images: [],
       latitude: null,
@@ -202,63 +201,7 @@ function CreateWishPageContent() {
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Action Figures">
-                              Action Figures
-                            </SelectItem>
-                            <SelectItem value="Arts & Crafts">
-                              Arts & Crafts
-                            </SelectItem>
-                            <SelectItem value="Baby Toys">Baby Toys</SelectItem>
-                            <SelectItem value="Blocks & Building">
-                              Blocks & Building
-                            </SelectItem>
-                            <SelectItem value="Board Games">
-                              Board Games
-                            </SelectItem>
-                            <SelectItem value="Books">Books</SelectItem>
-                            <SelectItem value="Dolls">Dolls</SelectItem>
-                            <SelectItem value="Educational">
-                              Educational
-                            </SelectItem>
-                            <SelectItem value="Electronic Toys">
-                              Electronic Toys
-                            </SelectItem>
-                            <SelectItem value="Outdoor Toys">
-                              Outdoor Toys
-                            </SelectItem>
-                            <SelectItem value="Pretend Play">
-                              Pretend Play
-                            </SelectItem>
-                            <SelectItem value="Puzzles">Puzzles</SelectItem>
-                            <SelectItem value="Stuffed Animals">
-                              Stuffed Animals
-                            </SelectItem>
-                            <SelectItem value="Vehicles">Vehicles</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
                     name="ageRange"

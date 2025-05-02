@@ -1507,7 +1507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Parse query parameters
       if (req.query.location) filters.location = req.query.location as string;
       if (req.query.ageRange) filters.ageRange = req.query.ageRange as string;
-      if (req.query.category) filters.category = req.query.category as string;
+      // Category filter removed
       if (req.query.search) filters.search = req.query.search as string;
       
       // Handle location-based distance filtering
