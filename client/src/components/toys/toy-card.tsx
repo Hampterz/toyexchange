@@ -195,10 +195,10 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       {/* Confetti effect when marking a toy as sold */}
       {showConfetti && <ConfettiEffect duration={3000} numberOfPieces={300} />}
       <div 
-        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer touch-manipulation h-full"
+        className="bg-white rounded-lg shadow-sm hover:shadow-md overflow-hidden group transition-all duration-300 transform hover:-translate-y-1 cursor-pointer touch-manipulation h-full relative"
         onClick={() => setIsExpanded(true)}
         role="button"
-        aria-label={`View details for ${toy.title}`}
+        aria-label={`View details for ${toy.title} ${toy.distance ? `(${Math.round(toy.distance * 10) / 10} miles away)` : ''}`}
       >
         <div className="relative pb-[90%] xs:pb-[95%] bg-neutral-100">
           {mainImage ? (
@@ -246,8 +246,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
           
           {/* Distance badge on top left */}
           {toy.distance && (
-            <div className="absolute top-1 left-1 xs:top-2 xs:left-2 sm:top-3 sm:left-3 bg-blue-600 text-white text-[9px] xs:text-xs font-bold px-1.5 py-0.5 xs:px-2 sm:py-1 rounded-full">
-              {Math.round(toy.distance * 10) / 10} mi
+            <div className="absolute top-1 left-1 xs:top-2 xs:left-2 sm:top-3 sm:left-3 bg-blue-600 text-white text-[9px] xs:text-xs font-bold px-1.5 py-0.5 xs:px-2 sm:py-1 rounded-full shadow-sm z-10">
+              <span className="flex items-center">
+                <MapPin className="w-3 h-3 mr-0.5 hidden xs:inline" />
+                {Math.round(toy.distance * 10) / 10} mi
+              </span>
             </div>
           )}
           
