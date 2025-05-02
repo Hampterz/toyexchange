@@ -159,13 +159,7 @@ export default function HomePage() {
           <div className="md:col-span-3 lg:col-span-3 bg-white p-4 sm:p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow md:sticky md:top-[100px] self-start">
 
             
-            {/* Search - desktop only */}
-            <div className="hidden md:block mb-6">
-              <ToySearch 
-                onSearch={(query) => handleFilterChange({...filters, search: query})} 
-                initialValue={filters.search || ""}
-              />
-            </div>
+
             
             <FilterBar onFilterChange={handleFilterChange} initialFilters={filters} />
           </div>

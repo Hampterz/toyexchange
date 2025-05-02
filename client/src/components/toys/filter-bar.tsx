@@ -507,7 +507,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <div className="mt-4 mb-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-medium text-blue-700">Radius</h4>
-            <span className="text-sm font-medium text-blue-700">{filters.distance || 10} miles</span>
+            <span className="text-sm font-medium text-blue-700">
+              {filters.distance || 10} <span className="hidden xs:inline">miles</span><span className="xs:hidden">m</span>
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Ruler className="h-4 w-4 text-blue-600" />
@@ -527,9 +529,12 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             />
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>1 mile</span>
-            <span>50 miles</span>
-            <span>100 miles</span>
+            <span className="hidden xs:inline">1 mile</span>
+            <span className="xs:hidden">1m</span>
+            <span className="hidden xs:inline">50 miles</span>
+            <span className="xs:hidden">50m</span>
+            <span className="hidden xs:inline">100 miles</span>
+            <span className="xs:hidden">100m</span>
           </div>
         </div>
       </div>
