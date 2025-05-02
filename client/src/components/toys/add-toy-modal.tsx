@@ -359,7 +359,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-hidden p-0">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
         <div className="sticky top-0 bg-white border-b py-4 px-6 z-20 w-full flex justify-between items-center">
           <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-8 w-8 p-0">
@@ -367,7 +367,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
           </Button>
         </div>
         
-        <div className="overflow-y-auto p-6 max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
           {!user ? (
             <div className="space-y-4">
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
@@ -405,142 +405,146 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 
                 // Now proceed with submission
                 onSubmit(formData);
-              })} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Toy Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. Building Blocks Set" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              })} className="p-6 grid grid-cols-1 md:grid-cols-2 md:gap-8">
+              {/* Left Column - Form Fields */}
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Toy Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. Building Blocks Set" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Describe the toy, its features, and any details a parent might want to know..." 
-                        rows={3} 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ageRanges"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age Ranges (Select all that apply)</FormLabel>
-                    <FormControl>
-                      <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
-                        {AGE_RANGES.map((age) => (
-                          <div key={age} className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id={`age-${age}`}
-                              checked={field.value?.includes(age)}
-                              onChange={(e) => {
-                                const updated = e.target.checked
-                                  ? [...(field.value || []), age]
-                                  : (field.value || []).filter((a) => a !== age);
-                                field.onChange(updated);
-                                // Also update form value directly to ensure it's properly updated
-                                form.setValue('ageRanges', updated, { shouldValidate: true });
-                              }}
-                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
-                            />
-                            <label htmlFor={`age-${age}`} className="text-sm">{age}</label>
-                          </div>
-                        ))}
-                      </div>
-                    </FormControl>
-                    <FormDescription className="text-xs text-blue-600">
-                      Please select at least one age range
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormItem>
-                <FormLabel>Condition</FormLabel>
-                <div className="relative">
-                  <select
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={form.getValues().condition || "Like New"}
-                    onChange={(e) => {
-                      form.setValue("condition", e.target.value);
-                    }}
-                  >
-                    <option value="" disabled>Select condition</option>
-                    {CONDITIONS.map((condition) => (
-                      <option key={condition} value={condition}>
-                        {condition}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <FormDescription className="text-xs mt-1">
-                  Like New = No visible wear / Gently Used = Minor wear / Used = Some visible wear / Well Loved = Significant wear but functional
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Pickup Location</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
-                        <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
-                        <AddressAutocomplete
-                          placeholder="Search for a pickup location"
-                          className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
-                          defaultValue={field.value}
-                          onAddressSelect={(address, coordinates) => {
-                            field.onChange(address);
-                            
-                            // Update coordinates in the database when available
-                            if (coordinates) {
-                              // Store latitude and longitude with the toy
-                              console.log("Selected coordinates:", coordinates);
-                              setLocationCoordinates(coordinates);
-                            } else {
-                              setLocationCoordinates(null);
-                            }
-                          }}
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe the toy, its features, and any details a parent might want to know..." 
+                          rows={4} 
+                          {...field} 
                         />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
-                <h3 className="text-sm font-medium text-blue-800 mb-3 flex items-center">
-                  <ImageIcon className="h-4 w-4 mr-1" /> Media Upload
+                <FormField
+                  control={form.control}
+                  name="ageRanges"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age Ranges (Select all that apply)</FormLabel>
+                      <FormControl>
+                        <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+                          {AGE_RANGES.map((age) => (
+                            <div key={age} className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`age-${age}`}
+                                checked={field.value?.includes(age)}
+                                onChange={(e) => {
+                                  const updated = e.target.checked
+                                    ? [...(field.value || []), age]
+                                    : (field.value || []).filter((a) => a !== age);
+                                  field.onChange(updated);
+                                  // Also update form value directly to ensure it's properly updated
+                                  form.setValue('ageRanges', updated, { shouldValidate: true });
+                                }}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+                              />
+                              <label htmlFor={`age-${age}`} className="text-sm">{age}</label>
+                            </div>
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormDescription className="text-xs text-blue-600">
+                        Please select at least one age range
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormItem>
+                  <FormLabel>Condition</FormLabel>
+                  <div className="relative">
+                    <select
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={form.getValues().condition || "Like New"}
+                      onChange={(e) => {
+                        form.setValue("condition", e.target.value);
+                      }}
+                    >
+                      <option value="" disabled>Select condition</option>
+                      {CONDITIONS.map((condition) => (
+                        <option key={condition} value={condition}>
+                          {condition}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <FormDescription className="text-xs mt-1">
+                    Like New = No visible wear / Gently Used = Minor wear / Used = Some visible wear / Well Loved = Significant wear but functional
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pickup Location</FormLabel>
+                      <FormControl>
+                        <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
+                          <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
+                          <AddressAutocomplete
+                            placeholder="Search for a pickup location"
+                            className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
+                            defaultValue={field.value}
+                            onAddressSelect={(address, coordinates) => {
+                              field.onChange(address);
+                              
+                              // Update coordinates in the database when available
+                              if (coordinates) {
+                                // Store latitude and longitude with the toy
+                                console.log("Selected coordinates:", coordinates);
+                                setLocationCoordinates(coordinates);
+                              } else {
+                                setLocationCoordinates(null);
+                              }
+                            }}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Right Column - Media Upload */}
+              <div className="bg-blue-50 p-6 rounded-md border border-blue-100 h-full flex flex-col">
+                <h3 className="text-lg font-medium text-blue-800 mb-4 flex items-center">
+                  <ImageIcon className="h-5 w-5 mr-2" /> Toy Photos
                 </h3>
                 
-                <div>
+                <div className="flex-grow">
                   {/* Simplified Media Upload Area */}
                   <div 
-                    className="relative cursor-pointer"
+                    className="relative cursor-pointer h-full"
                     onClick={() => {
                       // Always open the image upload dialog directly - simplifies the experience
                       document.getElementById('image-upload')?.click();
@@ -552,7 +556,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   {/* Hidden file inputs for actual uploads */}
                   <div>
                     {/* Video upload option is still available via a separate button */}
-                    <div className="mt-2 text-center">
+                    <div className="mt-4 text-center">
                       <Button 
                         type="button" 
                         variant="outline" 
@@ -752,18 +756,19 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 </div>
               )}
               
-              <div className="flex space-x-3 pt-2">
+              {/* Action buttons - spans both columns */}
+              <div className="md:col-span-2 flex justify-end space-x-3 pt-6">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={onClose} 
-                  className="flex-1 border-blue-200 text-blue-800"
+                  className="border-blue-200 text-blue-800"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  className="flex-1 bg-blue-700 hover:bg-blue-800" 
+                  className="bg-blue-700 hover:bg-blue-800 w-32" 
                   disabled={isUploading || addToyMutation.isPending}
                 >
                   {isUploading || addToyMutation.isPending ? 
