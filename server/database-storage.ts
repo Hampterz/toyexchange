@@ -233,18 +233,22 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(toys).orderBy(desc(toys.createdAt));
     
     if (filters) {
-      // Location filter with array support
+      // We'll remove the direct location filtering by address/string
+      // since we're moving to proper radius-based filtering instead
+      // Location will now be filtered in post-processing using distance calculation
+      
+      // We'll keep this block commented for reference
+      /*
       if (filters.location && Array.isArray(filters.location) && filters.location.length > 0) {
         console.log(`Filtering toys by multiple locations:`, filters.location);
-        // If there are multiple locations, we use the "in" operator which matches ANY locations in the array
         query = query.where(
           inArray(toys.location, filters.location)
         );
       } else if (filters.location && typeof filters.location === 'string' && filters.location !== "any") {
         console.log(`Filtering toys by single location:`, filters.location);
-        // For backwards compatibility with single string values
         query = query.where(eq(toys.location, filters.location));
       }
+      */
       
       // Category filter with array support
       if (filters.category && Array.isArray(filters.category) && filters.category.length > 0) {
@@ -399,37 +403,44 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Helper function to calculate distance between two points using the Haversine formula
-  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  private calculateDistance(lat1: number | string, lon1: number | string, lat2: number | string, lon2: number | string): number {
+    // Convert all coordinates to numbers if they are strings
+    const latUser = typeof lat1 === 'string' ? parseFloat(lat1) : lat1;
+    const lonUser = typeof lon1 === 'string' ? parseFloat(lon1) : lon1;
+    const latToy = typeof lat2 === 'string' ? parseFloat(lat2) : lat2;
+    const lonToy = typeof lon2 === 'string' ? parseFloat(lon2) : lon2;
+    
     // Check for null, undefined or NaN values
-    if (lat1 === null || lon1 === null || lat2 === null || lon2 === null ||
-        lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined ||
-        isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
-      console.error("Invalid coordinate values:", { lat1, lon1, lat2, lon2 });
+    if (latUser === null || lonUser === null || latToy === null || lonToy === null ||
+        latUser === undefined || lonUser === undefined || latToy === undefined || lonToy === undefined ||
+        isNaN(latUser) || isNaN(lonUser) || isNaN(latToy) || isNaN(lonToy)) {
+      console.error("Invalid coordinate values:", { latUser, lonUser, latToy, lonToy });
       return Number.MAX_VALUE; // Return a very large distance so this toy won't be included in distance filters
     }
     
     // Validate coordinates are in reasonable ranges
-    if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || Math.abs(lon1) > 180 || Math.abs(lon2) > 180) {
-      console.error("Coordinate values out of range:", { lat1, lon1, lat2, lon2 });
+    if (Math.abs(latUser) > 90 || Math.abs(latToy) > 90 || Math.abs(lonUser) > 180 || Math.abs(lonToy) > 180) {
+      console.error("Coordinate values out of range:", { latUser, lonUser, latToy, lonToy });
       return Number.MAX_VALUE;
     }
     
-    const R = 3963.0; // Radius of the Earth in miles
-    const dLat = this.deg2rad(lat2 - lat1);
-    const dLon = this.deg2rad(lon2 - lon1);
+    const R = 3958.8; // Radius of the Earth in miles
+    const dLat = this.deg2rad(latToy - latUser);
+    const dLon = this.deg2rad(lonToy - lonUser);
     const a = 
       Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
+      Math.cos(this.deg2rad(latUser)) * Math.cos(this.deg2rad(latToy)) * 
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     const distance = R * c; // Distance in miles
     
     // A sanity check in case the calculation somehow produces NaN or Infinity
     if (isNaN(distance) || !isFinite(distance)) {
-      console.error("Distance calculation failed:", { lat1, lon1, lat2, lon2, result: distance });
+      console.error("Distance calculation failed:", { latUser, lonUser, latToy, lonToy, result: distance });
       return Number.MAX_VALUE;
     }
     
+    console.log(`Distance calculation: ${distance.toFixed(2)} miles between [${latUser}, ${lonUser}] and [${latToy}, ${lonToy}]`);
     return distance;
   }
   
