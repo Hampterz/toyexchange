@@ -225,13 +225,13 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
       <div className="space-y-4">
         {/* Image/Video Upload Area */}
         {(!imageFiles || imageFiles.length === 0) && (!videoFiles || videoFiles.length === 0) ? (
-          <div className="border-2 border-dashed border-blue-200 rounded-md p-6 text-center bg-blue-50 hover:bg-blue-100 transition-colors">
-            <Upload className="mx-auto h-12 w-12 text-blue-600" />
-            <div className="mt-2">
-              <p className="text-sm font-medium text-blue-800">
+          <div className="border-2 border-dashed border-blue-200 rounded-md p-3 sm:p-4 md:p-6 text-center bg-blue-50 hover:bg-blue-100 transition-colors">
+            <Upload className="mx-auto h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-blue-600" />
+            <div className="mt-1 sm:mt-2">
+              <p className="text-xs sm:text-sm font-medium text-blue-800">
                 Click here to add images
               </p>
-              <p className="text-xs text-blue-700 mt-1">
+              <p className="text-[10px] xs:text-xs text-blue-700 mt-0.5 sm:mt-1">
                 Upload up to 4 photos (PNG, JPG, WEBP)
               </p>
               <p className="text-xs text-blue-700 mt-1 font-bold">
@@ -432,9 +432,13 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Toy Name</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Toy Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Building Blocks Set" {...field} />
+                        <Input 
+                          placeholder="e.g. Building Blocks Set" 
+                          className="text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-3"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -446,11 +450,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Description</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Describe the toy, its features, and any details a parent might want to know..." 
-                          rows={4} 
+                          rows={3}
+                          className="text-xs sm:text-sm min-h-[70px] sm:min-h-[100px] px-2.5 py-1.5 sm:px-3 sm:py-2"
                           {...field} 
                         />
                       </FormControl>
@@ -692,24 +697,24 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 name="tags"
                 render={() => (
                   <FormItem>
-                    <FormLabel className="flex items-center space-x-2">
-                      <Tag className="h-4 w-4 text-blue-700" />
+                    <FormLabel className="flex items-center space-x-1.5 sm:space-x-2 text-sm sm:text-base">
+                      <Tag className="h-3 w-3 sm:h-4 sm:w-4 text-blue-700" />
                       <span>Tags</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="p-1">
+                      <div className="p-0.5 sm:p-1">
                         {/* Simple Tag Selector */}
-                        <div className="mb-2">
+                        <div className="mb-1.5 sm:mb-2">
                           <div className="relative w-full">
                             <Button
                               type="button"
                               variant="outline"
                               role="combobox"
-                              className="w-full justify-between text-left font-normal"
+                              className="w-full justify-between text-left font-normal text-xs sm:text-sm py-1.5 sm:py-2 h-auto"
                               onClick={() => setShowTagSelector(!showTagSelector)}
                             >
                               <div className="flex items-center">
-                                <Tag className="mr-2 h-4 w-4 shrink-0" />
+                                <Tag className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
                                 <span>Select Tags ({selectedTags.length || 0})</span>
                               </div>
                             </Button>
@@ -722,18 +727,18 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                   onClick={() => setShowTagSelector(false)}
                                 ></div>
                                 <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
-                                  <div className="max-h-60 overflow-auto p-2">
+                                  <div className="max-h-48 sm:max-h-60 overflow-auto p-1.5 sm:p-2">
                                     {COMMON_ATTRIBUTES.map(tag => (
                                       <div 
                                         key={tag}
-                                        className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                        className="relative flex cursor-pointer select-none items-center rounded-sm px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                                         onClick={() => toggleTag(tag)}
                                       >
                                         <input 
                                           type="checkbox" 
                                           checked={selectedTags.includes(tag)}
                                           readOnly
-                                          className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
+                                          className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
                                         />
                                         <span>{tag}</span>
                                       </div>
@@ -746,22 +751,22 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                           
                           {/* Show selected tags and allow removal */}
                           {selectedTags.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-3">
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                               {selectedTags.map(tag => (
                                 <Badge 
                                   key={tag} 
                                   variant="default"
-                                  className="cursor-pointer py-1 px-3 transition-all bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                  className="cursor-pointer py-0.5 sm:py-1 px-2 sm:px-3 text-xs sm:text-sm transition-all bg-blue-100 text-blue-800 hover:bg-blue-200"
                                   onClick={() => toggleTag(tag)}
                                 >
-                                  #{tag} <X className="ml-1 h-3 w-3" />
+                                  #{tag} <X className="ml-1 h-2.5 w-2.5 sm:h-3 sm:w-3" />
                                 </Badge>
                               ))}
                             </div>
                           )}
                         </div>
                         
-                        <FormDescription className="mt-2 text-xs text-blue-600">
+                        <FormDescription className="mt-1 sm:mt-2 text-[10px] xs:text-xs text-blue-600">
                           Tags help other parents find your toy more easily
                         </FormDescription>
                       </div>
@@ -773,14 +778,19 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
               {/* Display form validation error summary if submit was attempted */}
               {form.formState.submitCount > 0 && Object.keys(form.formState.errors).length > 0 && (
-                <div className="bg-red-50 text-red-800 p-3 rounded-md mb-4 border border-red-200">
-                  <h4 className="font-medium mb-1">Please fix the following issues:</h4>
-                  <ul className="list-disc pl-5 text-sm">
+                <div className="bg-red-50 text-red-800 p-2.5 sm:p-3 rounded-md mb-3 sm:mb-4 border border-red-200">
+                  <h4 className="font-medium mb-0.5 sm:mb-1 text-sm sm:text-base">Please fix the following issues:</h4>
+                  <ul className="list-disc pl-4 sm:pl-5 text-xs sm:text-sm">
                     {Object.entries(form.formState.errors).map(([field, error]) => (
                       <li key={field}>
-                        {field === 'ageRanges' ? 'Age Range' : 
-                         field === 'imageFiles' ? 'Images' : 
-                         field.charAt(0).toUpperCase() + field.slice(1)}: {error?.message as string}
+                        <span className="font-medium">
+                          {field === 'ageRanges' ? 'Age Range' : 
+                           field === 'imageFiles' ? 'Images' : 
+                           field.charAt(0).toUpperCase() + field.slice(1)}:
+                        </span>{' '}
+                        <span className="text-red-700">
+                          {error?.message as string}
+                        </span>
                       </li>
                     ))}
                   </ul>
