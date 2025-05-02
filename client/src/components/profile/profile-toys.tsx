@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Edit, Trash2, Tag, Film } from "lucide-react";
+import { Loader2, Edit, Trash2, Tag, Film, Upload } from "lucide-react";
 import { HandshakeIcon } from "@/components/ui/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -531,7 +531,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
 
       {/* Edit Toy Dialog */}
       <Dialog open={toyToEdit !== null} onOpenChange={(open) => !open && setToyToEdit(null)}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Toy Listing</DialogTitle>
           </DialogHeader>
@@ -573,6 +573,113 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                 />
               </div>
             </div>
+            
+            {/* Image Management Section */}
+            <div className="grid gap-2">
+              <Label>Images</Label>
+              
+              {/* Current Images */}
+              {editedToyImages && editedToyImages.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium mb-2">Current Images</div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {editedToyImages.map((image, index) => (
+                      <div key={index} className="relative border rounded-md overflow-hidden h-36 group">
+                        <img
+                          src={image}
+                          alt={`Image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            className="p-1 bg-white bg-opacity-90 rounded-full text-red-600 hover:text-red-800 hover:bg-white"
+                            onClick={() => handleRemoveImage(index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">No images currently uploaded</div>
+              )}
+              
+              {/* New Image Upload */}
+              <Input
+                id="edit-image-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    setNewImageFiles(e.target.files);
+                  }
+                }}
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => document.getElementById('edit-image-upload')?.click()}
+                className="w-full"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {editedToyImages.length > 0 ? "Add More Images" : "Upload Images"}
+              </Button>
+              
+              {/* Preview New Images */}
+              {newImageFiles && newImageFiles.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  <div className="text-sm font-medium">New Images to Upload</div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {Array.from(newImageFiles).map((file, index) => (
+                      <div key={`new-${index}`} className="relative border rounded-md overflow-hidden h-36">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`New Image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Availability Toggle */}
+            {toyToEdit && (
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="edit-availability" className="text-sm">
+                  Availability:
+                </Label>
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="edit-availability"
+                    checked={!!toyToEdit.isAvailable}
+                    onCheckedChange={(checked) => {
+                      if (toyToEdit) {
+                        handleToggleAvailability(toyToEdit.id, !!toyToEdit.isAvailable);
+                      }
+                    }}
+                    disabled={toggleAvailabilityMutation.isPending}
+                  />
+                  <Label 
+                    htmlFor="edit-availability"
+                    className="cursor-pointer text-sm"
+                  >
+                    {!!toyToEdit.isAvailable ? "Available" : "Not available"}
+                  </Label>
+                </div>
+                <div className="text-xs text-muted-foreground ml-4">
+                  {!!toyToEdit.isAvailable 
+                    ? "This toy is visible to others" 
+                    : "This toy is hidden from search results"}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -580,9 +687,9 @@ export function ProfileToys({ userId }: ProfileToysProps) {
             </DialogClose>
             <Button 
               onClick={handleSaveEditedToy}
-              disabled={editToyMutation.isPending || !editedToyTitle}
+              disabled={editToyMutation.isPending || isUploading || !editedToyTitle}
             >
-              {editToyMutation.isPending ? (
+              {(editToyMutation.isPending || isUploading) ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
