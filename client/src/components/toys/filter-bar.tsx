@@ -150,46 +150,45 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               defaultValue=""
               className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
               onAddressSelect={(address, coordinates, placeId) => {
-                // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
-                // or if it has coordinates (both ensure a complete address was selected)
-                if (address && (placeId || coordinates)) {
+                // Only proceed if we have an address and coordinates
+                if (address && coordinates) {
+                  console.log("Location selected:", address, coordinates);
+                  
                   // Add to the existing locations array instead of replacing
                   const newLocations = [...filters.location];
                   
                   // Only add if it's not already in the list
                   if (!newLocations.includes(address)) {
                     newLocations.push(address);
-                    handleFilterChange("location", newLocations);
                   }
                   
-                  // If we have coordinates, update the latitude and longitude
-                  if (coordinates) {
-                    // Ensure coordinates are converted to numbers
-                    const lat = Number(coordinates.latitude);
-                    const lng = Number(coordinates.longitude);
-                    
-                    handleFilterChange("latitude", lat);
-                    handleFilterChange("longitude", lng);
-                    
-                    // Set a smaller default distance radius - 5 miles is more reasonable
-                    // This will show only truly local results
-                    handleFilterChange("distance", 5);
-                    
-                    // Apply filter immediately when user selects a location
-                    onFilterChange({
-                      ...filters,
-                      location: newLocations,
-                      latitude: lat,
-                      longitude: lng,
-                      distance: 5
-                    });
-                    
-                    // Clear the input field after selection for better UX
-                    const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
-                    if (inputEl) {
-                      inputEl.value = '';
-                    }
+                  // Always use coordinates for radius-based filtering
+                  // Ensure coordinates are converted to numbers
+                  const lat = Number(coordinates.latitude);
+                  const lng = Number(coordinates.longitude);
+                  
+                  console.log(`Using coordinates for radius filtering: [${lat}, ${lng}]`);
+                  
+                  // Apply all filter changes at once for better performance
+                  const updatedFilters = {
+                    ...filters,
+                    location: newLocations,
+                    latitude: lat,
+                    longitude: lng,
+                    distance: filters.distance || 5 // Keep existing distance or use 5 miles default
+                  };
+                  
+                  // Update state and apply filter
+                  setFilters(updatedFilters);
+                  onFilterChange(updatedFilters);
+                  
+                  // Clear the input field after selection for better UX
+                  const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
+                  if (inputEl) {
+                    inputEl.value = '';
                   }
+                } else {
+                  console.log("Missing coordinates for location:", address);
                 }
               }}
             />
@@ -453,45 +452,45 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             defaultValue=""
             className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
             onAddressSelect={(address, coordinates, placeId) => {
-              // Only add the address if it has a placeId (means it was selected from autocomplete dropdown)
-              // or if it has coordinates (both ensure a complete address was selected)
-              if (address && (placeId || coordinates)) {
-                // Add to existing locations instead of replacing
+              // Only proceed if we have an address and coordinates
+              if (address && coordinates) {
+                console.log("Location selected:", address, coordinates);
+                
+                // Add to the existing locations array instead of replacing
                 const newLocations = [...filters.location];
                 
-                // Only add if not already in the list
+                // Only add if it's not already in the list
                 if (!newLocations.includes(address)) {
                   newLocations.push(address);
-                  handleFilterChange("location", newLocations);
                 }
                 
-                // If we have coordinates, update the latitude and longitude
-                if (coordinates) {
-                  // Ensure coordinates are converted to numbers
-                  const lat = Number(coordinates.latitude);
-                  const lng = Number(coordinates.longitude);
-                  
-                  handleFilterChange("latitude", lat);
-                  handleFilterChange("longitude", lng);
-                  
-                  // Set a reasonable default distance
-                  handleFilterChange("distance", 5);
-                  
-                  // Apply filter immediately when user selects a location
-                  onFilterChange({
-                    ...filters,
-                    location: newLocations,
-                    latitude: lat,
-                    longitude: lng,
-                    distance: 5
-                  });
-                  
-                  // Clear the input field after selection for better UX
-                  const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
-                  if (inputEl) {
-                    inputEl.value = '';
-                  }
+                // Always use coordinates for radius-based filtering
+                // Ensure coordinates are converted to numbers
+                const lat = Number(coordinates.latitude);
+                const lng = Number(coordinates.longitude);
+                
+                console.log(`Using coordinates for radius filtering: [${lat}, ${lng}]`);
+                
+                // Apply all filter changes at once for better performance
+                const updatedFilters = {
+                  ...filters,
+                  location: newLocations,
+                  latitude: lat,
+                  longitude: lng,
+                  distance: filters.distance || 5 // Keep existing distance or use 5 miles default
+                };
+                
+                // Update state and apply filter
+                setFilters(updatedFilters);
+                onFilterChange(updatedFilters);
+                
+                // Clear the input field after selection for better UX
+                const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
+                if (inputEl) {
+                  inputEl.value = '';
                 }
+              } else {
+                console.log("Missing coordinates for location:", address);
               }
             }}
           />
