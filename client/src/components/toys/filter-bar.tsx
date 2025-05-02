@@ -484,15 +484,15 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   <Badge 
                     key={location} 
                     variant="secondary"
-                    className="flex items-center gap-1 py-1 bg-blue-50 mb-1"
+                    className="flex items-center gap-1 py-1 bg-blue-50 mb-1 max-w-full"
                   >
-                    <span className="text-xs max-w-[200px] truncate">{location}</span>
+                    <span className="text-xs max-w-[90%] truncate">{location}</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLocationRemove(location);
                       }}
-                      className="text-blue-500 hover:text-blue-700 ml-1"
+                      className="text-blue-500 hover:text-blue-700 ml-1 flex-shrink-0"
                     >
                       ×
                     </button>
@@ -626,10 +626,10 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               <Badge 
                 key={tag} 
                 variant="default"
-                className="cursor-pointer py-1 px-3 transition-all bg-blue-100 text-blue-800 hover:bg-blue-200"
+                className="cursor-pointer py-1 px-2 transition-all bg-blue-100 text-blue-800 hover:bg-blue-200 max-w-full"
                 onClick={() => toggleTag(tag)}
               >
-                #{tag} <X className="ml-1 h-3 w-3" />
+                <span className="truncate">#{tag}</span> <X className="ml-1 h-3 w-3 flex-shrink-0" />
               </Badge>
             ))}
           </div>

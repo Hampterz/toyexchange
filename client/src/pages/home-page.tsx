@@ -157,31 +157,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Filters - Full height on mobile with sticky position */}
           <div className="md:col-span-3 lg:col-span-3 bg-white p-4 sm:p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow md:sticky md:top-[100px] self-start">
-            {/* Sort Options */}
-            <div className="mb-4 md:mb-6">
-              <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Sort by</h3>
-              <div className="flex md:flex-col gap-3 md:gap-2 mt-3">
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="sortBy" 
-                    value="newest" 
-                    defaultChecked 
-                    className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-xs sm:text-sm text-blue-800">Newest First</span>
-                </label>
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="sortBy" 
-                    value="closest" 
-                    className="h-4 w-4 text-blue-700 border-blue-300 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-xs sm:text-sm text-blue-800">Closest to Me</span>
-                </label>
-              </div>
-            </div>
+
             
             {/* Search - desktop only */}
             <div className="hidden md:block mb-6">
