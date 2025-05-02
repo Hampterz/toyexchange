@@ -193,13 +193,16 @@ const UserProfilePage: React.FC = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="flex items-center gap-4 mb-1">
-                  <CardTitle className="text-2xl">{user.name}</CardTitle>
-                  {user.currentBadge && (
-                    <UserBadge badgeName={user.currentBadge} showTooltip={true} className="text-lg" />
-                  )}
-                </div>
-                <CardDescription>{user.username}</CardDescription>
+                <CardTitle className="text-2xl mb-1">{user.name}</CardTitle>
+                <CardDescription className="mb-1">{user.username}</CardDescription>
+                {user.currentBadge && (
+                  <UserBadge 
+                    badgeName={user.currentBadge} 
+                    showTooltip={true} 
+                    size="lg"
+                    className="text-xl mt-1" 
+                  />
+                )}
               </div>
             </div>
             {currentUser && currentUser.id !== userId && (
@@ -245,18 +248,14 @@ const UserProfilePage: React.FC = () => {
               
               <Separator className="my-3" />
               
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <p className="text-xl font-bold">{user.toysShared || 0}</p>
-                  <p className="text-xs text-muted-foreground">Toys Shared</p>
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <p className="text-2xl font-bold text-blue-600">{user.toysShared || 0}</p>
+                  <p className="text-sm text-blue-700">Toys Shared</p>
                 </div>
-                <div>
-                  <p className="text-xl font-bold">{user.successfulExchanges || 0}</p>
-                  <p className="text-xs text-muted-foreground">Exchanges</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold">{(user as any).followers || 0}</p>
-                  <p className="text-xs text-muted-foreground">Followers</p>
+                <div className="bg-green-50 rounded-lg p-3">
+                  <p className="text-2xl font-bold text-green-600">{user.successfulExchanges || 0}</p>
+                  <p className="text-sm text-green-700">Exchanges</p>
                 </div>
               </div>
               
