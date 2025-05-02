@@ -464,11 +464,11 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   name="ageRanges"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Age Ranges (Select all that apply)</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Age Ranges (Select all that apply)</FormLabel>
                       <FormControl>
-                        <div className="grid grid-cols-2 gap-2 border rounded-md p-3">
+                        <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 gap-1.5 xs:gap-2 border rounded-md p-2 sm:p-3">
                           {AGE_RANGES.map((age) => (
-                            <div key={age} className="flex items-center space-x-2">
+                            <div key={age} className="flex items-center space-x-1.5 sm:space-x-2">
                               <input
                                 type="checkbox"
                                 id={`age-${age}`}
@@ -483,12 +483,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                                 }}
                                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
                               />
-                              <label htmlFor={`age-${age}`} className="text-sm">{age}</label>
+                              <label htmlFor={`age-${age}`} className="text-xs sm:text-sm">{age}</label>
                             </div>
                           ))}
                         </div>
                       </FormControl>
-                      <FormDescription className="text-xs text-blue-600">
+                      <FormDescription className="text-[10px] xs:text-xs text-blue-600">
                         Please select at least one age range
                       </FormDescription>
                       <FormMessage />
@@ -497,10 +497,10 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 />
 
                 <FormItem>
-                  <FormLabel>Condition</FormLabel>
+                  <FormLabel className="text-sm sm:text-base">Condition</FormLabel>
                   <div className="relative">
                     <select
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="w-full rounded-md border border-input bg-background px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       value={form.getValues().condition || "Like New"}
                       onChange={(e) => {
                         form.setValue("condition", e.target.value);
@@ -514,7 +514,7 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                       ))}
                     </select>
                   </div>
-                  <FormDescription className="text-xs mt-1">
+                  <FormDescription className="text-[10px] xs:text-xs mt-1">
                     Like New = No visible wear / Gently Used = Minor wear / Used = Some visible wear / Well Loved = Significant wear but functional
                   </FormDescription>
                   <FormMessage />
@@ -525,13 +525,13 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pickup Location</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Pickup Location</FormLabel>
                       <FormControl>
-                        <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2">
-                          <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
+                        <div className="flex items-center bg-white rounded-md border border-gray-300 px-2 py-1.5 sm:px-3 sm:py-2">
+                          <MapPin className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 text-blue-600" />
                           <AddressAutocomplete
                             placeholder="Search for a pickup location"
-                            className="w-full border-none focus-visible:ring-0 p-0 shadow-none"
+                            className="w-full border-none focus-visible:ring-0 p-0 shadow-none text-xs sm:text-sm"
                             defaultValue={field.value}
                             onAddressSelect={(address, coordinates) => {
                               field.onChange(address);
@@ -555,9 +555,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
               </div>
 
               {/* Right Column - Media Upload */}
-              <div className="mt-4 md:mt-0 bg-blue-50 p-4 sm:p-5 md:p-6 rounded-md border border-blue-100 h-full flex flex-col">
-                <h3 className="text-base sm:text-lg font-medium text-blue-800 mb-3 sm:mb-4 flex items-center">
-                  <ImageIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" /> Toy Photos
+              <div className="mt-3 sm:mt-4 md:mt-0 bg-blue-50 p-3 sm:p-4 md:p-6 rounded-md border border-blue-100 h-full flex flex-col">
+                <h3 className="text-sm sm:text-base md:text-lg font-medium text-blue-800 mb-2 sm:mb-3 flex items-center">
+                  <ImageIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" /> Toy Photos
                 </h3>
                 
                 <div className="flex-grow">
@@ -575,12 +575,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                   {/* Hidden file inputs for actual uploads */}
                   <div>
                     {/* Video upload option is still available via a separate button */}
-                    <div className="mt-4 text-center">
+                    <div className="mt-3 sm:mt-4 text-center">
                       <Button 
                         type="button" 
                         variant="outline" 
                         size="sm"
-                        className="text-blue-700 border-blue-200"
+                        className="text-blue-700 border-blue-200 text-xs sm:text-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           document.getElementById('video-upload')?.click();
@@ -788,24 +788,25 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
               )}
               
               {/* Action buttons - spans both columns */}
-              <div className="md:col-span-2 flex justify-end space-x-3 pt-6">
+              <div className="md:col-span-2 flex flex-col xs:flex-row gap-3 xs:gap-3 xs:justify-end pt-4 sm:pt-6">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={onClose} 
-                  className="border-blue-200 text-blue-800"
+                  className="border-blue-200 text-blue-800 order-2 xs:order-1"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  className="bg-blue-700 hover:bg-blue-800 w-32" 
+                  className="bg-blue-700 hover:bg-blue-800 w-full xs:w-32 order-1 xs:order-2" 
                   disabled={isUploading || addToyMutation.isPending}
                 >
                   {isUploading || addToyMutation.isPending ? 
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading...
+                      <span className="hidden xs:inline">Uploading...</span>
+                      <span className="xs:hidden">Please wait...</span>
                     </> : 
                     "Share Toy"
                   }
