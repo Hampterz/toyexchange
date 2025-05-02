@@ -378,15 +378,15 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
-        <div className="sticky top-0 bg-white border-b py-4 px-6 z-20 w-full flex justify-between items-center">
-          <DialogTitle className="text-xl font-bold">Share a Toy</DialogTitle>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-8 w-8 p-0">
+      <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden p-0 w-[95vw] sm:w-[90vw] mx-auto">
+        <div className="sticky top-0 bg-white border-b py-3 sm:py-4 px-4 sm:px-6 z-20 w-full flex justify-between items-center">
+          <DialogTitle className="text-lg xs:text-xl font-bold">Share a Toy</DialogTitle>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-7 w-7 sm:h-8 sm:w-8 p-0">
             <X className="h-4 w-4" />
           </Button>
         </div>
         
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(95vh-60px)] px-4 sm:px-6 py-3 sm:py-4">
           {!user ? (
             <div className="space-y-4">
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
@@ -424,9 +424,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                 
                 // Now proceed with submission
                 onSubmit(formData);
-              })} className="p-6 grid grid-cols-1 md:grid-cols-2 md:gap-8">
+              })} className="p-3 sm:p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 md:gap-6 lg:gap-8">
               {/* Left Column - Form Fields */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <FormField
                   control={form.control}
                   name="title"
@@ -555,9 +555,9 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
               </div>
 
               {/* Right Column - Media Upload */}
-              <div className="bg-blue-50 p-6 rounded-md border border-blue-100 h-full flex flex-col">
-                <h3 className="text-lg font-medium text-blue-800 mb-4 flex items-center">
-                  <ImageIcon className="h-5 w-5 mr-2" /> Toy Photos
+              <div className="mt-4 md:mt-0 bg-blue-50 p-4 sm:p-5 md:p-6 rounded-md border border-blue-100 h-full flex flex-col">
+                <h3 className="text-base sm:text-lg font-medium text-blue-800 mb-3 sm:mb-4 flex items-center">
+                  <ImageIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2" /> Toy Photos
                 </h3>
                 
                 <div className="flex-grow">

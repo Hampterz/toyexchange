@@ -529,23 +529,25 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 </button>
               </div>
               
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold mb-1">Description</h3>
-                <p className="text-neutral-700 text-sm leading-relaxed">
+              <div className="mt-3 sm:mt-4">
+                <h3 className="text-xs sm:text-sm font-semibold mb-1">Description</h3>
+                <p className="text-neutral-700 text-xs sm:text-sm leading-relaxed">
                   {toy.description}
                 </p>
               </div>
               
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold mb-1">Pickup Location</h3>
-                <div className="flex items-center text-neutral-700 text-sm">
-                  <MapPin className="h-4 w-4 mr-1 text-neutral-500" />
-                  <span>
-                    {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
-                     toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
-                     toy.location.split(',')[0]}
+              <div className="mt-3 sm:mt-4">
+                <h3 className="text-xs sm:text-sm font-semibold mb-1">Pickup Location</h3>
+                <div className="flex items-center text-neutral-700 text-xs sm:text-sm">
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-neutral-500 flex-shrink-0" />
+                  <span className="flex flex-wrap">
+                    <span className="mr-1">
+                      {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
+                      toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
+                      toy.location.split(',')[0]}
+                    </span>
                     {toy.distance && toyOwner?.locationPrivacy !== 'private' && (
-                      <span className="ml-1 text-blue-600 font-medium">
+                      <span className="text-blue-600 font-medium">
                         ({Math.round(toy.distance * 10) / 10} miles away)
                       </span>
                     )}
@@ -553,23 +555,23 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 </div>
               </div>
               
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold mb-1">Tags</h3>
+              <div className="mt-3 sm:mt-4">
+                <h3 className="text-xs sm:text-sm font-semibold mb-1">Tags</h3>
                 <div className="flex flex-wrap gap-1">
                   {toy.tags && toy.tags.length > 0 ? (
                     toy.tags.map((tag, i) => (
-                      <Badge key={i} variant="secondary" className="text-xs bg-neutral-100 text-neutral-700">
+                      <Badge key={i} variant="secondary" className="text-[10px] xs:text-xs bg-neutral-100 text-neutral-700 py-0 px-1.5 h-5">
                         {tag}
                       </Badge>
                     ))
                   ) : (
-                    <span className="text-sm text-neutral-500">No tags</span>
+                    <span className="text-xs sm:text-sm text-neutral-500">No tags</span>
                   )}
                 </div>
               </div>
               
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold mb-2">Share this toy</h3>
+              <div className="mt-3 sm:mt-4">
+                <h3 className="text-xs sm:text-sm font-semibold mb-1 sm:mb-2">Share this toy</h3>
                 <div className="flex items-center space-x-2">
                   <SocialShareButtons
                     url={getShareableUrl()}
@@ -583,20 +585,20 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                 </div>
               </div>
 
-              <div className="mt-6 border-t pt-4">
-                <div className="flex items-center">
+              <div className="mt-4 sm:mt-6 border-t pt-3 sm:pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0">
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold">Shared by</h3>
+                    <h3 className="text-xs sm:text-sm font-semibold">Shared by</h3>
                     {toyOwner && (
                       <HoverCard>
                         <HoverCardTrigger asChild className="inline-block mt-1">
                           <Link href={`/users/${toyOwner.id}`}>
-                            <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
+                            <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm hover:text-primary cursor-pointer">
                               <span className="font-medium">{toyOwner.name}</span>
                               {toyOwner.currentBadge && (
                                 <UserBadge 
                                   badgeName={toyOwner.currentBadge} 
-                                  className="text-lg" 
+                                  className="text-base sm:text-lg" 
                                   showTooltip={true}
                                   iconOnly={true}
                                 />
@@ -604,17 +606,17 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                             </div>
                           </Link>
                         </HoverCardTrigger>
-                        <HoverCardContent className="w-80 p-4">
+                        <HoverCardContent className="w-72 sm:w-80 p-3 sm:p-4">
                           <div className="flex justify-between">
                             <div>
                               <Link href={`/users/${toyOwner.id}`}>
-                                <h4 className="font-bold hover:text-primary cursor-pointer">{toyOwner.name}</h4>
+                                <h4 className="font-bold text-sm sm:text-base hover:text-primary cursor-pointer">{toyOwner.name}</h4>
                               </Link>
-                              <div className="flex items-center text-sm text-neutral-500 mt-1">
+                              <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
                                 <Calendar className="h-3 w-3 mr-1" />
                                 <span>Joined {formatDate(toyOwner.createdAt)}</span>
                               </div>
-                              <div className="flex items-center text-sm text-neutral-500 mt-1">
+                              <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
                                 <MapPin className="h-3 w-3 mr-1" />
                                 <span>
                                   {toyOwner.locationPrivacy === 'exact_location' ? toyOwner.location :
@@ -624,14 +626,14 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                               </div>
                               <Link 
                                 href={`/users/${toyOwner.id}`}
-                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 inline-block"
+                                className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 inline-block"
                               >
                                 View Profile
                               </Link>
                             </div>
                             <div className="flex flex-col items-center">
-                              <span className="text-lg font-bold text-blue-600">{toyOwner.successfulExchanges || 0}</span>
-                              <span className="text-xs text-neutral-500">Exchanges</span>
+                              <span className="text-base sm:text-lg font-bold text-blue-600">{toyOwner.successfulExchanges || 0}</span>
+                              <span className="text-[10px] sm:text-xs text-neutral-500">Exchanges</span>
                             </div>
                           </div>
                         </HoverCardContent>
@@ -641,7 +643,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   
                   {!isOwner && (
                     <Button 
-                      className="bg-primary hover:bg-primary/90"
+                      className="bg-primary hover:bg-primary/90 text-sm w-full sm:w-auto mt-1 sm:mt-0"
                       onClick={() => {
                         setIsExpanded(false);
                         onRequestClick(toy);
