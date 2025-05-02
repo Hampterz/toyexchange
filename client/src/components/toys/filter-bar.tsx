@@ -53,8 +53,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
     distance: initialFilters?.distance || 5, // Default to 5 miles
-    latitude: initialFilters?.latitude || (user?.latitude || undefined),
-    longitude: initialFilters?.longitude || (user?.longitude || undefined),
+    // Ensure coordinates are properly converted to numbers
+    latitude: initialFilters?.latitude || (user?.latitude ? Number(user.latitude) : undefined),
+    longitude: initialFilters?.longitude || (user?.longitude ? Number(user.longitude) : undefined),
   });
   
   const [searchValue, setSearchValue] = useState(initialFilters?.search || "");
@@ -126,6 +127,27 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       // Otherwise add it
       const updatedValues = [...currentValues, value];
       handleFilterChange(filterType, updatedValues);
+    }
+  };
+  
+  // Handle location removal with special logic for coordinates
+  const handleLocationRemove = (locationToRemove: string) => {
+    const newLocations = filters.location.filter(l => l !== locationToRemove);
+    
+    // If removing the last location, also clear coordinates
+    if (newLocations.length === 0) {
+      const updatedFilters = {
+        ...filters,
+        location: newLocations,
+        latitude: undefined,
+        longitude: undefined
+      };
+      setFilters(updatedFilters);
+      onFilterChange(updatedFilters);
+      console.log("Cleared location coordinates");
+    } else {
+      // Otherwise just update the location list
+      handleFilterChange("location", newLocations);
     }
   };
 
@@ -235,8 +257,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        const newLocations = filters.location.filter(l => l !== location);
-                        handleFilterChange("location", newLocations);
+                        handleLocationRemove(location);
                       }}
                       className="text-blue-500 hover:text-blue-700 ml-1"
                     >
@@ -509,8 +530,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        const newLocations = filters.location.filter(l => l !== location);
-                        handleFilterChange("location", newLocations);
+                        handleLocationRemove(location);
                       }}
                       className="text-blue-500 hover:text-blue-700 ml-1"
                     >
