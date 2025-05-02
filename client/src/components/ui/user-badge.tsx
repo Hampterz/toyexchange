@@ -23,47 +23,47 @@ const badgeConfig: Record<string, {
   color: string;
 }> = {
   'eco_champion': {
-    icon: <Leaf className="h-3 w-3" />,
+    icon: <Leaf className="h-5 w-5" />,
     description: 'Eco Champion: Significantly contributed to reducing waste through recycling toys',
     color: 'bg-green-100 text-green-800 hover:bg-green-200',
   },
   'super_sharer': {
-    icon: <Heart className="h-3 w-3" />,
+    icon: <Heart className="h-5 w-5" />,
     description: 'Super Sharer: Shared 20+ toys with the community',
     color: 'bg-pink-100 text-pink-800 hover:bg-pink-200',
   },
   'trusted_member': {
-    icon: <Shield className="h-3 w-3" />,
+    icon: <Shield className="h-5 w-5" />,
     description: 'Trusted Member: Earned exceptional trust from other community members',
     color: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
   },
   'top_contributor': {
-    icon: <Star className="h-3 w-3" />,
+    icon: <Star className="h-5 w-5" />,
     description: 'Top Contributor: Among the most active members in the community',
     color: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
   },
   'safety_advocate': {
-    icon: <Shield className="h-3 w-3" />,
+    icon: <Shield className="h-5 w-5" />,
     description: 'Safety Advocate: Promotes safe toy sharing practices',
     color: 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200',
   },
   'community_builder': {
-    icon: <Award className="h-3 w-3" />,
+    icon: <Award className="h-5 w-5" />,
     description: 'Community Builder: Actively helps grow the ToyShare community',
     color: 'bg-purple-100 text-purple-800 hover:bg-purple-200',
   },
   'toy_expert': {
-    icon: <Zap className="h-3 w-3" />,
+    icon: <Zap className="h-5 w-5" />,
     description: 'Toy Expert: Recognized for expertise in toys and child development',
     color: 'bg-orange-100 text-orange-800 hover:bg-orange-200',
   },
   'newcomer': {
-    icon: <Star className="h-3 w-3" />,
+    icon: <Star className="h-5 w-5" />,
     description: 'Newcomer: Just started their toy sharing journey',
     color: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
   },
   'pioneer': {
-    icon: <Trophy className="h-3 w-3" />,
+    icon: <Trophy className="h-5 w-5" />,
     description: 'Pioneer: One of the first members of the ToyShare community',
     color: 'bg-amber-100 text-amber-800 hover:bg-amber-200',
   },
@@ -78,7 +78,7 @@ export function UserBadge({
   ...props
 }: UserBadgeProps) {
   const badgeInfo = badgeConfig[badgeName] || {
-    icon: <Award className="h-3 w-3" />,
+    icon: <Award className="h-4 w-4" />,
     description: badgeName,
     color: 'bg-primary/10 text-primary hover:bg-primary/20',
   };
