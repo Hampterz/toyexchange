@@ -423,22 +423,20 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <Button 
             variant="outline"
             onClick={() => {
-              setFilters({
+              const updatedFilters = {
                 ...filters,
                 category: [],
                 ageRange: [],
                 condition: [],
                 location: [],
-                tags: []
-              });
-              onFilterChange({
-                ...filters,
-                category: [],
-                ageRange: [],
-                condition: [],
-                location: [],
-                tags: []
-              });
+                tags: [],
+                // Also clear coordinates when clearing all filters
+                latitude: undefined,
+                longitude: undefined
+              };
+              setFilters(updatedFilters);
+              onFilterChange(updatedFilters);
+              console.log("Cleared all filters including coordinates");
             }}
             className="w-full mb-3 transform transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
           >
@@ -707,25 +705,22 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         <Button 
           variant="outline"
           onClick={() => {
-            setFilters({
+            const updatedFilters = {
               ...filters,
               category: [],
               ageRange: [],
               condition: [],
               location: [],
               tags: [],
-              search: ""
-            });
+              search: "",
+              // Also clear coordinates when clearing all filters
+              latitude: undefined,
+              longitude: undefined
+            };
             setSearchValue("");
-            onFilterChange({
-              ...filters,
-              category: [],
-              ageRange: [],
-              condition: [],
-              location: [],
-              tags: [],
-              search: ""
-            });
+            setFilters(updatedFilters);
+            onFilterChange(updatedFilters);
+            console.log("Cleared all filters including coordinates");
           }}
           className="w-full mb-3 transform transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md border border-red-300 text-red-600 hover:bg-red-50"
         >
