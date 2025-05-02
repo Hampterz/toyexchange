@@ -778,9 +778,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
 
               {/* Display form validation error summary if submit was attempted */}
               {form.formState.submitCount > 0 && Object.keys(form.formState.errors).length > 0 && (
-                <div className="bg-red-50 text-red-800 p-2.5 sm:p-3 rounded-md mb-3 sm:mb-4 border border-red-200">
-                  <h4 className="font-medium mb-0.5 sm:mb-1 text-sm sm:text-base">Please fix the following issues:</h4>
-                  <ul className="list-disc pl-4 sm:pl-5 text-xs sm:text-sm">
+                <div className="md:col-span-2 bg-red-50 text-red-800 p-2 xs:p-2.5 sm:p-3 rounded-md mb-2 xs:mb-3 sm:mb-4 border border-red-200">
+                  <h4 className="font-medium mb-0.5 sm:mb-1 text-xs sm:text-sm md:text-base flex items-center">
+                    <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 flex-shrink-0" />
+                    Please fix the following issues:
+                  </h4>
+                  <ul className="list-disc pl-3 xs:pl-4 sm:pl-5 text-[10px] xs:text-xs sm:text-sm space-y-0.5 sm:space-y-1">
                     {Object.entries(form.formState.errors).map(([field, error]) => (
                       <li key={field}>
                         <span className="font-medium">
@@ -798,23 +801,23 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
               )}
               
               {/* Action buttons - spans both columns */}
-              <div className="md:col-span-2 flex flex-col xs:flex-row gap-3 xs:gap-3 xs:justify-end pt-4 sm:pt-6">
+              <div className="md:col-span-2 flex flex-col xs:flex-row gap-2 xs:gap-3 xs:justify-end mt-2 sm:mt-4 pt-3 sm:pt-6 border-t border-gray-100">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={onClose} 
-                  className="border-blue-200 text-blue-800 order-2 xs:order-1"
+                  className="border-blue-200 text-blue-800 order-2 xs:order-1 text-xs sm:text-sm h-9 sm:h-10"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  className="bg-blue-700 hover:bg-blue-800 w-full xs:w-32 order-1 xs:order-2" 
+                  className="bg-blue-700 hover:bg-blue-800 w-full xs:w-auto xs:px-4 sm:px-6 order-1 xs:order-2 text-xs sm:text-sm h-9 sm:h-10" 
                   disabled={isUploading || addToyMutation.isPending}
                 >
                   {isUploading || addToyMutation.isPending ? 
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       <span className="hidden xs:inline">Uploading...</span>
                       <span className="xs:hidden">Please wait...</span>
                     </> : 
