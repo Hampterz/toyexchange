@@ -33,6 +33,9 @@ export default function HomePage() {
 
   // Set user's location from their profile or try to get current location
   useEffect(() => {
+    // Flag to track if we've applied a location filter
+    let locationApplied = false;
+    
     // If user is logged in, use their stored address from profile
     if (user && user.latitude && user.longitude && user.location) {
       const updatedFilters = {
@@ -48,10 +51,12 @@ export default function HomePage() {
       if (updatedFilters.latitude && updatedFilters.longitude) {
         handleFilterChange(updatedFilters);
         console.log("Auto-applied location filter from user profile:", user.location);
+        locationApplied = true;
       }
     } 
-    // Otherwise try to get their current location
-    else if ("geolocation" in navigator) {
+    
+    // If we haven't applied a location filter from user profile, try to get current location
+    if (!locationApplied && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
@@ -99,8 +104,27 @@ export default function HomePage() {
         },
         (error) => {
           console.log("Unable to get location: ", error.message);
-          // Show the location access denied alert
-          setShowLocationDeniedAlert(true);
+          
+          // Try to fall back to account location if available
+          if (user && user.location && user.latitude && user.longitude && !locationApplied) {
+            console.log("Falling back to user account location:", user.location);
+            
+            // Use the location from user account profile
+            const updatedFilters = {
+              ...filters,
+              latitude: typeof user.latitude === 'string' ? parseFloat(user.latitude) : user.latitude,
+              longitude: typeof user.longitude === 'string' ? parseFloat(user.longitude) : user.longitude,
+              distance: filters.distance || 10,
+              location: [user.location]
+            };
+            
+            setFilters(updatedFilters);
+            handleFilterChange(updatedFilters);
+            console.log("Applied fallback location from user profile");
+          } else {
+            // If no fallback available, show the alert
+            setShowLocationDeniedAlert(true);
+          }
           
           // Log the specific error for debugging
           if (error.code === error.PERMISSION_DENIED) {
@@ -112,7 +136,9 @@ export default function HomePage() {
           }
           
           // Even if we can't get location, we can still show toys without location filter
-          console.log("Continuing without location filter");
+          if (!user?.location) {
+            console.log("No location available from browser or user profile");
+          }
         }
       );
     }
@@ -162,6 +188,7 @@ export default function HomePage() {
             <AlertTitle className="text-amber-700">Location access required</AlertTitle>
             <AlertDescription className="text-amber-600">
               <p className="mb-2">To see toys near you, please allow location access. This helps us show toys within your preferred distance.</p>
+              <p className="text-xs text-amber-700">If you continue without location access, you'll need to enter your desired location in the search bar below to see toys in that area.</p>
               <div className="flex gap-2 mt-3">
                 <Button 
                   variant="outline" 

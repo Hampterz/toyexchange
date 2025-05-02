@@ -210,11 +210,15 @@ export function AddressAutocomplete({
         className={cn("w-full outline-none bg-transparent text-sm address-autocomplete-input", className)}
         autoComplete="off"
         spellCheck="false"
-        aria-label="Enter your address"
+        aria-label="Enter your location to find toys nearby"
+        aria-describedby="location-description"
         disabled={disabled}
         required={required}
         autoFocus={autoFocus}
       />
+      <span id="location-description" className="sr-only">
+        Enter a location to see toys within your preferred distance radius. This helps filter results to show only toys in your area.
+      </span>
     </div>
   );
 }

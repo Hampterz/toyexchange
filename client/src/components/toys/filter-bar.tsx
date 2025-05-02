@@ -261,15 +261,17 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   <Badge 
                     key={location} 
                     variant="secondary"
-                    className="flex items-center gap-1 py-1 bg-blue-50"
+                    className="flex items-center gap-1 py-1.5 px-2.5 mb-1 bg-blue-100 border border-blue-200 shadow-sm"
                   >
-                    <span className="text-xs max-w-[150px] truncate">{location}</span>
+                    <MapPin className="h-3 w-3 text-blue-700 mr-1" />
+                    <span className="text-xs font-medium text-blue-700 max-w-[150px] truncate">{location}</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLocationRemove(location);
                       }}
                       className="text-blue-500 hover:text-blue-700 ml-1"
+                      aria-label="Remove location"
                     >
                       ×
                     </button>
@@ -496,15 +498,17 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                   <Badge 
                     key={location} 
                     variant="secondary"
-                    className="flex items-center gap-1 py-1 bg-blue-50 mb-1 max-w-full"
+                    className="flex items-center gap-1 py-1.5 px-2.5 mb-1 bg-blue-100 border border-blue-200 shadow-sm max-w-full"
                   >
-                    <span className="text-xs max-w-[90%] truncate">{location}</span>
+                    <MapPin className="h-3 w-3 text-blue-700 mr-1 flex-shrink-0" />
+                    <span className="text-xs font-medium text-blue-700 max-w-[90%] truncate">{location}</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleLocationRemove(location);
                       }}
                       className="text-blue-500 hover:text-blue-700 ml-1 flex-shrink-0"
+                      aria-label="Remove location"
                     >
                       ×
                     </button>
