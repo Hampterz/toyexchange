@@ -87,16 +87,26 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   // Mutation to mark a toy as sold
   const markAsSoldMutation = useMutation({
     mutationFn: async () => {
-      // Use current date/time for soldDate
-      const now = new Date();
-      
-      const res = await apiRequest("PATCH", `/api/toys/${toy.id}`, {
-        status: "sold",
-        isAvailable: false,
-        // Send the full ISO string for the server to parse
-        soldDate: now.toISOString()
-      });
-      return await res.json();
+      try {
+        // Use current date/time for soldDate
+        const now = new Date();
+        
+        const res = await apiRequest("PATCH", `/api/toys/${toy.id}`, {
+          status: "sold",
+          isAvailable: false,
+          soldDate: now
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to mark toy as sold");
+        }
+        
+        return await res.json();
+      } catch (error) {
+        console.error("Error marking toy as sold:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       // Show success toast
@@ -109,20 +119,29 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
       // Show confetti celebration effect
       setShowConfetti(true);
       
+      // Update local state to reflect the change
+      // This ensures immediate UI update even before refetching
+      toy.status = "sold";
+      toy.isAvailable = false;
+      toy.soldDate = new Date().toISOString();
+      
       // Invalidate the toy queries to refresh data
       queryClient.invalidateQueries({ queryKey: [`/api/toys/${toy.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/toys"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/toys/by-user"] });
       queryClient.invalidateQueries({ queryKey: [`/api/users/${user?.id}/toys`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/community-metrics"] });
       
       // Hide the expanded toy view after a short delay to show confetti
       setTimeout(() => {
         setIsExpanded(false);
-      }, 500);
+      }, 1000);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Error in markAsSoldMutation:", error);
       toast({
         title: "Error",
-        description: "Failed to mark toy as sold",
+        description: error.message || "Failed to mark toy as sold. Please try again.",
         variant: "destructive",
       });
     },
