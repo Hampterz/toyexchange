@@ -345,7 +345,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   <HoverCardTrigger asChild>
                     <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-neutral-600 cursor-pointer">
                       <span className="text-[10px] sm:text-xs">Shared by:</span>
-                      <Link href={`/user-profile/${toyOwner.id}`}>
+                      <Link href={`/users/${toyOwner.id}`}>
                         <span className="font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[150px] hover:text-primary">{toyOwner.name}</span>
                       </Link>
                       {toyOwner.currentBadge && (
@@ -361,7 +361,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   <HoverCardContent className="w-72 sm:w-80 p-3 sm:p-4">
                     <div className="flex justify-between">
                       <div>
-                        <Link href={`/user-profile/${toyOwner.id}`}>
+                        <Link href={`/users/${toyOwner.id}`}>
                           <h4 className="font-bold text-sm sm:text-base hover:text-primary">{toyOwner.name}</h4>
                         </Link>
                         <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
@@ -377,7 +377,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                           </span>
                         </div>
                         <Link 
-                          href={`/user-profile/${toyOwner.id}`}
+                          href={`/users/${toyOwner.id}`}
                           className="text-xs text-blue-600 hover:text-blue-800 hover:underline mt-2 inline-block"
                         >
                           View Profile
@@ -590,7 +590,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     {toyOwner && (
                       <HoverCard>
                         <HoverCardTrigger asChild className="inline-block mt-1">
-                          <Link href={`/user-profile/${toyOwner.id}`}>
+                          <Link href={`/users/${toyOwner.id}`}>
                             <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
                               <span className="font-medium">{toyOwner.name}</span>
                               {toyOwner.currentBadge && (
@@ -607,7 +607,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                         <HoverCardContent className="w-80 p-4">
                           <div className="flex justify-between">
                             <div>
-                              <Link href={`/user-profile/${toyOwner.id}`}>
+                              <Link href={`/users/${toyOwner.id}`}>
                                 <h4 className="font-bold hover:text-primary cursor-pointer">{toyOwner.name}</h4>
                               </Link>
                               <div className="flex items-center text-sm text-neutral-500 mt-1">
@@ -623,7 +623,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                                 </span>
                               </div>
                               <Link 
-                                href={`/user-profile/${toyOwner.id}`}
+                                href={`/users/${toyOwner.id}`}
                                 className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 inline-block"
                               >
                                 View Profile
