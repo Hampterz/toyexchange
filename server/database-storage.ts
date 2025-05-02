@@ -251,13 +251,7 @@ export class DatabaseStorage implements IStorage {
       */
       
       // Category filter with array support
-      if (filters.category && Array.isArray(filters.category) && filters.category.length > 0) {
-        query = query.where(
-          inArray(toys.category, filters.category)
-        );
-      } else if (filters.category && typeof filters.category === 'string' && filters.category !== "all") {
-        query = query.where(eq(toys.category, filters.category));
-      }
+      // Category filter removed
       
       // Condition filter with array support
       if (filters.condition && Array.isArray(filters.condition) && filters.condition.length > 0) {
@@ -294,8 +288,7 @@ export class DatabaseStorage implements IStorage {
             // Check description with LIKE for partial matches
             like(sql`LOWER(${toys.description})`, searchTerm),
             
-            // Check category for matches (often people search by category name)
-            like(sql`LOWER(${toys.category})`, searchTerm),
+            // Category search removed
             
             // Check if any tag contains the search term or search words
             sql`EXISTS (
@@ -319,8 +312,7 @@ export class DatabaseStorage implements IStorage {
                 SELECT 1 FROM jsonb_array_elements_text(${toys.tags}::jsonb) tag 
                 WHERE LOWER(tag) = ${searchTermExact}
               ) THEN 3
-              WHEN LOWER(${toys.category}) = ${searchTermExact} THEN 4
-              WHEN LOWER(${toys.description}) LIKE ${`%${searchTermExact}%`} THEN 5
+              WHEN LOWER(${toys.description}) LIKE ${`%${searchTermExact}%`} THEN 4
               ELSE 6
             END ASC,
             ${toys.createdAt} DESC
@@ -732,9 +724,7 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(groups);
     
     if (filters) {
-      if (filters.category) {
-        query = query.where(eq(groups.category, filters.category));
-      }
+      // Group category filtering removed
       if (filters.location) {
         query = query.where(eq(groups.location, filters.location));
       }
@@ -749,7 +739,7 @@ export class DatabaseStorage implements IStorage {
       .from(groupMembers)
       .where(eq(groupMembers.userId, userId));
     
-    const groupIds = members.map(m => m.groupId);
+    const groupIds = members.map((member: {groupId: number}) => member.groupId);
     
     if (groupIds.length === 0) return [];
     
@@ -903,7 +893,7 @@ export class DatabaseStorage implements IStorage {
   async getReportsByUser(userId: number): Promise<Report[]> {
     return db.select()
       .from(reports)
-      .where(eq(reports.reportedBy, userId))
+      .where(eq(reports.reporterId, userId))
       .orderBy(desc(reports.createdAt));
   }
 
