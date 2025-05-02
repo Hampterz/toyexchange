@@ -20,7 +20,6 @@ export default function HomePage() {
   const [filters, setFilters] = useState<FilterOptions>({
     location: [],
     ageRange: [],
-    category: [],
     condition: [],
     tags: [],
     search: "",

@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AGE_RANGES, CATEGORIES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
-import { TOY_CATEGORIES, COMMON_ATTRIBUTES } from "@shared/schema";
+import { AGE_RANGES, CONDITIONS, LOCATIONS } from "@/lib/utils/constants";
+import { COMMON_ATTRIBUTES } from "@shared/schema";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { Slider } from "@/components/ui/slider";
@@ -32,7 +32,6 @@ type FilterBarProps = {
 export type FilterOptions = {
   location: string[];
   ageRange: string[];
-  category: string[];
   condition: string[];
   tags: string[];
   search?: string;
@@ -48,7 +47,6 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   const [filters, setFilters] = useState<FilterOptions>({
     location: initialFilters?.location || [],
     ageRange: initialFilters?.ageRange || [],
-    category: initialFilters?.category || [],
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
@@ -306,41 +304,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           </PopoverContent>
         </Popover>
         
-        {/* Category Dropdown */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              className="w-full justify-between text-left font-normal"
-            >
-              <div className="flex items-center">
-                <Grid className="mr-2 h-4 w-4 shrink-0" />
-                <span>Category ({filters.category.length || 0})</span>
-              </div>
-              <span className="opacity-70">{filters.category.length > 0 ? `${filters.category.length} selected` : ""}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] md:w-[450px] p-0">
-            <div className="max-h-60 overflow-auto p-2">
-              {CATEGORIES.map(category => (
-                <div 
-                  key={category}
-                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                  onClick={() => handleMultiSelectChange("category", category)}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={filters.category.includes(category)}
-                    readOnly
-                    className="h-4 w-4 mr-2 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
-                  />
-                  <span>{category}</span>
-                </div>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+
         
         {/* Condition Dropdown */}
         <Popover>
@@ -415,8 +379,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         </Popover>
         
         {/* Clear all filters (show only if some filters are active) */}
-        {(filters.category.length > 0 || 
-          filters.ageRange.length > 0 || 
+        {(filters.ageRange.length > 0 || 
           filters.condition.length > 0 || 
           filters.location.length > 0 || 
           filters.tags.length > 0) && (
@@ -425,7 +388,6 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
             onClick={() => {
               const updatedFilters = {
                 ...filters,
-                category: [],
                 ageRange: [],
                 condition: [],
                 location: [],
@@ -572,28 +534,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
         </div>
       </div>
       
-      {/* Category Filters */}
-      <div className="mb-6">
-        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Categories</h3>
-        <div className="space-y-2 mt-3">
-          {CATEGORIES.map(category => (
-            <label key={category} className="flex items-center">
-              <input 
-                type="checkbox" 
-                checked={filters.category.includes(category)}
-                onChange={(e) => {
-                  const newCategories = e.target.checked
-                    ? [...filters.category, category]
-                    : filters.category.filter(c => c !== category);
-                  handleFilterChange("category", newCategories);
-                }}
-                className="h-4 w-4 text-blue-700 border-blue-300 rounded-full focus:ring-blue-500 checkbox-pop cursor-pointer transform transition-transform duration-200 hover:scale-110"
-              />
-              <span className="ml-2 text-sm text-blue-800">{category}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+
       
       {/* Age Range Filters */}
       <div className="mb-6">
@@ -696,8 +637,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       </div>
       
       {/* Clear all filters (show only if some filters are active) */}
-      {(filters.category.length > 0 || 
-        filters.ageRange.length > 0 || 
+      {(filters.ageRange.length > 0 || 
         filters.condition.length > 0 || 
         filters.location.length > 0 || 
         filters.tags.length > 0 || 
@@ -707,7 +647,6 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           onClick={() => {
             const updatedFilters = {
               ...filters,
-              category: [],
               ageRange: [],
               condition: [],
               location: [],
