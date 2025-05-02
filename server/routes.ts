@@ -186,15 +186,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
       const toyData = { ...req.body, userId };
 
-      const validatedData = insertToySchema.parse(toyData);
-      const newToy = await storage.createToy(validatedData);
+      console.log("Received toy data for creation:", JSON.stringify(toyData));
       
-      res.status(201).json(newToy);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid toy data", errors: error.errors });
+      try {
+        const validatedData = insertToySchema.parse(toyData);
+        console.log("Validated toy data:", JSON.stringify(validatedData));
+        
+        const newToy = await storage.createToy(validatedData);
+        console.log("New toy created successfully:", newToy.id);
+        
+        res.status(201).json(newToy);
+      } catch (validationError) {
+        console.error("Validation error when creating toy:", validationError);
+        if (validationError instanceof z.ZodError) {
+          return res.status(400).json({ 
+            message: "Invalid toy data", 
+            errors: validationError.errors 
+          });
+        }
+        throw validationError; // Re-throw if it's not a Zod error
       }
-      res.status(500).json({ message: "Failed to create toy" });
+    } catch (error) {
+      console.error("Error creating toy:", error);
+      res.status(500).json({ message: "Failed to create toy", error: String(error) });
     }
   });
 
