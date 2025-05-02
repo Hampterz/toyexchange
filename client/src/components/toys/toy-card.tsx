@@ -398,11 +398,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
 
       {/* Expanded Toy Detail Dialog */}
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-        <DialogContent className="max-w-5xl w-[95vw] p-0 overflow-hidden mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto sm:overflow-y-hidden">
+        <DialogContent className="max-w-5xl w-[95vw] p-0 overflow-hidden mx-2 sm:mx-4 max-h-[95vh] overflow-y-auto">
           <div className="sr-only">Toy Details</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Image/Video Gallery */}
-            <div className="relative bg-black h-[300px] sm:h-[400px] md:h-full min-h-[300px] sm:min-h-[400px]">
+            <div className="relative bg-black h-[250px] xs:h-[300px] sm:h-[400px] md:h-full min-h-[250px] xs:min-h-[300px] sm:min-h-[400px]">
               {!viewingVideos && toy.images && toy.images.length > 0 ? (
                 <div className="w-full h-full relative">
                   <img 
@@ -512,20 +512,20 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             </div>
             
             {/* Toy Details */}
-            <div className="p-6 flex flex-col">
+            <div className="p-3 sm:p-4 md:p-6 flex flex-col overflow-y-auto max-h-[50vh] md:max-h-[80vh]">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-xl font-bold">{toy.title}</h2>
-                  <div className="flex items-center my-1">
-                    <Badge className="mr-2 bg-primary">{toy.condition}</Badge>
-                    <Badge variant="outline">Ages {toy.ageRange}</Badge>
+                  <h2 className="text-lg xs:text-xl font-bold">{toy.title}</h2>
+                  <div className="flex flex-wrap items-center gap-1 my-1">
+                    <Badge className="mr-1 bg-primary text-xs xs:text-sm">{toy.condition}</Badge>
+                    <Badge variant="outline" className="text-xs xs:text-sm">Ages {toy.ageRange}</Badge>
                   </div>
                 </div>
                 <button 
                   onClick={handleFavoriteClick}
-                  className="h-9 w-9 bg-white border border-neutral-200 rounded-full flex items-center justify-center transition hover:bg-neutral-50"
+                  className="h-8 w-8 sm:h-9 sm:w-9 bg-white border border-neutral-200 rounded-full flex items-center justify-center transition hover:bg-neutral-50"
                 >
-                  <Heart className={`h-5 w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-400"}`} />
+                  <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isFavorited ? "fill-primary text-primary" : "text-neutral-400"}`} />
                 </button>
               </div>
               

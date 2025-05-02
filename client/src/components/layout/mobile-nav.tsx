@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Plus, Home, Search, Heart, User, Menu, X, HelpCircle, Shield, FileText, BookOpen } from "lucide-react";
+import { 
+  Plus, Home, Search, Heart, User, Menu, X, 
+  HelpCircle, Shield, FileText, BookOpen, Bell, 
+  MessageCircle, Info
+} from "lucide-react";
 import {
   Sheet,
   SheetClose,
@@ -11,6 +15,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 type MobileNavProps = {
   onAddToyClick: () => void;
@@ -19,21 +27,59 @@ type MobileNavProps = {
 export function MobileNav({ onAddToyClick }: MobileNavProps) {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  
+  // Fetch messages to count unread ones
+  const { data: messages } = useQuery({
+    queryKey: ['/api/messages'],
+    queryFn: async () => {
+      if (!user) return [];
+      try {
+        const response = await apiRequest("GET", "/api/messages");
+        return await response.json();
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+        return [];
+      }
+    },
+    enabled: !!user,
+    refetchInterval: 30000, // Refetch every 30 seconds to check for new messages
+  });
+  
+  // Update unread message count whenever messages change
+  useEffect(() => {
+    if (messages && user) {
+      const unreadCount = messages.filter(
+        (message: any) => message.receiverId === user.id && !message.read
+      ).length;
+      
+      setUnreadMessages(unreadCount);
+    }
+  }, [messages, user]);
 
   return (
     <>
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-blue-100 shadow-lg z-40">
         <div className="flex items-center justify-around">
           <Link href="/" className={`flex flex-col items-center py-3 px-2 ${location === '/' ? 'text-primary font-medium' : 'text-blue-400'}`}>
-            <div className={`h-6 w-6 rounded-full ${location === '/' ? 'bg-primary' : 'bg-blue-400'} flex items-center justify-center text-white`}>
-              <i className="fas fa-gamepad text-xs"></i>
-            </div>
-            <span className="text-xs mt-1">ToyShare</span>
+            <Home className="h-5 w-5" />
+            <span className="text-xs mt-1">Home</span>
           </Link>
-          <Link href="/favorites" className={`flex flex-col items-center py-3 px-2 ${location === '/favorites' ? 'text-blue-700' : 'text-blue-400'}`}>
-            <Heart className="h-5 w-5" />
-            <span className="text-xs mt-1">Favorites</span>
+          
+          <Link href="/messages" className={`flex flex-col items-center py-3 px-2 ${location === '/messages' ? 'text-blue-700' : 'text-blue-400'} relative`}>
+            <MessageCircle className="h-5 w-5" />
+            {unreadMessages > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+              >
+                {unreadMessages}
+              </Badge>
+            )}
+            <span className="text-xs mt-1">Messages</span>
           </Link>
+          
           <button 
             onClick={onAddToyClick}
             className="flex flex-col items-center py-3 px-2 text-blue-400"
@@ -42,6 +88,12 @@ export function MobileNav({ onAddToyClick }: MobileNavProps) {
               <Plus className="h-5 w-5" />
             </div>
           </button>
+          
+          <Link href="/favorites" className={`flex flex-col items-center py-3 px-2 ${location === '/favorites' ? 'text-blue-700' : 'text-blue-400'}`}>
+            <Heart className="h-5 w-5" />
+            <span className="text-xs mt-1">Favorites</span>
+          </Link>
+          
           <Link href="/profile" className={`flex flex-col items-center py-3 px-2 ${location === '/profile' ? 'text-blue-700' : 'text-blue-400'}`}>
             <User className="h-5 w-5" />
             <span className="text-xs mt-1">Profile</span>
