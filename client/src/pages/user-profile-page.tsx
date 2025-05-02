@@ -185,24 +185,26 @@ const UserProfilePage: React.FC = () => {
         {/* User Profile Card */}
         <Card className="md:col-span-1">
           <CardHeader>
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16">
+            <div className="flex flex-col items-center space-y-2">
+              <Avatar className="h-20 w-20">
                 <AvatarImage src={user.profilePicture || ''} alt={user.name} />
-                <AvatarFallback className="bg-primary text-lg">
+                <AvatarFallback className="bg-primary text-xl">
                   {user.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <CardTitle className="text-2xl mb-1">{user.name}</CardTitle>
-                <CardDescription className="mb-1">{user.username}</CardDescription>
-                {user.currentBadge && (
-                  <UserBadge 
-                    badgeName={user.currentBadge} 
-                    showTooltip={true} 
-                    size="lg"
-                    className="text-xl mt-1" 
-                  />
-                )}
+              
+              {user.currentBadge && (
+                <UserBadge 
+                  badgeName={user.currentBadge} 
+                  showTooltip={true} 
+                  size="lg"
+                  className="text-xl w-full text-center justify-center" 
+                />
+              )}
+              
+              <div className="text-center mt-1">
+                <CardTitle className="text-2xl">{user.name}</CardTitle>
+                <CardDescription>{user.username}</CardDescription>
               </div>
             </div>
             {currentUser && currentUser.id !== userId && (

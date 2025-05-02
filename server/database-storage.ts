@@ -500,9 +500,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteToy(id: number): Promise<boolean> {
+    // First get the toy to identify the owner
+    const toy = await this.getToy(id);
+    if (!toy) return false;
+    
     const [deletedToy] = await db.delete(toys)
       .where(eq(toys.id, id))
       .returning();
+    
+    if (deletedToy) {
+      // Decrement the user's toysShared count
+      await updateUserSustainabilityMetrics(this, toy.userId, { toysSharedIncrement: -1 });
+      
+      // Update community metrics
+      const metrics = await this.getCommunityMetrics();
+      await this.updateCommunityMetrics({
+        toysSaved: metrics.toysSaved - 1,
+        wasteReduced: metrics.wasteReduced - 0.5 // Adjust waste reduction by same amount used when creating
+      });
+    }
+    
     return !!deletedToy;
   }
 
