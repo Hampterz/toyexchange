@@ -88,17 +88,12 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
   const addToyMutation = useMutation({
     mutationFn: async (toyData: any) => {
       try {
-        const res = await fetch("/api/toys", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(toyData),
-          credentials: "include"
-        });
+        console.log("Submitting toy data via apiRequest");
+        const res = await apiRequest("POST", "/api/toys", toyData);
         
         if (!res.ok) {
           const errorData = await res.json();
+          console.error("Server returned error:", errorData);
           throw new Error(errorData.message || "Failed to create toy");
         }
         
