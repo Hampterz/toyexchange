@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { AGE_RANGES, CATEGORIES, CONDITIONS } from "@/lib/utils/constants";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { insertToySchema, COMMON_ATTRIBUTES, TOY_CATEGORIES, Toy } from "@shared/schema";
+import { insertToySchema, COMMON_ATTRIBUTES, Toy } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

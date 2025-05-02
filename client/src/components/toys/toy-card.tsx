@@ -87,14 +87,14 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   // Mutation to mark a toy as sold
   const markAsSoldMutation = useMutation({
     mutationFn: async () => {
-      // Format date for the server properly
+      // Use current date/time for soldDate
       const now = new Date();
       
       const res = await apiRequest("PATCH", `/api/toys/${toy.id}`, {
         status: "sold",
         isAvailable: false,
-        // Convert date to SQL-compatible format
-        soldDate: now.toISOString().split('T')[0]
+        // Send the full ISO string for the server to parse
+        soldDate: now.toISOString()
       });
       return await res.json();
     },

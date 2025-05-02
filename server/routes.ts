@@ -186,6 +186,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const toy = await storage.getToy(id);
       
+      console.log("Update toy request:", { 
+        id,
+        requestBody: req.body,
+        user: req.user?.id
+      });
+      
       if (!toy) {
         return res.status(404).json({ message: "Toy not found" });
       }
@@ -194,10 +200,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not authorized to update this toy" });
       }
       
-      const updatedToy = await storage.updateToy(id, req.body);
+      // Convert soldDate to Date object if it's a string
+      const updates = { ...req.body };
+      if (updates.soldDate && typeof updates.soldDate === 'string') {
+        updates.soldDate = new Date(updates.soldDate);
+      }
+      
+      console.log("Processing update with data:", updates);
+      
+      const updatedToy = await storage.updateToy(id, updates);
+      
+      // Update community metrics when a toy is marked as sold
+      if (updates.status === 'sold') {
+        const metrics = await storage.getCommunityMetrics();
+        await storage.updateCommunityMetrics({
+          toysSaved: metrics.toysSaved + 1
+        });
+        console.log("Updated community metrics for sold toy");
+      }
+      
       res.json(updatedToy);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update toy" });
+      console.error("Error updating toy:", error);
+      res.status(500).json({ message: "Failed to update toy", error: String(error) });
     }
   });
 

@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { insertWishSchema } from "@shared/schema";
-import { TOY_CATEGORIES, COMMON_ATTRIBUTES } from "@shared/schema";
+import { COMMON_ATTRIBUTES } from "@shared/schema";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { PageHeader } from "@/components/page-header";
 import { Loader2, X } from "lucide-react";
