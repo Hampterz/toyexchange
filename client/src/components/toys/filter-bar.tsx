@@ -52,7 +52,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     condition: initialFilters?.condition || [],
     tags: initialFilters?.tags || [],
     search: initialFilters?.search || "",
-    distance: initialFilters?.distance || 5, // Default to 5 miles
+    distance: initialFilters?.distance || 10, // Default to 10 miles
     // Ensure coordinates are properly converted to numbers
     latitude: initialFilters?.latitude || (user?.latitude ? Number(user.latitude) : undefined),
     longitude: initialFilters?.longitude || (user?.longitude ? Number(user.longitude) : undefined),
@@ -197,7 +197,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                     location: newLocations,
                     latitude: lat,
                     longitude: lng,
-                    distance: filters.distance || 5 // Keep existing distance or use 5 miles default
+                    distance: filters.distance || 10 // Keep existing distance or use 10 miles default
                   };
                   
                   // Update state and apply filter
@@ -220,7 +220,7 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
           <div className="mt-3 mb-3 px-1">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-medium text-blue-700">Radius</h4>
-              <span className="text-xs font-medium text-blue-700">{filters.distance || 5} miles</span>
+              <span className="text-xs font-medium text-blue-700">{filters.distance || 10} miles</span>
             </div>
             <Slider
               value={[filters.distance || 5]}
