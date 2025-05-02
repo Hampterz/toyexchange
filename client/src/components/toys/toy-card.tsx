@@ -200,7 +200,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
         role="button"
         aria-label={`View details for ${toy.title}`}
       >
-        <div className="relative pb-[80%] xs:pb-[85%] bg-neutral-100">
+        <div className="relative pb-[90%] xs:pb-[95%] bg-neutral-100">
           {mainImage ? (
             <img 
               src={mainImage} 
@@ -244,13 +244,20 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             </button>
           </div>
           
+          {/* Distance badge on top left */}
+          {toy.distance && (
+            <div className="absolute top-1 left-1 xs:top-2 xs:left-2 sm:top-3 sm:left-3 bg-blue-600 text-white text-[9px] xs:text-xs font-bold px-1.5 py-0.5 xs:px-2 sm:py-1 rounded-full">
+              {Math.round(toy.distance * 10) / 10} mi
+            </div>
+          )}
+          
           <div className="absolute bottom-1 left-1 xs:bottom-2 xs:left-2 sm:bottom-3 sm:left-3 bg-primary text-white text-[9px] xs:text-xs font-bold px-1.5 py-0.5 xs:px-2 sm:py-1 rounded-full">
             {toy.condition}
           </div>
         </div>
         
-        <div className="p-2 xs:p-2.5 sm:p-3 flex flex-col h-[calc(100%-85%)]">
-          <div className="flex items-center justify-between mb-1 sm:mb-2">
+        <div className="p-2 xs:p-2.5 sm:p-3 flex flex-col h-[calc(100%-95%)]">
+          <div className="flex items-center justify-between mb-1">
             <h3 className="font-bold font-heading text-xs xs:text-sm sm:text-base truncate max-w-[70%]">
               {toy.title}
             </h3>
@@ -259,11 +266,11 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
             </span>
           </div>
           
-          <p className="text-neutral-600 text-[10px] xs:text-xs sm:text-sm mb-1 xs:mb-2 sm:mb-3 line-clamp-2">
+          <p className="text-neutral-600 text-[10px] xs:text-xs sm:text-sm line-clamp-2">
             {toy.description}
           </p>
           
-          <div className="flex flex-col gap-1 sm:gap-2 mt-auto">
+          <div className="flex flex-col gap-1 sm:gap-1 mt-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <MapPin className="text-neutral-500 mr-0.5 xs:mr-1 h-2.5 w-2.5 xs:h-3 xs:w-3 flex-shrink-0" />
@@ -271,11 +278,6 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   {toyOwner?.locationPrivacy === 'exact_location' ? toy.location :
                    toyOwner?.locationPrivacy === 'private' ? 'Location hidden' :
                    toy.location.split(',')[0]}
-                  {toy.distance && (
-                    <span className="ml-0.5 xs:ml-1 text-blue-600 font-medium">
-                      ({Math.round(toy.distance * 10) / 10} mi)
-                    </span>
-                  )}
                 </span>
               </div>
               
