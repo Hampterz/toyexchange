@@ -200,15 +200,15 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
         role="button"
         aria-label={`View details for ${toy.title}`}
       >
-        <div className="relative pb-[90%] xs:pb-[95%] bg-neutral-100">
+        <div className="relative pb-[100%] xs:pb-[100%] bg-neutral-100">
           {mainImage ? (
             <img 
               src={mainImage} 
               alt={toy.title} 
               className="absolute h-full w-full object-cover transition group-hover:scale-105" 
               loading="lazy"
-              width="300"
-              height="225"
+              width="400"
+              height="400"
             />
           ) : (
             <div className="absolute h-full w-full flex items-center justify-center text-neutral-400">
@@ -256,7 +256,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
           </div>
         </div>
         
-        <div className="p-2 xs:p-2.5 sm:p-3 flex flex-col h-[calc(100%-95%)]">
+        <div className="p-2 xs:p-2.5 sm:p-3 flex flex-col h-[calc(100%-100%)]">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-bold font-heading text-xs xs:text-sm sm:text-base truncate max-w-[70%]">
               {toy.title}
