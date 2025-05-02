@@ -22,6 +22,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 interface ProfileToysProps {
   userId: number;
@@ -32,6 +42,11 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   const queryClient = useQueryClient();
   const [toyToDelete, setToyToDelete] = useState<number | null>(null);
   const [toyToMarkAsTraded, setToyToMarkAsTraded] = useState<number | null>(null);
+  const [toyToEdit, setToyToEdit] = useState<Toy | null>(null);
+  const [editedToyTitle, setEditedToyTitle] = useState<string>("");
+  const [editedToyDescription, setEditedToyDescription] = useState<string>("");
+  const [editedToyAgeRange, setEditedToyAgeRange] = useState<string>("");
+  const [editedToyCondition, setEditedToyCondition] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("active");
 
   // Query user's toys
@@ -123,10 +138,54 @@ export function ProfileToys({ userId }: ProfileToysProps) {
     },
   });
 
+  // Edit toy mutation
+  const editToyMutation = useMutation({
+    mutationFn: async (params: { toyId: number, updates: Partial<Toy> }) => {
+      await apiRequest("PATCH", `/api/toys/${params.toyId}`, params.updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/toys`] });
+      toast({
+        title: "Toy Updated",
+        description: "Your toy listing has been successfully updated",
+      });
+      setToyToEdit(null);
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update the toy. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleToggleAvailability = (toyId: number, currentAvailability: boolean) => {
     toggleAvailabilityMutation.mutate({ 
       toyId, 
       isAvailable: !currentAvailability 
+    });
+  };
+  
+  const handleEditToy = (toy: Toy) => {
+    setToyToEdit(toy);
+    setEditedToyTitle(toy.title);
+    setEditedToyDescription(toy.description || "");
+    setEditedToyAgeRange(toy.ageRange || "");
+    setEditedToyCondition(toy.condition || "");
+  };
+  
+  const handleSaveEditedToy = () => {
+    if (!toyToEdit) return;
+    
+    editToyMutation.mutate({
+      toyId: toyToEdit.id,
+      updates: {
+        title: editedToyTitle,
+        description: editedToyDescription,
+        ageRange: editedToyAgeRange,
+        condition: editedToyCondition
+      }
     });
   };
 
@@ -222,7 +281,13 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                         </div>
                         
                         <div className="flex space-x-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit toy">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8" 
+                            onClick={() => handleEditToy(toy)}
+                            title="Edit toy"
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button 
@@ -417,6 +482,70 @@ export function ProfileToys({ userId }: ProfileToysProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Toy Dialog */}
+      <Dialog open={toyToEdit !== null} onOpenChange={(open) => !open && setToyToEdit(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Toy Listing</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={editedToyTitle}
+                onChange={(e) => setEditedToyTitle(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={editedToyDescription}
+                onChange={(e) => setEditedToyDescription(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="ageRange">Age Range</Label>
+                <Input
+                  id="ageRange"
+                  value={editedToyAgeRange}
+                  onChange={(e) => setEditedToyAgeRange(e.target.value)}
+                  placeholder="e.g. 3-5"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="condition">Condition</Label>
+                <Input
+                  id="condition"
+                  value={editedToyCondition}
+                  onChange={(e) => setEditedToyCondition(e.target.value)}
+                  placeholder="e.g. Like New"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={handleSaveEditedToy}
+              disabled={editToyMutation.isPending || !editedToyTitle}
+            >
+              {editToyMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
