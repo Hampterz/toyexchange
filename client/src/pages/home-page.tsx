@@ -24,7 +24,7 @@ export default function HomePage() {
     condition: [],
     tags: [],
     search: "",
-    distance: 5, // Default distance of 5 miles
+    distance: 10, // Default distance of 10 miles
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
   
@@ -36,7 +36,7 @@ export default function HomePage() {
         ...prev,
         latitude: typeof user.latitude === 'string' ? parseFloat(user.latitude) : user.latitude,
         longitude: typeof user.longitude === 'string' ? parseFloat(user.longitude) : user.longitude,
-        distance: prev.distance || 5, // Ensure a default value
+        distance: prev.distance || 10, // Ensure a default value
         location: user.location ? [user.location] : []
       }));
     } 
@@ -48,7 +48,7 @@ export default function HomePage() {
             ...prev,
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            distance: prev.distance || 5 // Ensure a default value
+            distance: prev.distance || 10 // Ensure a default value
           }));
         },
         (error) => {
