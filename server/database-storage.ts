@@ -1067,12 +1067,7 @@ export class DatabaseStorage implements IStorage {
         query = query.where(eq(wishes.location, filters.location));
       }
       
-      // Category filter with array support
-      if (filters.category && Array.isArray(filters.category) && filters.category.length > 0) {
-        query = query.where(inArray(wishes.category, filters.category));
-      } else if (filters.category && typeof filters.category === 'string' && filters.category !== "all") {
-        query = query.where(eq(wishes.category, filters.category));
-      }
+      // Category filter removed
       
       // Age range filter with array support
       if (filters.ageRange && Array.isArray(filters.ageRange) && filters.ageRange.length > 0) {
@@ -1105,8 +1100,7 @@ export class DatabaseStorage implements IStorage {
             // Check description with LIKE for partial matches
             like(sql`LOWER(${wishes.description})`, searchTerm),
             
-            // Check category for matches
-            like(sql`LOWER(${wishes.category})`, searchTerm),
+            // Category search removed
             
             // Check if any tag contains the search term or search words
             sql`EXISTS (
