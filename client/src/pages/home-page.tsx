@@ -99,8 +99,20 @@ export default function HomePage() {
         },
         (error) => {
           console.log("Unable to get location: ", error.message);
-          // Show error to user through a toast notification
+          // Show the location access denied alert
           setShowLocationDeniedAlert(true);
+          
+          // Log the specific error for debugging
+          if (error.code === error.PERMISSION_DENIED) {
+            console.log("User denied geolocation permission");
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            console.log("Location information unavailable");
+          } else if (error.code === error.TIMEOUT) {
+            console.log("Location request timed out");
+          }
+          
+          // Even if we can't get location, we can still show toys without location filter
+          console.log("Continuing without location filter");
         }
       );
     }
@@ -149,7 +161,49 @@ export default function HomePage() {
             <MapPin className="h-4 w-4 text-amber-500" />
             <AlertTitle className="text-amber-700">Location access required</AlertTitle>
             <AlertDescription className="text-amber-600">
-              To see toys near you, please allow location access. This helps us show toys within your preferred distance.
+              <p className="mb-2">To see toys near you, please allow location access. This helps us show toys within your preferred distance.</p>
+              <div className="flex gap-2 mt-3">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs border-amber-500 text-amber-700 hover:bg-amber-50"
+                  onClick={() => {
+                    // Try requesting location permission again
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                          // Hide the alert when we successfully get location
+                          setShowLocationDeniedAlert(false);
+                          
+                          // Update filters with the location
+                          const updatedFilters = {
+                            ...filters,
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            distance: filters.distance || 10
+                          };
+                          setFilters(updatedFilters);
+                          handleFilterChange(updatedFilters);
+                        },
+                        (error) => {
+                          // Still failed - leave the message visible
+                          console.log("Still unable to get location: ", error.message);
+                        }
+                      );
+                    }
+                  }}
+                >
+                  Try Again
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowLocationDeniedAlert(false)}
+                >
+                  Continue Without Location
+                </Button>
+              </div>
             </AlertDescription>
             <button 
               onClick={() => setShowLocationDeniedAlert(false)}
