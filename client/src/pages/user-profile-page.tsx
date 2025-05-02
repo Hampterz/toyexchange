@@ -117,6 +117,7 @@ const UserProfilePage: React.FC = () => {
       const response = await apiRequest("POST", "/api/messages", {
         receiverId: userId,
         content: messageContent,
+        toyId: 0, // Using 0 for general messages not tied to a specific toy
       });
       return response.json();
     },
@@ -133,9 +134,10 @@ const UserProfilePage: React.FC = () => {
     onError: (error) => {
       toast({
         title: 'Error',
-        description: 'Failed to send message',
+        description: 'Failed to send message. Please try again.',
         variant: 'destructive',
       });
+      console.error('Message sending error:', error);
     }
   });
   
@@ -191,7 +193,7 @@ const UserProfilePage: React.FC = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4 mb-1">
                   <CardTitle className="text-2xl">{user.name}</CardTitle>
                   {user.currentBadge && (
                     <UserBadge badgeName={user.currentBadge} showTooltip={true} className="text-lg" />
@@ -203,27 +205,12 @@ const UserProfilePage: React.FC = () => {
             {currentUser && currentUser.id !== userId && (
               <div className="flex gap-2 mt-4">
                 <Button 
-                  className="flex-1"
+                  className="w-full"
                   variant="outline"
                   onClick={() => setMessageDialogOpen(true)}
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Message
-                </Button>
-                <Button 
-                  className="flex-1"
-                  variant={isFollowing ? "outline" : "default"}
-                  onClick={() => followMutation.mutate()}
-                  disabled={followMutation.isPending}
-                >
-                  {followMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : isFollowing ? (
-                    <UserMinus className="mr-2 h-4 w-4" />
-                  ) : (
-                    <UserPlus className="mr-2 h-4 w-4" />
-                  )}
-                  {isFollowing ? 'Unfollow' : 'Follow'}
                 </Button>
               </div>
             )}
