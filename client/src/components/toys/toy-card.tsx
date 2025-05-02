@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
@@ -344,7 +345,9 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   <HoverCardTrigger>
                     <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-neutral-600 cursor-pointer">
                       <span className="text-[10px] sm:text-xs">Shared by:</span>
-                      <span className="font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[150px]">{toyOwner.name}</span>
+                      <Link href={`/user-profile/${toyOwner.id}`}>
+                        <span className="font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[150px] hover:text-primary">{toyOwner.name}</span>
+                      </Link>
                       {toyOwner.currentBadge && (
                         <UserBadge 
                           badgeName={toyOwner.currentBadge} 
@@ -358,7 +361,9 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                   <HoverCardContent className="w-72 sm:w-80 p-3 sm:p-4">
                     <div className="flex justify-between">
                       <div>
-                        <h4 className="font-bold text-sm sm:text-base">{toyOwner.name}</h4>
+                        <Link href={`/user-profile/${toyOwner.id}`}>
+                          <h4 className="font-bold text-sm sm:text-base hover:text-primary">{toyOwner.name}</h4>
+                        </Link>
                         <div className="flex items-center text-xs sm:text-sm text-neutral-500 mt-1">
                           <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
                           <span>Joined {formatDate(toyOwner.createdAt)}</span>
@@ -371,6 +376,12 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                              toyOwner.cityName || toyOwner.location.split(',')[0]}
                           </span>
                         </div>
+                        <Link 
+                          href={`/user-profile/${toyOwner.id}`}
+                          className="text-xs text-blue-600 hover:text-blue-800 hover:underline mt-2 inline-block"
+                        >
+                          View Profile
+                        </Link>
                       </div>
                       <div className="flex flex-col items-center">
                         <span className="text-base sm:text-lg font-bold text-blue-600">{toyOwner.successfulExchanges || 0}</span>
@@ -579,22 +590,26 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                     {toyOwner && (
                       <HoverCard>
                         <HoverCardTrigger className="inline-block mt-1">
-                          <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
-                            <span className="font-medium">{toyOwner.name}</span>
-                            {toyOwner.currentBadge && (
-                              <UserBadge 
-                                badgeName={toyOwner.currentBadge} 
-                                className="text-lg" 
-                                showTooltip={true}
-                                iconOnly={true}
-                              />
-                            )}
-                          </div>
+                          <Link href={`/user-profile/${toyOwner.id}`}>
+                            <div className="flex items-center gap-2 text-sm hover:text-primary cursor-pointer">
+                              <span className="font-medium">{toyOwner.name}</span>
+                              {toyOwner.currentBadge && (
+                                <UserBadge 
+                                  badgeName={toyOwner.currentBadge} 
+                                  className="text-lg" 
+                                  showTooltip={true}
+                                  iconOnly={true}
+                                />
+                              )}
+                            </div>
+                          </Link>
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80 p-4">
                           <div className="flex justify-between">
                             <div>
-                              <h4 className="font-bold">{toyOwner.name}</h4>
+                              <Link href={`/user-profile/${toyOwner.id}`}>
+                                <h4 className="font-bold hover:text-primary cursor-pointer">{toyOwner.name}</h4>
+                              </Link>
                               <div className="flex items-center text-sm text-neutral-500 mt-1">
                                 <Calendar className="h-3 w-3 mr-1" />
                                 <span>Joined {formatDate(toyOwner.createdAt)}</span>
@@ -607,6 +622,12 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
                                    toyOwner.location.split(',')[0]}
                                 </span>
                               </div>
+                              <Link 
+                                href={`/user-profile/${toyOwner.id}`}
+                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 inline-block"
+                              >
+                                View Profile
+                              </Link>
                             </div>
                             <div className="flex flex-col items-center">
                               <span className="text-lg font-bold text-blue-600">{toyOwner.successfulExchanges || 0}</span>
