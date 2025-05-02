@@ -87,10 +87,14 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
   // Mutation to mark a toy as sold
   const markAsSoldMutation = useMutation({
     mutationFn: async () => {
+      // Format date for the server properly
+      const now = new Date();
+      
       const res = await apiRequest("PATCH", `/api/toys/${toy.id}`, {
         status: "sold",
         isAvailable: false,
-        soldDate: new Date().toISOString()
+        // Convert date to SQL-compatible format
+        soldDate: now.toISOString().split('T')[0]
       });
       return await res.json();
     },
@@ -196,7 +200,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
         role="button"
         aria-label={`View details for ${toy.title}`}
       >
-        <div className="relative pb-[70%] xs:pb-[75%] bg-neutral-100">
+        <div className="relative pb-[80%] xs:pb-[85%] bg-neutral-100">
           {mainImage ? (
             <img 
               src={mainImage} 
@@ -245,7 +249,7 @@ export function ToyCard({ toy, onRequestClick }: ToyCardProps) {
           </div>
         </div>
         
-        <div className="p-2 xs:p-3 sm:p-4 flex flex-col h-[calc(100%-70%)]">
+        <div className="p-2 xs:p-2.5 sm:p-3 flex flex-col h-[calc(100%-85%)]">
           <div className="flex items-center justify-between mb-1 sm:mb-2">
             <h3 className="font-bold font-heading text-xs xs:text-sm sm:text-base truncate max-w-[70%]">
               {toy.title}
