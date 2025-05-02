@@ -240,6 +240,8 @@ export const toys = pgTable("toys", {
   description: text("description").notNull(),
   ageRange: text("age_range").notNull(),
   condition: text("condition").notNull(),
+  // Category field still exists in database but is no longer used in UI
+  category: text("category").notNull(), // Keep this because the database requires it
   images: jsonb("images").notNull().$type<string[]>(),
   location: text("location").notNull(),
   latitude: text("latitude"),
@@ -255,23 +257,29 @@ export const toys = pgTable("toys", {
 });
 
 // Create schema with soldDate explicitly excluded to fix validation issues
-export const insertToySchema = createInsertSchema(toys).pick({
-  userId: true,
-  title: true,
-  description: true,
-  ageRange: true,
-  condition: true,
-  images: true,
-  location: true,
-  latitude: true,
-  longitude: true,
-  tags: true,
-  isAvailable: true,
-  status: true,
-  recommendedAges: true,
-  safetyNotes: true,
-  videos: true,
-});
+// Create schema with explicit handling for the category field that's still in the database
+export const insertToySchema = createInsertSchema(toys)
+  .pick({
+    userId: true,
+    title: true,
+    description: true,
+    ageRange: true,
+    condition: true,
+    images: true,
+    location: true,
+    latitude: true,
+    longitude: true,
+    tags: true,
+    isAvailable: true,
+    status: true,
+    recommendedAges: true,
+    safetyNotes: true,
+    videos: true,
+  })
+  .extend({
+    // Add category field that's still in database but no longer in UI
+    category: z.string().default("Other"),
+  });
 
 // Message model
 export const messages = pgTable("messages", {
