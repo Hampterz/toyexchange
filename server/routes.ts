@@ -112,6 +112,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           filters.condition = [req.query.condition as string];
         }
       }
+      
+      // Process tags filter
+      if (req.query.tags) {
+        if (Array.isArray(req.query.tags)) {
+          filters.tags = req.query.tags;
+        } else {
+          filters.tags = [req.query.tags as string];
+        }
+      }
+      
       if (req.query.search) filters.search = req.query.search as string;
       if (req.query.isAvailable) filters.isAvailable = req.query.isAvailable === "true";
       

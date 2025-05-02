@@ -720,14 +720,14 @@ export function AddToyModal({ isOpen, onClose }: AddToyModalProps) {
                               </div>
                             </Button>
                             
-                            {/* Dropdown for tag selection */}
+                            {/* Dropdown for tag selection with fixed z-index and positioning */}
                             {showTagSelector && (
                               <>
                                 <div 
-                                  className="fixed inset-0 z-0"
+                                  className="fixed inset-0 z-50"
                                   onClick={() => setShowTagSelector(false)}
                                 ></div>
-                                <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
+                                <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
                                   <div className="max-h-60 overflow-auto p-2">
                                     {COMMON_ATTRIBUTES.map(tag => (
                                       <div 
