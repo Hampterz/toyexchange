@@ -44,6 +44,9 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
   // Get user info for location
   const { user } = useAuth();
   
+  // State to track if we need to highlight the location input
+  const [shouldHighlightLocation, setShouldHighlightLocation] = useState(false);
+  
   const [filters, setFilters] = useState<FilterOptions>({
     location: initialFilters?.location || [],
     ageRange: initialFilters?.ageRange || [],
@@ -116,6 +119,17 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     }
   }, [initialFilters]);
 
+  // Check if we need to highlight the location input
+  useEffect(() => {
+    // If no locations set and coordinates missing, we need to highlight the input
+    const noLocationInfo = 
+      filters.location.length === 0 && 
+      !filters.latitude && 
+      !filters.longitude;
+      
+    setShouldHighlightLocation(noLocationInfo);
+  }, [filters.location, filters.latitude, filters.longitude]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
@@ -175,7 +189,12 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
       <div className="space-y-3 mb-4">
         {/* Direct Location Search - Moved to top */}
         <div className="mb-3">
-          <div className="flex items-center bg-white rounded-md border border-gray-300 px-3 py-2 mb-2 shadow-sm">
+          {shouldHighlightLocation && (
+            <div className="flex items-center justify-center mb-2">
+              <span className="text-xs text-blue-600 animate-pulse font-medium">Please enter your location</span>
+            </div>
+          )}
+          <div className={`flex items-center bg-white rounded-md border ${shouldHighlightLocation ? 'border-blue-400 address-input-glow' : 'border-gray-300'} px-3 py-2 mb-2 shadow-sm`}>
             <MapPin className="mr-2 h-4 w-4 shrink-0 text-blue-600" />
             <AddressAutocomplete
               placeholder="Search for location..."
@@ -438,14 +457,19 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
     <div>
       {/* Location Filters - Moved to top */}
       <div className="mb-6">
-        <h3 className="text-sm text-neutral-600 font-medium mb-2 border-b pb-1">Location</h3>
+        <div className="flex justify-between items-center mb-2 border-b pb-1">
+          <h3 className="text-sm text-neutral-600 font-medium">Location</h3>
+          {shouldHighlightLocation && (
+            <span className="text-xs text-blue-600 animate-pulse">Please enter a location</span>
+          )}
+        </div>
         
         {/* Google Maps Address Autocomplete */}
         <div className="mb-3">
           <AddressAutocomplete
             placeholder="Search for location..."
             defaultValue=""
-            className="w-full mb-2 border border-gray-300 rounded-md py-2 px-3"
+            className={`w-full mb-2 border ${shouldHighlightLocation ? 'border-blue-400 address-input-glow' : 'border-gray-300'} rounded-md py-2 px-3`}
             onAddressSelect={(address, coordinates, placeId) => {
               // Only proceed if we have an address and coordinates
               if (address && coordinates) {

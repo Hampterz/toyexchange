@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Glowing location search animation */
+@keyframes glowingInput {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+}
+
+.address-input-glow {
+  animation: glowingInput 2s infinite;
+  border-radius: 0.375rem;
+}
+
 /* Custom autocomplete styling for Google Maps */
 .pac-container {
   border-radius: 0.75rem !important;
