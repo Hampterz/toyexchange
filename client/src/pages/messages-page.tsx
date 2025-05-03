@@ -168,35 +168,89 @@ export default function MessagesPage() {
   // Block user mutation
   const blockUserMutation = useMutation({
     mutationFn: async (otherUserId: number) => {
-      // In a real app, you would call an API to block the user
+      // Call API to block the user
+      const response = await fetch("/api/user-blocks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          blockedId: otherUserId
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to block user");
+      }
+      
+      const data = await response.json();
+      // Update local state for immediate UI feedback
       setBlockedUsers(prev => [...prev, otherUserId]);
+      return data;
+    },
+    onSuccess: (_, otherUserId) => {
+      // Update UI or refetch data as needed
       toast({
         title: "User blocked",
         description: "You will no longer receive messages from this user",
       });
-      return otherUserId;
-    },
-    onSuccess: (otherUserId) => {
-      // Update UI or refetch data as needed
+      
+      // Invalidate relevant queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["/api/user-blocks"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/messages"] });
+      
       if (selectedUser === otherUserId) {
         const remainingUsers = conversationsData?.filter(
           u => u.id !== otherUserId && u.id !== user?.id && !blockedUsers.includes(u.id)
         );
         setSelectedUser(remainingUsers?.length ? remainingUsers[0].id : null);
       }
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to block user",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
 
   // Mute user mutation
   const muteUserMutation = useMutation({
     mutationFn: async (otherUserId: number) => {
-      // In a real app, you would call an API to mute the user
+      // Call API to mute the user
+      const response = await fetch("/api/user-mutes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          mutedId: otherUserId
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to mute user");
+      }
+      
+      const data = await response.json();
+      // Update local state for immediate UI feedback
       setMutedUsers(prev => [...prev, otherUserId]);
+      return data;
+    },
+    onSuccess: (_, otherUserId) => {
       toast({
         title: "User muted",
         description: "You will no longer receive notifications from this user",
       });
-      return otherUserId;
+      
+      // Invalidate relevant queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["/api/user-mutes"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to mute user",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
   

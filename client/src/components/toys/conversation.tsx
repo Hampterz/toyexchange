@@ -297,68 +297,75 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
                   </div>
                 )}
                 
-                <ContextMenu>
-                  <ContextMenuTrigger>
-                    <div 
-                      className={`max-w-[75%] group relative ${
-                        isSentByMe 
-                          ? 'bg-primary text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
-                          : 'bg-white text-gray-800 border border-gray-200 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
-                      } px-4 py-2`}
-                    >
-                      {/* Delete button for unread messages sent by current user */}
-                      {isSentByMe && !message.read && (
-                        <button
+                <div className="relative group">
+                  {/* Message content */}
+                  <div 
+                    className={`max-w-[75%] group relative ${
+                      isSentByMe 
+                        ? 'bg-primary text-white rounded-tl-lg rounded-tr-lg rounded-bl-lg' 
+                        : 'bg-white text-gray-800 border border-gray-200 rounded-tl-lg rounded-tr-lg rounded-br-lg shadow-sm'
+                    } px-4 py-2`}
+                  >
+                    <p>{message.content}</p>
+                  </div>
+
+                  {/* Three dots menu icon that appears on hover */}
+                  <div 
+                    className="absolute top-0 right-0 transform translate-x-[calc(100%+4px)] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const dropdown = e.currentTarget.nextElementSibling;
+                      if (dropdown) {
+                        dropdown.classList.toggle('hidden');
+                      }
+                    }}
+                  >
+                    <div className="p-1 rounded-full hover:bg-gray-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="5" r="1"></circle>
+                        <circle cx="12" cy="19" r="1"></circle>
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {/* Dropdown menu for message actions */}
+                  <div className="absolute z-10 top-0 right-0 transform translate-x-[calc(100%+24px)] hidden bg-white rounded-md shadow-md border border-gray-200 text-sm">
+                    <ul className="py-1">
+                      {isSentByMe ? (
+                        <li 
+                          className="px-4 py-2 hover:bg-red-50 text-red-600 cursor-pointer flex items-center"
                           onClick={() => {
                             if (window.confirm("Are you sure you want to delete this message?")) {
                               deleteMessageMutation.mutate(message.id);
                             }
                           }}
-                          className="absolute -right-3 -top-3 bg-red-100 hover:bg-red-200 text-red-600 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Delete message"
                         >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </li>
+                      ) : (
+                        <li 
+                          className="px-4 py-2 hover:bg-amber-50 text-amber-600 cursor-pointer flex items-center"
+                          onClick={() => handleReportMessage(message.id)}
+                        >
+                          <Flag className="h-4 w-4 mr-2" />
+                          Report
+                        </li>
                       )}
-                      <p>{message.content}</p>
-                      <div className={`text-xs mt-1 ${isSentByMe ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                        <div className="flex justify-between">
-                          <span>
-                            {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                          </span>
-                          {isSentByMe && (
-                            <span className="text-[10px] pl-2">
-                              {message.read ? "Read" : "Delivered"}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    {isSentByMe ? (
-                      <ContextMenuItem 
-                        onClick={() => {
-                          if (window.confirm("Are you sure you want to delete this message?")) {
-                            deleteMessageMutation.mutate(message.id);
-                          }
-                        }}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Message
-                      </ContextMenuItem>
-                    ) : (
-                      <ContextMenuItem 
-                        onClick={() => handleReportMessage(message.id)} 
-                        className="text-amber-600"
-                      >
-                        <Flag className="h-4 w-4 mr-2" />
-                        Report Message
-                      </ContextMenuItem>
+                    </ul>
+                  </div>
+                  
+                  {/* Timestamp and read status outside the bubble */}
+                  <div className={`text-xs mt-1 px-1 ${isSentByMe ? 'text-right text-gray-500' : 'text-gray-500'}`}>
+                    {message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                    {isSentByMe && (
+                      <span className="ml-2 text-[10px] text-blue-500">
+                        {message.read ? "Read" : "Delivered"}
+                      </span>
                     )}
-                  </ContextMenuContent>
-                </ContextMenu>
+                  </div>
+                </div>
               </div>
             );
           })
