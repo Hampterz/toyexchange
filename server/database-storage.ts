@@ -1280,4 +1280,136 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     }
   }
+  
+  // User blocks
+  async createUserBlock(blockData: InsertUserBlock): Promise<UserBlock> {
+    try {
+      const [block] = await db
+        .insert(userBlocks)
+        .values(blockData)
+        .returning();
+      
+      return block;
+    } catch (error) {
+      console.error("Error creating user block:", error);
+      throw error;
+    }
+  }
+  
+  async deleteUserBlock(blockerId: number, blockedId: number): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(userBlocks)
+        .where(
+          and(
+            eq(userBlocks.blockerId, blockerId),
+            eq(userBlocks.blockedId, blockedId)
+          )
+        );
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting user block:", error);
+      return false;
+    }
+  }
+  
+  async getUserBlocks(blockerId: number): Promise<UserBlock[]> {
+    try {
+      const blocks = await db
+        .select()
+        .from(userBlocks)
+        .where(eq(userBlocks.blockerId, blockerId));
+      
+      return blocks;
+    } catch (error) {
+      console.error("Error getting user blocks:", error);
+      return [];
+    }
+  }
+  
+  async isUserBlocked(blockerId: number, blockedId: number): Promise<boolean> {
+    try {
+      const [block] = await db
+        .select()
+        .from(userBlocks)
+        .where(
+          and(
+            eq(userBlocks.blockerId, blockerId),
+            eq(userBlocks.blockedId, blockedId)
+          )
+        );
+      
+      return !!block;
+    } catch (error) {
+      console.error("Error checking if user is blocked:", error);
+      return false;
+    }
+  }
+  
+  // User mutes
+  async createUserMute(muteData: InsertUserMute): Promise<UserMute> {
+    try {
+      const [mute] = await db
+        .insert(userMutes)
+        .values(muteData)
+        .returning();
+      
+      return mute;
+    } catch (error) {
+      console.error("Error creating user mute:", error);
+      throw error;
+    }
+  }
+  
+  async deleteUserMute(muterId: number, mutedId: number): Promise<boolean> {
+    try {
+      const result = await db
+        .delete(userMutes)
+        .where(
+          and(
+            eq(userMutes.muterId, muterId),
+            eq(userMutes.mutedId, mutedId)
+          )
+        );
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error deleting user mute:", error);
+      return false;
+    }
+  }
+  
+  async getUserMutes(muterId: number): Promise<UserMute[]> {
+    try {
+      const mutes = await db
+        .select()
+        .from(userMutes)
+        .where(eq(userMutes.muterId, muterId));
+      
+      return mutes;
+    } catch (error) {
+      console.error("Error getting user mutes:", error);
+      return [];
+    }
+  }
+  
+  async isUserMuted(muterId: number, mutedId: number): Promise<boolean> {
+    try {
+      const [mute] = await db
+        .select()
+        .from(userMutes)
+        .where(
+          and(
+            eq(userMutes.muterId, muterId),
+            eq(userMutes.mutedId, mutedId)
+          )
+        );
+      
+      return !!mute;
+    } catch (error) {
+      console.error("Error checking if user is muted:", error);
+      return false;
+    }
+  }
 }

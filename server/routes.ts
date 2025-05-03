@@ -636,6 +636,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // User blocks
+  app.post("/api/user-blocks", ensureAuthenticated, async (req, res) => {
+    try {
+      const { blockedId, reason } = req.body;
+      const blockerId = req.user.id;
+      
+      if (!blockedId) {
+        return res.status(400).json({ message: "Blocked user ID is required" });
+      }
+      
+      // Create the block
+      const block = await storage.createUserBlock({
+        blockerId: blockerId,
+        blockedId,
+        reason: reason || null
+      });
+      
+      res.status(201).json(block);
+    } catch (error) {
+      console.error("Error creating user block:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Remove user block
+  app.delete("/api/user-blocks/:blockedId", ensureAuthenticated, async (req, res) => {
+    try {
+      const { blockedId } = req.params;
+      const blockerId = req.user.id;
+      
+      // Delete the block
+      const success = await storage.deleteUserBlock(blockerId, parseInt(blockedId));
+      
+      if (success) {
+        res.json({ message: "User unblocked successfully" });
+      } else {
+        res.status(404).json({ message: "Block not found" });
+      }
+    } catch (error) {
+      console.error("Error removing user block:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Get blocked users for current user
+  app.get("/api/user-blocks", ensureAuthenticated, async (req, res) => {
+    try {
+      const blockerId = req.user.id;
+      
+      // Get all blocks for the current user
+      const blocks = await storage.getUserBlocks(blockerId);
+      
+      // Get details for each blocked user
+      const blockedUsers = await Promise.all(
+        blocks.map(async (block) => {
+          const user = await storage.getUser(block.blockedId);
+          return {
+            ...block,
+            blockedUser: user
+          };
+        })
+      );
+      
+      res.json(blockedUsers);
+    } catch (error) {
+      console.error("Error fetching user blocks:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // User mutes
+  app.post("/api/user-mutes", ensureAuthenticated, async (req, res) => {
+    try {
+      const { mutedId } = req.body;
+      const muterId = req.user.id;
+      
+      if (!mutedId) {
+        return res.status(400).json({ message: "Muted user ID is required" });
+      }
+      
+      // Create the mute
+      const mute = await storage.createUserMute({
+        muterId: muterId,
+        mutedId
+      });
+      
+      res.status(201).json(mute);
+    } catch (error) {
+      console.error("Error creating user mute:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Remove user mute
+  app.delete("/api/user-mutes/:mutedId", ensureAuthenticated, async (req, res) => {
+    try {
+      const { mutedId } = req.params;
+      const muterId = req.user.id;
+      
+      // Delete the mute
+      const success = await storage.deleteUserMute(muterId, parseInt(mutedId));
+      
+      if (success) {
+        res.json({ message: "User unmuted successfully" });
+      } else {
+        res.status(404).json({ message: "Mute not found" });
+      }
+    } catch (error) {
+      console.error("Error removing user mute:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Get muted users for current user
+  app.get("/api/user-mutes", ensureAuthenticated, async (req, res) => {
+    try {
+      const muterId = req.user.id;
+      
+      // Get all mutes for the current user
+      const mutes = await storage.getUserMutes(muterId);
+      
+      // Get details for each muted user
+      const mutedUsers = await Promise.all(
+        mutes.map(async (mute) => {
+          const user = await storage.getUser(mute.mutedId);
+          return {
+            ...mute,
+            mutedUser: user
+          };
+        })
+      );
+      
+      res.json(mutedUsers);
+    } catch (error) {
+      console.error("Error fetching user mutes:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
   // Get reviews for a user (from completed toy requests)
   app.get("/api/users/:userId/reviews", async (req, res) => {
     try {
