@@ -21,7 +21,7 @@ import {
 import session from "express-session";
 import { IStorage, CommunityMetrics, MemStorage } from "./storage";
 import { db, pool, initDatabase } from "./db";
-import { eq, and, desc, sql, asc, or, inArray, like } from "drizzle-orm";
+import { eq, and, desc, sql, asc, or, inArray, like, not } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import { hashPassword } from "./auth";
 import createMemoryStore from "memorystore";
@@ -331,6 +331,13 @@ export class DatabaseStorage implements IStorage {
         if (tagConditions.length > 0) {
           query = query.where(or(...tagConditions));
         }
+      }
+      
+      // Filter out toys from blocked users
+      if (filters.excludeUserIds && Array.isArray(filters.excludeUserIds) && filters.excludeUserIds.length > 0) {
+        query = query.where(
+          not(inArray(toys.userId, filters.excludeUserIds))
+        );
       }
 
       // Distance filter - we'll need to do post-processing for this

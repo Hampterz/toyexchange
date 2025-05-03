@@ -79,6 +79,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: ["active"]
       };
       
+      // If user is authenticated, exclude toys from blocked users
+      if (req.isAuthenticated() && req.user) {
+        // Get blocked users
+        const blockedUsers = await storage.getUserBlocks(req.user.id);
+        if (blockedUsers && blockedUsers.length > 0) {
+          // Extract the IDs of blocked users
+          const blockedUserIds = blockedUsers.map(block => block.blockedId);
+          filters.excludeUserIds = blockedUserIds;
+        }
+      }
+      
       // Allow overriding the status filter if explicitly provided
       if (req.query.status) {
         if (Array.isArray(req.query.status)) {
@@ -171,6 +182,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!toy) {
         return res.status(404).json({ message: "Toy not found" });
+      }
+      
+      // If user is authenticated, check if they've blocked the toy owner
+      if (req.isAuthenticated() && req.user) {
+        const isBlocked = await storage.isUserBlocked(req.user.id, toy.userId);
+        if (isBlocked) {
+          return res.status(403).json({ message: "This toy is unavailable" });
+        }
       }
       
       res.json(toy);
@@ -753,7 +772,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get muted users for current user
   app.get("/api/user-mutes", ensureAuthenticated, async (req, res) => {
     try {
-      const muterId = req.user.id;
+      const muterId = req.user!.id;
       
       // Get all mutes for the current user
       const mutes = await storage.getUserMutes(muterId);
