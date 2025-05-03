@@ -656,6 +656,22 @@ export const insertUserBlockSchema = createInsertSchema(userBlocks).pick({
 export type InsertUserBlock = z.infer<typeof insertUserBlockSchema>;
 export type UserBlock = typeof userBlocks.$inferSelect;
 
+// User mutes for message notifications
+export const userMutes = pgTable("user_mutes", {
+  id: serial("id").primaryKey(),
+  muterId: integer("muter_id").notNull(), // User who initiated the mute
+  mutedId: integer("muted_id").notNull(), // User who is muted
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertUserMuteSchema = createInsertSchema(userMutes).pick({
+  muterId: true,
+  mutedId: true,
+});
+
+export type InsertUserMute = z.infer<typeof insertUserMuteSchema>;
+export type UserMute = typeof userMutes.$inferSelect;
+
 // Wish list model for toy requests
 export const wishes = pgTable("wishes", {
   id: serial("id").primaryKey(),

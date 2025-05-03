@@ -429,6 +429,13 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
                 latitude: undefined,
                 longitude: undefined
               };
+              
+              // Clear any input field for location search
+              const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
+              if (inputEl) {
+                inputEl.value = '';
+              }
+              
               setFilters(updatedFilters);
               onFilterChange(updatedFilters);
               console.log("Cleared all filters including coordinates");
@@ -701,6 +708,13 @@ export function FilterBar({ onFilterChange, initialFilters }: FilterBarProps) {
               latitude: undefined,
               longitude: undefined
             };
+            
+            // Clear any input field for location search
+            const inputEl = document.querySelector('.address-autocomplete-input') as HTMLInputElement;
+            if (inputEl) {
+              inputEl.value = '';
+            }
+            
             setSearchValue("");
             setFilters(updatedFilters);
             onFilterChange(updatedFilters);
