@@ -14,6 +14,8 @@ import {
   safetyTips, type SafetyTip, type InsertSafetyTip,
   wishes, type Wish, type InsertWish,
   wishOffers, type WishOffer, type InsertWishOffer,
+  userBlocks, type UserBlock, type InsertUserBlock,
+  userMutes, type UserMute, type InsertUserMute,
   BADGES 
 } from "@shared/schema";
 import session from "express-session";

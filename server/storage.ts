@@ -14,6 +14,8 @@ import {
   safetyTips, type SafetyTip, type InsertSafetyTip,
   wishes, type Wish, type InsertWish,
   wishOffers, type WishOffer, type InsertWishOffer,
+  userBlocks, type UserBlock, type InsertUserBlock,
+  userMutes, type UserMute, type InsertUserMute,
   BADGES 
 } from "@shared/schema";
 import session from "express-session";
@@ -195,6 +197,18 @@ export interface IStorage {
   savePasswordResetToken(userId: number, token: string, expiry: Date): Promise<User | undefined>;
   getUserByResetToken(token: string): Promise<User | undefined>;
   updatePassword(userId: number, newPassword: string): Promise<User | undefined>;
+  
+  // User blocking functionality
+  createUserBlock(blockData: InsertUserBlock): Promise<UserBlock>;
+  deleteUserBlock(blockerId: number, blockedId: number): Promise<boolean>;
+  getUserBlocks(blockerId: number): Promise<UserBlock[]>;
+  isUserBlocked(blockerId: number, blockedId: number): Promise<boolean>;
+  
+  // User muting functionality
+  createUserMute(muteData: InsertUserMute): Promise<UserMute>;
+  deleteUserMute(muterId: number, mutedId: number): Promise<boolean>;
+  getUserMutes(muterId: number): Promise<UserMute[]>;
+  isUserMuted(muterId: number, mutedId: number): Promise<boolean>;
 
   // Session store
   sessionStore: session.SessionStore;

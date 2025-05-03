@@ -640,7 +640,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/user-blocks", ensureAuthenticated, async (req, res) => {
     try {
       const { blockedId, reason } = req.body;
-      const blockerId = req.user.id;
+      // Using non-null assertion since ensureAuthenticated guarantees req.user exists
+      const blockerId = req.user!.id;
       
       if (!blockedId) {
         return res.status(400).json({ message: "Blocked user ID is required" });
@@ -664,7 +665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/user-blocks/:blockedId", ensureAuthenticated, async (req, res) => {
     try {
       const { blockedId } = req.params;
-      const blockerId = req.user.id;
+      const blockerId = req.user!.id;
       
       // Delete the block
       const success = await storage.deleteUserBlock(blockerId, parseInt(blockedId));
@@ -683,7 +684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get blocked users for current user
   app.get("/api/user-blocks", ensureAuthenticated, async (req, res) => {
     try {
-      const blockerId = req.user.id;
+      const blockerId = req.user!.id;
       
       // Get all blocks for the current user
       const blocks = await storage.getUserBlocks(blockerId);
@@ -710,7 +711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/user-mutes", ensureAuthenticated, async (req, res) => {
     try {
       const { mutedId } = req.body;
-      const muterId = req.user.id;
+      const muterId = req.user!.id;
       
       if (!mutedId) {
         return res.status(400).json({ message: "Muted user ID is required" });
@@ -733,7 +734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/user-mutes/:mutedId", ensureAuthenticated, async (req, res) => {
     try {
       const { mutedId } = req.params;
-      const muterId = req.user.id;
+      const muterId = req.user!.id;
       
       // Delete the mute
       const success = await storage.deleteUserMute(muterId, parseInt(mutedId));
