@@ -513,9 +513,9 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                           
                           <div className="flex space-x-2">
                             <Button 
-                              variant="outline" 
+                              variant="default" 
                               size="sm"
-                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                              className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                               onClick={() => setToyToReactivate(toy.id)}
                               disabled={reactivateToyMutation.isPending}
                             >
@@ -600,12 +600,12 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                           
                           <div className="flex space-x-2">
                             <Button 
-                              variant="outline" 
+                              variant="default" 
                               size="sm"
-                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                              className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                unmarkTradedMutation.mutate(toy.id);
+                                reactivateToyMutation.mutate(toy.id);
                               }}
                               disabled={unmarkTradedMutation.isPending}
                             >
