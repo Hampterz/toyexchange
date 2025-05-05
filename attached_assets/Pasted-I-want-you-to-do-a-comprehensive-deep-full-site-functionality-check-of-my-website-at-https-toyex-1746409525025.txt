@@ -1,0 +1,82 @@
+I want you to do a comprehensive, deep, full-site functionality check of my website at https://toyexchange.replit.app.
+
+✅ I want you to click every single button, every link, every navigation item, every interactive element, every form submission, every dropdown, every input field, every modal, every filter, every slider, and every card on every page.
+
+✅ I want you to visit every single page in the app, including but not limited to:
+
+Home
+
+Browse Toys
+
+Individual Toy Listings
+
+Post a Toy
+
+Edit a Toy
+
+My Listings
+
+Favorites
+
+Profile
+
+Login
+
+Signup
+
+Forgot Password
+
+Reset Password
+
+FAQ
+
+Contact
+
+Admin Panel (if available)
+
+✅ For each page and interaction:
+
+Confirm it loads successfully without console errors
+
+Confirm all buttons work (navigate or perform expected action)
+
+Confirm all forms submit successfully (or with correct validation errors if missing fields)
+
+Confirm no broken links, 404 pages, or missing resources
+
+Confirm all success and error messages show up as expected
+
+Confirm responsive layout works on desktop and mobile sizes
+
+Confirm image uploads work
+
+Confirm video uploads work
+
+Confirm login, logout, signup flows work
+
+Confirm password reset flow works end-to-end (including email link or code validation)
+
+Confirm search and filtering functionality works correctly (no incorrect results or missing data)
+
+Confirm pagination or infinite scroll works if present
+
+Confirm all icons and UI elements display properly (no missing images or broken CSS)
+
+Confirm email notifications (if configured) are actually sent
+
+✅ For each function tested, return:
+
+What was tested
+
+Whether it worked or failed
+
+If failed, return full error message or describe behavior
+
+✅ Be thorough: I expect you to check every single clickable or interactive element anywhere in the UI, including menus, footer links, social share buttons, etc.
+
+🔥 Additional instructions:
+Do not skip anything because it looks similar to another button or link. Even similar-looking elements may behave differently — check each instance individually.
+
+If any interaction relies on a logged-in user state, log in as a test user and repeat the full flow from the logged-in perspective.
+
+When reporting back, list each page and each button/interaction on that page, and whether it passed or failed.
