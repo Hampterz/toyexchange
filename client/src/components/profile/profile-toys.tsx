@@ -470,7 +470,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
               <Card key={toy.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <div className="absolute top-0 left-0 w-full h-full bg-amber-900/10 z-10 flex items-center justify-center">
+                    <div className="absolute top-0 left-0 w-full h-48 sm:h-full bg-amber-900/10 z-10 flex items-center justify-center pointer-events-none">
                       <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-lg font-bold transform -rotate-6 shadow-md">
                         Inactive
                       </div>
@@ -557,7 +557,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
               <Card key={toy.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <div className="absolute top-0 left-0 w-full h-full bg-green-900/10 z-10 flex items-center justify-center">
+                    <div className="absolute top-0 left-0 w-full h-48 sm:h-full bg-green-900/10 z-10 flex items-center justify-center pointer-events-none">
                       <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-lg font-bold transform -rotate-6 shadow-md">
                         Traded
                       </div>
