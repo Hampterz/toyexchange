@@ -61,6 +61,7 @@ import ReportsManagement from "@/pages/admin/reports-management";
 import ContactMessages from "@/pages/admin/contact-messages";
 import SafetyTipsManagement from "@/pages/admin/safety-tips-management";
 import MeetupLocationVerification from "@/pages/admin/meetup-location-verification";
+import TestingTools from "@/pages/testing-tools";
 
 // Layout component that wraps all pages with consistent header/footer
 const Layout = ({ children, showFooter = false }: { children: React.ReactNode, showFooter?: boolean }) => {
@@ -224,6 +225,15 @@ const Router = () => {
       </Route>
       <Route path="/community/leaderboard">
         {() => <Layout><LeaderboardPage /></Layout>}
+      </Route>
+
+      {/* Testing Tools */}
+      <Route path="/testing">
+        {() => (
+          <Layout>
+            <ProtectedRoute path="/testing" component={TestingTools} />
+          </Layout>
+        )}
       </Route>
 
       {/* Admin Pages */}

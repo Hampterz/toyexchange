@@ -603,7 +603,10 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                               variant="outline" 
                               size="sm"
                               className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                              onClick={() => unmarkTradedMutation.mutate(toy.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                unmarkTradedMutation.mutate(toy.id);
+                              }}
                               disabled={unmarkTradedMutation.isPending}
                             >
                               {unmarkTradedMutation.isPending ? (

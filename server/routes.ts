@@ -1981,6 +1981,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test endpoint to create an inactive toy for testing
+  app.post('/api/test/create-inactive-toy', ensureAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Create test toy
+      const newToy = await storage.createToy({
+        userId,
+        title: "Test Inactive Toy",
+        description: "This is a test toy for testing inactive functionality",
+        category: "Testing",
+        ageRange: "3-12",
+        condition: "Good",
+        status: "inactive", // Set to inactive directly
+        images: [],
+        location: req.user!.location || "Test Location",
+        latitude: null,
+        longitude: null,
+        isAvailable: false,
+        tags: ["test", "inactive"],
+        // Set lastActivityDate to 32 days ago to make it inactive
+        lastActivityDate: new Date(Date.now() - 32 * 24 * 60 * 60 * 1000)
+      });
+      
+      res.status(201).json(newToy);
+    } catch (error) {
+      console.error("Error creating test inactive toy:", error);
+      res.status(500).json({ message: "Error creating test inactive toy" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
