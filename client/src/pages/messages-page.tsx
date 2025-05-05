@@ -256,7 +256,7 @@ export default function MessagesPage() {
   
   // View user profile
   const viewUserProfile = (userId: number) => {
-    navigate(`/user-profile/${userId}`);
+    navigate(`/users/${userId}`);
   };
 
   if (!user) {
