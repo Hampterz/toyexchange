@@ -1,0 +1,2 @@
+This is a dummy image file. 
+In a real scenario, use a proper JPG/PNG file by adding it to this directory.
