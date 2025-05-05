@@ -116,9 +116,9 @@ export function ProfileToys({ userId }: ProfileToysProps) {
         familiesConnected: 1 // Increment by 1
       });
       
-      // Update user exchange count
-      await apiRequest("PATCH", `/api/users/${userId}`, {
-        successfulExchanges: 1
+      // Update user exchange count - use the sustainability endpoint with increment
+      await apiRequest("PATCH", `/api/users/${userId}/sustainability`, {
+        successfulExchanges: 1 // This is an increment, not an absolute value
       });
     },
     onSuccess: () => {
@@ -157,9 +157,9 @@ export function ProfileToys({ userId }: ProfileToysProps) {
         familiesConnected: -1 // Decrement by 1
       });
       
-      // Update user exchange count
-      await apiRequest("PATCH", `/api/users/${userId}`, {
-        successfulExchanges: -1
+      // Update user exchange count - use the sustainability endpoint with increment
+      await apiRequest("PATCH", `/api/users/${userId}/sustainability`, {
+        successfulExchanges: -1 // This is a negative increment
       });
     },
     onSuccess: () => {
