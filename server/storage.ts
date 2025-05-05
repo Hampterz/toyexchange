@@ -98,6 +98,7 @@ export interface IStorage {
   getToysByUser(userId: number): Promise<Toy[]>;
   createToy(toy: InsertToy): Promise<Toy>;
   updateToy(id: number, toy: Partial<Toy>): Promise<Toy | undefined>;
+  reactivateToy(id: number): Promise<Toy | undefined>;
   deleteToy(id: number): Promise<boolean>;
 
   // Message CRUD
@@ -484,7 +485,26 @@ export class MemStorage implements IStorage {
     const toy = this.toysMap.get(id);
     if (!toy) return undefined;
     
-    const updatedToy = { ...toy, ...updates };
+    // Set lastActivityDate to current time whenever a toy is updated
+    const updatesWithActivity = {
+      ...updates,
+      lastActivityDate: new Date()
+    };
+    
+    const updatedToy = { ...toy, ...updatesWithActivity };
+    this.toysMap.set(id, updatedToy);
+    return updatedToy;
+  }
+  
+  async reactivateToy(id: number): Promise<Toy | undefined> {
+    const toy = this.toysMap.get(id);
+    if (!toy) return undefined;
+    
+    const updatedToy = { 
+      ...toy, 
+      status: "active", 
+      lastActivityDate: new Date() 
+    };
     this.toysMap.set(id, updatedToy);
     return updatedToy;
   }

@@ -21,7 +21,7 @@ import {
 import session from "express-session";
 import { IStorage, CommunityMetrics, MemStorage } from "./storage";
 import { db, pool, initDatabase } from "./db";
-import { eq, and, desc, sql, asc, or, inArray, like, not } from "drizzle-orm";
+import { eq, and, desc, sql, asc, or, inArray, like, not, gte } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import { hashPassword } from "./auth";
 import createMemoryStore from "memorystore";
@@ -534,10 +534,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateToy(id: number, updates: Partial<Toy>): Promise<Toy | undefined> {
+    // Set lastActivityDate to current time whenever a toy is updated
+    const updatesWithActivity = {
+      ...updates,
+      lastActivityDate: new Date()
+    };
+    
     const [updatedToy] = await db.update(toys)
-      .set(updates)
+      .set(updatesWithActivity)
       .where(eq(toys.id, id))
       .returning();
+    return updatedToy;
+  }
+  
+  // Method to specifically reactivate an inactive toy
+  async reactivateToy(id: number): Promise<Toy | undefined> {
+    // Check if the toy exists and is inactive
+    const toy = await this.getToy(id);
+    if (!toy) {
+      return undefined;
+    }
+    
+    // Update the toy to be active and set lastActivityDate to now
+    const [updatedToy] = await db.update(toys)
+      .set({
+        status: "active",
+        lastActivityDate: new Date()
+      })
+      .where(eq(toys.id, id))
+      .returning();
+    
     return updatedToy;
   }
 
