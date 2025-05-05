@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Edit, Trash2, Tag, Film, Upload } from "lucide-react";
+import { Loader2, Edit, Trash2, Tag, Upload, RefreshCw } from "lucide-react";
 import { HandshakeIcon } from "@/components/ui/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -460,6 +460,93 @@ export function ProfileToys({ userId }: ProfileToysProps) {
           )}
         </TabsContent>
         
+        <TabsContent value="inactive" className="mt-4 space-y-4">
+          {inactiveToys.length === 0 ? (
+            <div className="text-center py-8 bg-amber-50 rounded-lg">
+              <p className="text-amber-700">You don't have any inactive toy listings.</p>
+            </div>
+          ) : (
+            inactiveToys.map(toy => (
+              <Card key={toy.id} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <div className="absolute top-0 left-0 w-full h-full bg-amber-900/10 z-10 flex items-center justify-center">
+                      <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-lg font-bold transform -rotate-6 shadow-md">
+                        Inactive
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row">
+                      <div className="sm:w-1/3 h-48 sm:h-auto bg-neutral-100">
+                        {toy.images && toy.images.length > 0 ? (
+                          <img 
+                            src={toy.images[0]} 
+                            alt={toy.title} 
+                            className="w-full h-full object-cover filter grayscale opacity-75" 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                            <i className="fas fa-image text-4xl"></i>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="p-4 sm:w-2/3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-bold text-lg mb-1">{toy.title}</h3>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              <Badge variant="outline">{toy.category}</Badge>
+                              <Badge variant="outline">Ages {toy.ageRange}</Badge>
+                              <Badge variant="outline">{toy.condition}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
+                          {toy.description}
+                        </p>
+                        
+                        <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-sm text-neutral-500">
+                            <span className="text-amber-700 font-medium">Inactive since:</span> {toy.lastActivityDate ? new Date(toy.lastActivityDate).toLocaleDateString() : 'Unknown date'}
+                          </div>
+                          
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                              onClick={() => setToyToReactivate(toy.id)}
+                              disabled={reactivateToyMutation.isPending}
+                            >
+                              {reactivateToyMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                              )}
+                              Reactivate
+                            </Button>
+
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-red-500"
+                              onClick={() => setToyToDelete(toy.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+        
         <TabsContent value="traded" className="mt-4 space-y-4">
           {tradedToys.length === 0 ? (
             <div className="text-center py-8 bg-green-50 rounded-lg">
@@ -609,6 +696,41 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                 <>
                   <HandshakeIcon className="mr-2 h-4 w-4" />
                   Confirm Trade
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reactivate Toy Dialog */}
+      <AlertDialog open={toyToReactivate !== null} onOpenChange={() => setToyToReactivate(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reactivate Toy</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will make your toy listing active again, and it will appear in search results.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (toyToReactivate !== null) {
+                  reactivateToyMutation.mutate(toyToReactivate);
+                }
+              }}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              {reactivateToyMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Reactivate Toy
                 </>
               )}
             </AlertDialogAction>
