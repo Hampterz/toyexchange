@@ -43,6 +43,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   const [toyToDelete, setToyToDelete] = useState<number | null>(null);
   const [toyToMarkAsTraded, setToyToMarkAsTraded] = useState<number | null>(null);
   const [toyToEdit, setToyToEdit] = useState<Toy | null>(null);
+  const [toyToReactivate, setToyToReactivate] = useState<number | null>(null);
   const [editedToyTitle, setEditedToyTitle] = useState<string>("");
   const [editedToyDescription, setEditedToyDescription] = useState<string>("");
   const [editedToyAgeRange, setEditedToyAgeRange] = useState<string>("");
@@ -181,6 +182,28 @@ export function ProfileToys({ userId }: ProfileToysProps) {
     },
   });
 
+  // Reactivate toy mutation
+  const reactivateToyMutation = useMutation({
+    mutationFn: async (toyId: number) => {
+      await apiRequest("POST", `/api/toys/${toyId}/reactivate`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/toys`] });
+      toast({
+        title: "Toy Reactivated",
+        description: "Your toy listing has been successfully reactivated",
+      });
+      setToyToReactivate(null);
+    },
+    onError: () => {
+      toast({
+        title: "Reactivation Failed",
+        description: "Failed to reactivate the toy. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Edit toy mutation
   const editToyMutation = useMutation({
     mutationFn: async (params: { toyId: number, updates: Partial<Toy> }) => {
@@ -301,6 +324,7 @@ export function ProfileToys({ userId }: ProfileToysProps) {
   // Filter toys based on status
   const activeToys = Array.isArray(toys) ? toys.filter(toy => toy.status === 'active') : [];
   const tradedToys = Array.isArray(toys) ? toys.filter(toy => toy.status === 'traded') : [];
+  const inactiveToys = Array.isArray(toys) ? toys.filter(toy => toy.status === 'inactive') : [];
 
   return (
     <div className="space-y-4">
@@ -310,18 +334,24 @@ export function ProfileToys({ userId }: ProfileToysProps) {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger 
             value="active" 
             className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
           >
-            Active Listings ({activeToys.length})
+            Active ({activeToys.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="inactive" 
+            className="data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700"
+          >
+            Inactive ({inactiveToys.length})
           </TabsTrigger>
           <TabsTrigger 
             value="traded" 
             className="data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
           >
-            Traded Toys ({tradedToys.length})
+            Traded ({tradedToys.length})
           </TabsTrigger>
         </TabsList>
         

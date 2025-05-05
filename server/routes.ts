@@ -277,6 +277,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reactivate an inactive toy
+  app.post("/api/toys/:id/reactivate", ensureAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const toy = await storage.getToy(id);
+      
+      console.log("Reactivate toy request:", { 
+        id,
+        user: req.user?.id
+      });
+      
+      if (!toy) {
+        return res.status(404).json({ message: "Toy not found" });
+      }
+      
+      if (toy.userId !== req.user!.id) {
+        return res.status(403).json({ message: "Not authorized to reactivate this toy" });
+      }
+      
+      const reactivatedToy = await storage.reactivateToy(id);
+      
+      res.json(reactivatedToy);
+    } catch (error) {
+      console.error("Error reactivating toy:", error);
+      res.status(500).json({ message: "Failed to reactivate toy", error: String(error) });
+    }
+  });
+
   // Delete a toy
   app.delete("/api/toys/:id", ensureAuthenticated, async (req, res) => {
     try {
