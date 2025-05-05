@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { ProfileToys } from "@/components/profile/profile-toys";
-import { ProfileRequests } from "@/components/profile/profile-requests";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 
@@ -33,11 +32,7 @@ export default function ProfilePage() {
   });
   const [isAddToyModalOpen, setIsAddToyModalOpen] = useState(false);
 
-  // Get toy requests that user needs to respond to (as an owner)
-  const { data: receivedRequests = [], isLoading: isLoadingReceived } = useQuery<any[]>({
-    queryKey: ["/api/requests/received"],
-    enabled: !!user,
-  });
+  // User data is loaded via useAuth hook
 
   const handleEditProfile = () => {
     setIsEditing(true);
@@ -336,27 +331,10 @@ export default function ProfilePage() {
           
           {/* Content Tabs */}
           <div className="md:w-2/3">
-            <Tabs defaultValue="toys" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="toys" className="click-scale">Your Listings</TabsTrigger>
-                <TabsTrigger value="requests" className="click-scale">
-                  Requests
-                  {receivedRequests?.length > 0 && (
-                    <span className="ml-2 bg-orange-500 text-white text-xs py-0.5 px-2 rounded-full badge-pulse">
-                      {receivedRequests.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="toys" className="mt-4">
-                <ProfileToys userId={user.id} />
-              </TabsContent>
-              
-              <TabsContent value="requests" className="mt-4">
-                <ProfileRequests />
-              </TabsContent>
-            </Tabs>
+            <div className="w-full">
+              <h2 className="text-xl font-semibold mb-4">Your Listings</h2>
+              <ProfileToys userId={user.id} />
+            </div>
           </div>
         </div>
       </div>
