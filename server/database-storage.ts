@@ -234,7 +234,40 @@ export class DatabaseStorage implements IStorage {
   async getToys(filters?: Record<string, any>): Promise<Toy[]> {
     let query = db.select().from(toys).orderBy(desc(toys.createdAt));
     
+    // Auto-hide toys that have been inactive for 31+ days by changing their status to "inactive"
+    // We'll do this automatically as part of the query
+    const thirtyOneDaysAgo = new Date();
+    thirtyOneDaysAgo.setDate(thirtyOneDaysAgo.getDate() - 31);
+    
     if (filters) {
+      // Apply status filter
+      if (filters.status && Array.isArray(filters.status) && filters.status.length > 0) {
+        // If explicitly requesting inactive toys, don't apply the 31-day filter
+        if (!filters.status.includes('inactive')) {
+          // Exclude toys older than 31 days that haven't been updated
+          query = query.where(
+            or(
+              gte(toys.lastActivityDate || toys.createdAt, thirtyOneDaysAgo),
+              inArray(toys.status, filters.status)
+            )
+          );
+        }
+        
+        // Apply the status filter normally
+        query = query.where(inArray(toys.status, filters.status));
+      } else if (filters.status) {
+        // Single status filter
+        query = query.where(eq(toys.status, filters.status));
+        
+        // Only apply the 31-day filter if we're not looking for inactive toys
+        if (filters.status !== 'inactive') {
+          query = query.where(gte(toys.lastActivityDate || toys.createdAt, thirtyOneDaysAgo));
+        }
+      } else {
+        // By default, only return active toys that are not older than 31 days
+        query = query.where(eq(toys.status, "active"));
+        query = query.where(gte(toys.lastActivityDate || toys.createdAt, thirtyOneDaysAgo));
+      }
       // We'll remove the direct location filtering by address/string
       // since we're moving to proper radius-based filtering instead
       // Location will now be filtered in post-processing using distance calculation

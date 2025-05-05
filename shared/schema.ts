@@ -254,6 +254,7 @@ export const toys = pgTable("toys", {
   safetyNotes: text("safety_notes"),
   videos: jsonb("videos").default([]).$type<string[]>(),
   createdAt: timestamp("created_at").defaultNow(),
+  lastActivityDate: timestamp("last_activity_date"),
 });
 
 // Create schema with soldDate explicitly excluded to fix validation issues
