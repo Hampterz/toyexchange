@@ -168,24 +168,31 @@ export default function MessagesPage() {
   // Block user mutation
   const blockUserMutation = useMutation({
     mutationFn: async (otherUserId: number) => {
-      // Call API to block the user
-      const response = await fetch("/api/user-blocks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          blockedId: otherUserId
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to block user");
+      try {
+        // Call API to block the user
+        const response = await fetch("/api/user-blocks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            blockedId: otherUserId,
+            reason: "Blocked from messages page"
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: "Failed to block user" }));
+          throw new Error(errorData.message || "Failed to block user");
+        }
+        
+        const data = await response.json();
+        // Update local state for immediate UI feedback
+        setBlockedUsers(prev => [...prev, otherUserId]);
+        return data;
+      } catch (error) {
+        console.error("Block user error:", error);
+        throw error;
       }
-      
-      const data = await response.json();
-      // Update local state for immediate UI feedback
-      setBlockedUsers(prev => [...prev, otherUserId]);
-      return data;
     },
     onSuccess: (_, otherUserId) => {
       // Update UI or refetch data as needed
@@ -217,24 +224,30 @@ export default function MessagesPage() {
   // Mute user mutation
   const muteUserMutation = useMutation({
     mutationFn: async (otherUserId: number) => {
-      // Call API to mute the user
-      const response = await fetch("/api/user-mutes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          mutedId: otherUserId
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error("Failed to mute user");
+      try {
+        // Call API to mute the user
+        const response = await fetch("/api/user-mutes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            mutedId: otherUserId
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: "Failed to mute user" }));
+          throw new Error(errorData.message || "Failed to mute user");
+        }
+        
+        const data = await response.json();
+        // Update local state for immediate UI feedback
+        setMutedUsers(prev => [...prev, otherUserId]);
+        return data;
+      } catch (error) {
+        console.error("Mute user error:", error);
+        throw error;
       }
-      
-      const data = await response.json();
-      // Update local state for immediate UI feedback
-      setMutedUsers(prev => [...prev, otherUserId]);
-      return data;
     },
     onSuccess: (_, otherUserId) => {
       toast({
