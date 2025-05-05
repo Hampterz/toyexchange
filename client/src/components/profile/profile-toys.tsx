@@ -607,9 +607,9 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                                 e.stopPropagation();
                                 reactivateToyMutation.mutate(toy.id);
                               }}
-                              disabled={unmarkTradedMutation.isPending}
+                              disabled={reactivateToyMutation.isPending}
                             >
-                              {unmarkTradedMutation.isPending ? (
+                              {reactivateToyMutation.isPending ? (
                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                               ) : (
                                 <Tag className="h-4 w-4 mr-2" />
