@@ -45,6 +45,29 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [reportReason, setReportReason] = useState<string>("");
   const [messageToReport, setMessageToReport] = useState<number | null>(null);
+  const [isBlocked, setIsBlocked] = useState(false);
+  
+  // Check if the user is blocked
+  useQuery({
+    queryKey: [`/api/user-blocks/check/${otherUserId}`],
+    enabled: !!otherUserId,
+    queryFn: async () => {
+      try {
+        const res = await fetch(`/api/user-blocks/check/${otherUserId}`, {
+          credentials: 'include'
+        });
+        if (!res.ok) {
+          return false;
+        }
+        const data = await res.json();
+        setIsBlocked(data.isBlocked);
+        return data.isBlocked;
+      } catch (error) {
+        console.error("Error checking block status:", error);
+        return false;
+      }
+    }
+  });
   
   // Get messages between the two users
   const { data: messages, isLoading, refetch } = useQuery<Message[]>({
@@ -374,34 +397,40 @@ export function Conversation({ userId, otherUserId, otherUser }: ConversationPro
       </CardContent>
       
       <CardFooter className="border-t p-3 bg-white">
-        <form onSubmit={handleSendMessage} className="flex w-full space-x-2">
-          <Textarea
-            placeholder="Type a message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => {
-              // Send message on Enter without Shift key
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (newMessage.trim() && !sendMessageMutation.isPending) {
-                  handleSendMessage(e);
+        {isBlocked ? (
+          <div className="w-full text-center py-2 bg-amber-50 text-amber-700 rounded-md border border-amber-200">
+            You cannot send messages to this user because they have blocked you.
+          </div>
+        ) : (
+          <form onSubmit={handleSendMessage} className="flex w-full space-x-2">
+            <Textarea
+              placeholder="Type a message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                // Send message on Enter without Shift key
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (newMessage.trim() && !sendMessageMutation.isPending) {
+                    handleSendMessage(e);
+                  }
                 }
-              }
-            }}
-            className="flex-1 min-h-[50px] max-h-[100px] border-gray-200 focus-visible:ring-primary resize-none"
-          />
-          <Button 
-            type="submit" 
-            className="bg-primary hover:bg-primary/90 self-end rounded-full h-10 w-10 p-0 shadow-md"
-            disabled={!newMessage.trim() || sendMessageMutation.isPending}
-          >
-            {sendMessageMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
-        </form>
+              }}
+              className="flex-1 min-h-[50px] max-h-[100px] border-gray-200 focus-visible:ring-primary resize-none"
+            />
+            <Button 
+              type="submit" 
+              className="bg-primary hover:bg-primary/90 self-end rounded-full h-10 w-10 p-0 shadow-md"
+              disabled={!newMessage.trim() || sendMessageMutation.isPending}
+            >
+              {sendMessageMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </form>
+        )}
       </CardFooter>
 
       {/* Report Message Dialog */}
