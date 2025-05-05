@@ -140,6 +140,46 @@ export function ProfileToys({ userId }: ProfileToysProps) {
       });
     },
   });
+  
+  // Unmark toy as traded mutation
+  const unmarkTradedMutation = useMutation({
+    mutationFn: async (toyId: number) => {
+      // Update the toy status back to active
+      await apiRequest("PATCH", `/api/toys/${toyId}`, { 
+        status: "active",
+        isAvailable: true
+      });
+      
+      // Update the community metrics to decrement toys saved count
+      await apiRequest("PATCH", "/api/community-metrics", {
+        toysSaved: -1, // Decrement by 1
+        familiesConnected: -1 // Decrement by 1
+      });
+      
+      // Update user exchange count
+      await apiRequest("PATCH", `/api/users/${userId}`, {
+        successfulExchanges: -1
+      });
+    },
+    onSuccess: () => {
+      // Invalidate queries to update UI
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}/toys`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/community-metrics'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/users/${userId}`] });
+      
+      toast({
+        title: "Toy Marked as Active",
+        description: "Your toy is now back in active listings.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to reactivate toy. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Edit toy mutation
   const editToyMutation = useMutation({
@@ -436,20 +476,37 @@ export function ProfileToys({ userId }: ProfileToysProps) {
                           {toy.description}
                         </p>
                         
-                        <div className="mt-auto flex items-center justify-between">
+                        <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
                           <div className="text-sm text-neutral-500">
                             <span className="text-green-700 font-medium">Traded on:</span> {toy.createdAt ? new Date(toy.createdAt).toLocaleDateString() : 'Unknown date'}
                           </div>
                           
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="text-red-500"
-                            onClick={() => setToyToDelete(toy.id)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Remove
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                              onClick={() => unmarkTradedMutation.mutate(toy.id)}
+                              disabled={unmarkTradedMutation.isPending}
+                            >
+                              {unmarkTradedMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <Tag className="h-4 w-4 mr-2" />
+                              )}
+                              Mark as Active
+                            </Button>
+
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-red-500"
+                              onClick={() => setToyToDelete(toy.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
