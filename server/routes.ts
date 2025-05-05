@@ -680,6 +680,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Check if a user is blocked
+  app.get("/api/user-blocks/check/:userId", ensureAuthenticated, async (req, res) => {
+    try {
+      const currentUserId = req.user!.id;
+      const checkUserId = parseInt(req.params.userId);
+      
+      if (isNaN(checkUserId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      // Check if the current user is blocked by the other user
+      const otherUserBlocks = await storage.getUserBlocks(checkUserId);
+      const isBlocked = otherUserBlocks.some(block => block.blockedId === currentUserId);
+      
+      res.json({ isBlocked });
+    } catch (error) {
+      console.error("Error checking block status:", error);
+      res.status(500).json({ message: "Failed to check block status", error: String(error) });
+    }
+  });
+  
   // Remove user block
   app.delete("/api/user-blocks/:blockedId", ensureAuthenticated, async (req, res) => {
     try {
