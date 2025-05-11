@@ -4,6 +4,7 @@ This repository includes comprehensive deployment guides for the ToyShare applic
 
 1. [AWS Deployment Guide](#aws-deployment-guide) - For deploying on Amazon Web Services
 2. [Hostinger Deployment Guide](./hostinger-instructions.md) - For deploying on Hostinger web hosting
+3. [Ubuntu Server Deployment Guide](#ubuntu-server-deployment-guide) - For deploying on any Ubuntu server (DigitalOcean, Linode, self-hosted, etc.)
 
 ## AWS Deployment Guide
 
@@ -954,6 +955,310 @@ After completing all the setup steps:
 6. Test the site on mobile devices
 7. Verify all API integrations (Google Maps, OAuth, etc.)
 
+## Ubuntu Server Deployment Guide
+
+This section provides detailed instructions for deploying ToyShare on a Ubuntu server (20.04 or later), such as a VPS from providers like DigitalOcean, Linode, Vultr, or a self-hosted server.
+
+### Initial Server Setup
+
+1. **Connect to Your Server**:
+   ```bash
+   ssh root@your-server-ip
+   ```
+
+2. **Create a New User with Sudo Privileges** (optional but recommended):
+   ```bash
+   # Create a new user
+   adduser toyshare
+   
+   # Add the user to the sudo group
+   usermod -aG sudo toyshare
+   
+   # Switch to the new user
+   su - toyshare
+   ```
+
+3. **Update System Packages**:
+   ```bash
+   sudo apt update
+   sudo apt upgrade -y
+   ```
+
+4. **Install Essential Packages**:
+   ```bash
+   sudo apt install -y build-essential git curl wget unzip htop software-properties-common
+   ```
+
+5. **Configure Firewall**:
+   ```bash
+   sudo apt install -y ufw
+   sudo ufw allow ssh
+   sudo ufw allow http
+   sudo ufw allow https
+   sudo ufw enable
+   ```
+
+### Install Node.js
+
+1. **Install Node.js Using NVM**:
+   ```bash
+   # Install NVM
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+   
+   # Activate NVM
+   export NVM_DIR="$HOME/.nvm"
+   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+   
+   # Install Node.js LTS
+   nvm install --lts
+   nvm use --lts
+   
+   # Verify installation
+   node -v
+   npm -v
+   ```
+
+### Install PostgreSQL
+
+1. **Install PostgreSQL**:
+   ```bash
+   sudo apt install -y postgresql postgresql-contrib
+   ```
+
+2. **Configure PostgreSQL**:
+   ```bash
+   # Access PostgreSQL prompt
+   sudo -u postgres psql
+   
+   # Create a database user with a password
+   CREATE USER toyshare WITH PASSWORD 'your-strong-password';
+   
+   # Create a database
+   CREATE DATABASE toyshare;
+   
+   # Grant privileges to the user
+   GRANT ALL PRIVILEGES ON DATABASE toyshare TO toyshare;
+   
+   # Exit PostgreSQL
+   \q
+   ```
+
+3. **Note Your Database Connection String**:
+   ```
+   postgresql://toyshare:your-strong-password@localhost:5432/toyshare
+   ```
+
+### Deploy the ToyShare Application
+
+1. **Clone the Repository**:
+   ```bash
+   # Navigate to home directory
+   cd ~
+   
+   # Clone the repository
+   git clone https://github.com/your-repo/toyshare.git
+   
+   # Go to the project directory
+   cd toyshare
+   ```
+
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Create Environment Variables**:
+   ```bash
+   # Create .env file
+   nano .env
+   ```
+   
+   Add the following content (replace with your actual values):
+   ```
+   DATABASE_URL=postgresql://toyshare:your-strong-password@localhost:5432/toyshare
+   VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+   VITE_GOOGLE_OAUTH_CLIENT_ID=your-google-oauth-client-id
+   EMAIL_USER=your-email-address
+   EMAIL_PASS=your-email-password
+   ```
+
+4. **Set Up the Database**:
+   ```bash
+   # Push schema to the database
+   npx drizzle-kit push
+   # Or if you have a script in package.json
+   npm run db:push
+   ```
+
+5. **Build the Application**:
+   ```bash
+   npm run build
+   ```
+
+6. **Install PM2 and Start the Application**:
+   ```bash
+   # Install PM2 globally
+   npm install -g pm2
+   
+   # Start the application
+   pm2 start npm --name "toyshare" -- run start
+   
+   # Configure PM2 to start on system reboot
+   pm2 startup
+   
+   # Save the current process list
+   pm2 save
+   
+   # Check the status
+   pm2 status
+   ```
+
+### Set Up Nginx as a Reverse Proxy
+
+1. **Install Nginx**:
+   ```bash
+   sudo apt install -y nginx
+   ```
+
+2. **Configure Nginx for ToyShare**:
+   ```bash
+   sudo nano /etc/nginx/sites-available/toyshare
+   ```
+   
+   Add the following configuration:
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com www.your-domain.com;
+       
+       location / {
+           proxy_pass http://localhost:3000;  # Adjust port if different
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+       
+       # Increase max upload size
+       client_max_body_size 10M;
+   }
+   ```
+
+3. **Enable the Site**:
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/toyshare /etc/nginx/sites-enabled/
+   sudo rm /etc/nginx/sites-enabled/default
+   sudo nginx -t
+   sudo systemctl restart nginx
+   ```
+
+### Set Up SSL with Let's Encrypt
+
+1. **Install Certbot**:
+   ```bash
+   sudo apt install -y certbot python3-certbot-nginx
+   ```
+
+2. **Obtain SSL Certificate**:
+   ```bash
+   sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+   ```
+   
+   Follow the prompts to complete the certificate setup.
+
+3. **Verify Auto-Renewal**:
+   ```bash
+   sudo certbot renew --dry-run
+   ```
+
+### Domain Configuration
+
+1. **Configure Your Domain's DNS**:
+   - Go to your domain registrar's DNS settings
+   - Create an A record that points to your server's IP address:
+     ```
+     Type: A
+     Name: @ (or blank for root domain)
+     Value: your-server-ip
+     ```
+   - Create another A record for "www" subdomain:
+     ```
+     Type: A
+     Name: www
+     Value: your-server-ip
+     ```
+
+2. **Wait for DNS Propagation**:
+   - DNS changes can take 24-48 hours to propagate worldwide
+   - During this time, you can check the status using commands like:
+   ```bash
+   dig your-domain.com
+   ```
+
+### Final Checks
+
+1. **Test Your Application**:
+   - Visit your domain in a browser (https://your-domain.com)
+   - Verify that all functions are working properly
+   - Test user registration, login, and toy listing creation
+
+2. **Set Up Monitoring and Backup**:
+   ```bash
+   # Simple cron job for database backup
+   sudo crontab -e
+   ```
+   
+   Add the following line to back up the database daily at 2 AM:
+   ```
+   0 2 * * * pg_dump -U toyshare toyshare > /home/toyshare/backups/toyshare_db_$(date +\%Y\%m\%d).sql
+   ```
+
+### Maintenance Tasks
+
+1. **Updating the Application**:
+   ```bash
+   cd ~/toyshare
+   git pull
+   npm install
+   npm run build
+   pm2 restart toyshare
+   ```
+
+2. **Checking Logs**:
+   ```bash
+   # Application logs
+   pm2 logs toyshare
+   
+   # Nginx logs
+   sudo tail -f /var/log/nginx/access.log
+   sudo tail -f /var/log/nginx/error.log
+   ```
+
+3. **Server Monitoring**:
+   ```bash
+   # Check system resources
+   htop
+   
+   # Check disk space
+   df -h
+   ```
+
+4. **Restarting Services**:
+   ```bash
+   # Restart Node.js application
+   pm2 restart toyshare
+   
+   # Restart Nginx
+   sudo systemctl restart nginx
+   
+   # Restart PostgreSQL
+   sudo systemctl restart postgresql
+   ```
+
 ## References and Additional Resources
 
 - [AWS Documentation](https://docs.aws.amazon.com/)
@@ -962,5 +1267,7 @@ After completing all the setup steps:
 - [Nginx Documentation](https://nginx.org/en/docs/)
 - [Let's Encrypt Documentation](https://letsencrypt.org/docs/)
 - [PM2 Documentation](https://pm2.keymetrics.io/docs/usage/quick-start/)
+- [Ubuntu Server Documentation](https://ubuntu.com/server/docs)
+- [DigitalOcean Documentation](https://docs.digitalocean.com/)
 
 If you encounter any issues not covered in this guide, please contact the ToyShare development team for assistance.
