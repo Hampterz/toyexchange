@@ -30,7 +30,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Configure multer storage for file uploads
   const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      const uploadDir = process.env.UPLOADS_DIR || path.join(process.cwd(), 'uploads');
       // Create directory if it doesn't exist
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });

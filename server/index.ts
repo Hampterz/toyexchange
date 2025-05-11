@@ -1,6 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import dotenv from 'dotenv';
+import path from 'path';
+import * as fs from 'fs';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -36,6 +42,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = process.env.UPLOADS_DIR || './uploads';
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(uploadsDir));
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -44,7 +59,7 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    console.error(err);
   });
 
   // importantly only setup vite in development and after
@@ -56,14 +71,11 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // In development use port 5000, in production use PORT env var or 3000
+  const port = process.env.NODE_ENV === 'development' ? 5000 : (process.env.PORT || 3000);
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
   });

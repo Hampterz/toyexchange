@@ -276,6 +276,7 @@ export const insertToySchema = createInsertSchema(toys)
     recommendedAges: true,
     safetyNotes: true,
     videos: true,
+    lastActivityDate: true,
   })
   .extend({
     // Add category field that's still in database but no longer in UI
